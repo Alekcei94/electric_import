@@ -5,6 +5,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.database.topology.NodeInst;
 import java.io.File;
 import org.junit.After;

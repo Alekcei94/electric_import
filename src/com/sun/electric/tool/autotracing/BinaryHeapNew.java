@@ -17,24 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.autotracing;
 
-import com.sun.electric.tool.dcs.Pair;
 import java.util.ArrayList;
 
 /**
  * This class implements typical BinaryHeap functionality and is used as is.
  * Value sorting was added as extension to basic functionality.
- * 0 11 2222 3333333 tree.
  */
-public class BinaryHeap {
+public class BinaryHeapNew {
 
     private ArrayList<Pair<Integer, Integer>> pairList;
 
     /**
-     * Constructor of heap.
+     *
      */
-    public BinaryHeap() {
+    public BinaryHeapNew() {
         pairList = new ArrayList<>();
     }
 
@@ -47,7 +45,7 @@ public class BinaryHeap {
 
     /**
      * Method to add element to heap, Method is using key-value pair as element.
-     * Replacing value of pair if it's less than original.
+     *
      * @param value
      * @param key
      */
@@ -69,13 +67,22 @@ public class BinaryHeap {
         } else {
             Pair<Integer, Integer> pair = new Pair<>(key, value);
             pairList.add(pair);
-            heapifyUp(getKeyHeapSize() - 1);
+
+            int i = getKeyHeapSize() - 1;
+            int parent = (i - 1) / 2;
+
+            while (i > 0 && pairList.get(parent).getSecondObject() > pairList.get(i).getSecondObject()) {
+                Pair<Integer, Integer> tempPair = pairList.get(i);
+                pairList.set(i, pairList.get(parent));
+                pairList.set(parent, tempPair);
+
+                i = parent;
+                parent = (i - 1) / 2;
+                
+            }
         }
     }
 
-    /**
-     * Reestablish heap property for element (going only up from its position).
-     */
     private void heapifyUp(int i) {
         if (i == 0) {
             return;
@@ -93,10 +100,9 @@ public class BinaryHeap {
     }
 
     /**
-     * Reestablish heap property for element (going only down from its position).
-     * heapifyDown is used when we're deleting minimum element.
+     * Typical heapify with key comparator.
      */
-    private void heapifyDown(int i) {
+    private void heapifyWithKey(int i) {
         int leftChild;
         int rightChild;
         int largestChild;
@@ -127,11 +133,11 @@ public class BinaryHeap {
     }
 
     /**
-     * Method to pop value of element with minimum key.
-     * 
+     * Method to get minimum key of elements.
+     *
      * @return
      */
-    public int getValueOfMinKeyElement() {
+    public int getMinKey() {
         if (getKeyHeapSize() == 0) {
             return -1;
         }
@@ -140,7 +146,7 @@ public class BinaryHeap {
         pairList.set(0, pairList.get(getKeyHeapSize() - 1));
         pairList.remove(getKeyHeapSize() - 1);
         
-        heapifyDown(0);
+        heapifyWithKey(0);
         return result;
     }
 

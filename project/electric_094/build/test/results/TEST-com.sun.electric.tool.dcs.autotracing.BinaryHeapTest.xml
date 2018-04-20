@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="DCS004-PC" name="com.sun.electric.tool.dcs.autotracing.BinaryHeapTest" skipped="0" tests="1" time="0.066" timestamp="2018-04-12T09:27:31">
+<testsuite errors="0" failures="0" hostname="DCS004-PC" name="com.sun.electric.tool.dcs.autotracing.BinaryHeapTest" skipped="0" tests="1" time="0.055" timestamp="2018-04-13T09:47:55">
   <properties>
     <property name="libs.jsp-compiler.javadoc" value="" />
     <property name="netbeans.autoupdate.country" value="RU" />
     <property name="nb.wait.for.caches" value="true" />
-    <property name="javac.test.classpath" value="C:\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar" />
+    <property name="javac.test.classpath" value="C:\electric_sources\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar" />
     <property name="libs.jsf20.maven-pom" value="" />
     <property name="manifest.custom.codebase" value="" />
     <property name="libs.spring-webmvc4.0.src" value="" />
@@ -12,7 +12,7 @@
     <property name="manifest.custom.application.library.allowable.codebase" value="" />
     <property name="javadoc.windowtitle" value="" />
     <property name="libs.jsp-compilation.javadoc" value="" />
-    <property name="user.dir" value="C:\electric_source_094\project\electric_094" />
+    <property name="user.dir" value="C:\electric_sources\electric_source_094\project\electric_094" />
     <property name="libs.javaee-api-7.0.src" value="" />
     <property name="java.vm.version" value="25.161-b12" />
     <property name="libs.MySQLDriver.classpath" value="C:\Program Files\NetBeans 8.2\ide\modules\ext\mysql-connector-java-5.1.23-bin.jar" />
@@ -34,7 +34,7 @@
     <property name="nb.show.statistics.ui" value="usageStatisticsEnabled" />
     <property name="netbeans.autoupdate.variant" value="" />
     <property name="have.tests" value="true" />
-    <property name="test.Tests.dir" value="C:\electric_source_094\Tests" />
+    <property name="test.Tests.dir" value="C:\electric_sources\electric_source_094\Tests" />
     <property name="org.xml.sax.driver" value="com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser" />
     <property name="libs.hamcrest.classpath" value="C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar" />
     <property name="libs.javac-api.javadoc" value="" />
@@ -59,7 +59,7 @@
     <property name="copylibs.rebase" value="true" />
     <property name="libs.spring-webmvc3.0.maven-pom" value="" />
     <property name="libs.swing-layout.maven-pom" value="" />
-    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner com.sun.electric.tool.dcs.autotracing.BinaryHeapTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false showoutput=true outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\electric_source_094\project\electric_094\build\test\results\TEST-com.sun.electric.tool.dcs.autotracing.BinaryHeapTest.xml crashfile=C:\electric_source_094\project\electric_094\build\junitvmwatcher1680432150214101682.properties propsfile=C:\electric_source_094\project\electric_094\build\junit5651589717286767345.properties" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner com.sun.electric.tool.dcs.autotracing.BinaryHeapTest skipNonTests=false filtertrace=true haltOnError=false haltOnFailure=false showoutput=true outputtoformatters=true logfailedtests=true threadid=0 logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,C:\electric_sources\electric_source_094\project\electric_094\build\test\results\TEST-com.sun.electric.tool.dcs.autotracing.BinaryHeapTest.xml crashfile=C:\electric_sources\electric_source_094\project\electric_094\build\junitvmwatcher6116835974566023403.properties propsfile=C:\electric_sources\electric_source_094\project\electric_094\build\junit9052020780469749901.properties" />
     <property name="build.classes.dir" value="build/classes" />
     <property name="netbeans.accept_license_class" value="org.netbeans.license.AcceptLicense" />
     <property name="jnlp.descriptor" value="application" />
@@ -74,7 +74,7 @@
     <property name="user.country" value="RU" />
     <property name="manifest.file" value="manifest.mf" />
     <property name="javadoc.encoding" value="UTF-8" />
-    <property name="javac.classpath" value="C:\electric_source_094\ext" />
+    <property name="javac.classpath" value="C:\electric_sources\electric_source_094\ext" />
     <property name="libs.jsp-compilation-syscp.src" value="" />
     <property name="libs.JAVADB_DRIVER_LABEL.src" value="" />
     <property name="libs.spring-framework400.classpath" value="C:\Program Files\NetBeans 8.2\ide\modules\org-apache-commons-logging.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\cglib-2.2.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-aop-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-aspects-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-beans-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-build-src-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-context-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-context-support-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-core-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-expression-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-framework-bom-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-instrument-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-instrument-tomcat-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-jdbc-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-jms-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-messaging-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-orm-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-oxm-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-test-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-tx-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-web-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-webmvc-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-webmvc-portlet-4.0.1.RELEASE.jar;C:\Program Files\NetBeans 8.2\java\modules\ext\spring-4\spring-websocket-4.0.1.RELEASE.jar" />
@@ -83,6 +83,7 @@
     <property name="build.compiler.emacs" value="true" />
     <property name="libs.javaee-web-api-6.0.src" value="" />
     <property name="libs.jsp-compilation-syscp.classpath" value="C:\Program Files\NetBeans 8.2\extide\ant\lib\ant.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\servlet3.1-jsp2.3-api.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\glassfish-jspparser-4.0.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\jstl-impl.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\jsf-2_2\javax.faces.jar" />
+    <property name="nu.validator.checker.imageCandidateString.hasWidth" value="0" />
     <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.8.0_161\jre\lib\endorsed" />
     <property name="libs.Comet-GlassFish-v3.maven-pom" value="" />
     <property name="netbeans.dynamic.classpath" value="C:\Program Files\NetBeans 8.2\platform\core\asm-all-5.0.1.jar;C:\Program Files\NetBeans 8.2\platform\core\core-base.jar;C:\Program Files\NetBeans 8.2\platform\core\core.jar;C:\Program Files\NetBeans 8.2\platform\core\org-netbeans-libs-asm.jar;C:\Program Files\NetBeans 8.2\platform\core\org-openide-filesystems-compat8.jar;C:\Program Files\NetBeans 8.2\platform\core\org-openide-filesystems.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core-base_ja.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core-base_pt_BR.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core-base_ru.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core-base_zh_CN.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core_ja.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core_pt_BR.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core_ru.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\core_zh_CN.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-netbeans-libs-asm_ja.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-netbeans-libs-asm_pt_BR.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-netbeans-libs-asm_ru.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-netbeans-libs-asm_zh_CN.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems-compat8_ja.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems-compat8_pt_BR.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems-compat8_ru.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems-compat8_zh_CN.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems_ja.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems_pt_BR.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems_ru.jar;C:\Program Files\NetBeans 8.2\platform\core\locale\org-openide-filesystems_zh_CN.jar;C:\Program Files\NetBeans 8.2\nb\core\org-netbeans-upgrader.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\core_nb.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\core_nb_ja.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\core_nb_pt_BR.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\core_nb_ru.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\core_nb_zh_CN.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\org-netbeans-upgrader_ja.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\org-netbeans-upgrader_pt_BR.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\org-netbeans-upgrader_ru.jar;C:\Program Files\NetBeans 8.2\nb\core\locale\org-netbeans-upgrader_zh_CN.jar" />
@@ -106,7 +107,7 @@
     <property name="libs.Java-EE-GlassFish-v3-Prelude.maven-pom" value="" />
     <property name="libs.junit_4.maven-pom" value="" />
     <property name="mkdist.disabled" value="false" />
-    <property name="javac.test.processorpath" value="C:\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar" />
+    <property name="javac.test.processorpath" value="C:\electric_sources\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar" />
     <property name="netbeans.buildnumber" value="201609300101" />
     <property name="libs.JWSAntTasks.javadoc" value="" />
     <property name="build.generated.sources.dir" value="build/generated-sources" />
@@ -130,12 +131,12 @@
     <property name="libs.spring-framework400.src" value="" />
     <property name="libs.PostgreSQLDriver.src" value="" />
     <property name="sun.arch.data.model" value="64" />
-    <property name="basedir" value="C:\electric_source_094\project\electric_094" />
+    <property name="basedir" value="C:\electric_sources\electric_source_094\project\electric_094" />
     <property name="libs.jpa20-persistence.maven-pom" value="" />
     <property name="jar.compress" value="true" />
     <property name="libs.javaee-web-api-7.0.classpath" value="C:\Program Files\NetBeans 8.2\enterprise\modules\ext\javaee-web-api-7.0.jar" />
     <property name="path.separator" value=";" />
-    <property name="ant.file.electric_094-impl" value="C:\electric_source_094\project\electric_094\nbproject\build-impl.xml" />
+    <property name="ant.file.electric_094-impl" value="C:\electric_sources\electric_source_094\project\electric_094\nbproject\build-impl.xml" />
     <property name="libs.javaee-web-api-6.0.javadoc" value="C:\Program Files\NetBeans 8.2\enterprise\docs\javaee-doc-api.jar" />
     <property name="ant.junit.enabletestlistenerevents" value="true" />
     <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
@@ -152,7 +153,7 @@
     <property name="manifest.available" value="true" />
     <property name="libs.primefaces.javadoc" value="" />
     <property name="libs.spring-framework300.maven-pom" value="" />
-    <property name="run.test.classpath" value="C:\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar:build/test/classes" />
+    <property name="run.test.classpath" value="C:\electric_sources\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar:build/test/classes" />
     <property name="ant.project.invoked-targets" value="test" />
     <property name="test.binaryexcludes" value="" />
     <property name="libs.swing-layout.javadoc" value="C:\Program Files\NetBeans 8.2\platform\docs\swing-layout-1.0.4-doc.zip" />
@@ -176,7 +177,7 @@
     <property name="libs.spring-webmvc4.0.maven-pom" value="" />
     <property name="libs.spring-framework300.src" value="" />
     <property name="libs.jstl.src" value="" />
-    <property name="empty.dir" value="C:\electric_source_094\project\electric_094\build\empty" />
+    <property name="empty.dir" value="C:\electric_sources\electric_source_094\project\electric_094\build\empty" />
     <property name="version-output" value="java version &quot;1.8" />
     <property name="test.binarytestincludes" value="" />
     <property name="libs.hibernate4-persistencemodelgen.src" value="" />
@@ -185,7 +186,7 @@
     <property name="nbplatform.default.harness.dir" value="C:\Program Files\NetBeans 8.2/harness" />
     <property name="java.home" value="C:\Program Files\Java\jdk1.8.0_161\jre" />
     <property name="libs.jsp-compilation.src" value="" />
-    <property name="debug.test.classpath" value="C:\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar:build/test/classes" />
+    <property name="debug.test.classpath" value="C:\electric_sources\electric_source_094\ext:build/classes:C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar:C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar:build/test/classes" />
     <property name="libs.javaee-endorsed-api-6.0.classpath" value="C:\Program Files\NetBeans 8.2\enterprise\modules\ext\javaee6-endorsed\javax.annotation.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\javaee6-endorsed\jaxb-api-osgi.jar;C:\Program Files\NetBeans 8.2\enterprise\modules\ext\javaee6-endorsed\webservices-api-osgi.jar" />
     <property name="libs.javaee-api-6.0.src" value="" />
     <property name="netbeans.importclass" value="org.netbeans.upgrade.AutoUpgrade" />
@@ -201,7 +202,7 @@
     <property name="libs.junit_4.javadoc" value="C:\Program Files\NetBeans 8.2\platform\docs\junit-4.12-javadoc.jar" />
     <property name="libs.EclipseLink-GlassFish-v3.maven-pom" value="" />
     <property name="libs.javaee-web-api-6.0.maven-pom" value="" />
-    <property name="run.classpath" value="C:\electric_source_094\ext:build/classes" />
+    <property name="run.classpath" value="C:\electric_sources\electric_source_094\ext:build/classes" />
     <property name="jna.boot.library.name" value="jnidispatch-422" />
     <property name="libs.javaee-endorsed-api-6.0.javadoc" value="C:\Program Files\NetBeans 8.2\enterprise\docs\javaee-doc-api.jar" />
     <property name="libs.javaee-api-7.0.classpath" value="C:\Program Files\NetBeans 8.2\enterprise\modules\ext\javaee-api-7.0.jar" />
@@ -217,10 +218,10 @@
     <property name="javadoc.use" value="true" />
     <property name="sun.java2d.noddraw" value="true" />
     <property name="libs.jsp-compiler.classpath" value="C:\Program Files\NetBeans 8.2\enterprise\ant\extra\jspcompile.jar" />
-    <property name="javac.processorpath" value="C:\electric_source_094\ext" />
+    <property name="javac.processorpath" value="C:\electric_sources\electric_source_094\ext" />
     <property name="libs.hamcrest.maven-pom" value="" />
     <property name="javac.compilerargs" value="" />
-    <property name="ant.file" value="C:\electric_source_094\project\electric_094\build.xml" />
+    <property name="ant.file" value="C:\electric_sources\electric_source_094\project\electric_094\build.xml" />
     <property name="libs.beans-binding.maven-pom" value="" />
     <property name="jnlp.codebase.type" value="no.codebase" />
     <property name="libs.hibernate4-support.javadoc" value="C:\Program Files\NetBeans 8.2\java\modules\ext\docs\javax.persistence-2.1.0-doc.zip" />
@@ -233,7 +234,7 @@
     <property name="libs.swing-layout.src" value="C:\Program Files\NetBeans 8.2\platform\docs\swing-layout-1.0.4-src.zip" />
     <property name="org.openide.major.version" value="IDE/1" />
     <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM" />
-    <property name="ant.file.electric_094" value="C:\electric_source_094\project\electric_094\build.xml" />
+    <property name="ant.file.electric_094" value="C:\electric_sources\electric_source_094\project\electric_094\build.xml" />
     <property name="netbeans.user" value="C:\Users\diivanov\AppData\Roaming\NetBeans\8.2" />
     <property name="javadoc.additionalparam" value="" />
     <property name="jnlp.offline-allowed" value="false" />
@@ -247,7 +248,7 @@
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_161\jre\bin" />
     <property name="have.sources" value="true" />
     <property name="libs.hamcrest.javadoc" value="" />
-    <property name="debug.classpath" value="C:\electric_source_094\ext:build/classes" />
+    <property name="debug.classpath" value="C:\electric_sources\electric_source_094\ext:build/classes" />
     <property name="javac.external.vm" value="true" />
     <property name="javadoc.private" value="false" />
     <property name="libs.jsf20.classpath" value="C:\Program Files\NetBeans 8.2\enterprise\modules\ext\jsf-2_2\javax.faces.jar" />
@@ -256,7 +257,6 @@
     <property name="javadoc.encoding.used" value="UTF-8" />
     <property name="dist.jar" value="dist/electric_094.jar" />
     <property name="libs.spring-framework400.maven-pom" value="" />
-    <property name="netbeans.automatic.build" value="true" />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
     <property name="ant.project.name" value="electric_094" />
     <property name="netbeans.hash.code" value="unique=NB_EXTIDE_GFMOD_JAVA_TOMCAT_WEBCOMMON_WEBEE05a20e9f0-71c4-4cf3-9d25-7b02e2785319_c264ed50-c233-42e6-9c26-e4c01d50749f" />
@@ -295,16 +295,16 @@
     <property name="libs.eclipselinkmodelgen.javadoc" value="" />
     <property name="libs.metro.javadoc" value="C:\Program Files\NetBeans 8.2\enterprise\docs\metro-1.4-doc.zip" />
     <property name="libs.struts.maven-pom" value="" />
-    <property name="file.reference.electric_source_094-electric_source_085_ext" value="C:\electric_source_094\ext" />
+    <property name="file.reference.electric_source_094-electric_source_085_ext" value="C:\electric_sources\electric_source_094\ext" />
     <property name="netbeans.home+have.tests" value="true" />
     <property name="annotation.processing.processor.options" value="" />
     <property name="libs.testng.maven-pom" value="" />
     <property name="libs.jaxb.src" value="" />
     <property name="jdk.launcher.addexports.5" value="java.management/sun.management=ALL-UNNAMED" />
     <property name="jdk.launcher.addexports.4" value="java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED" />
-    <property name="file.reference.electric_source_094-Tests" value="C:\electric_source_094\Tests" />
+    <property name="file.reference.electric_source_094-Tests" value="C:\electric_sources\electric_source_094\Tests" />
     <property name="jdk.launcher.addexports.3" value="java.desktop/sun.awt.im=ALL-UNNAMED" />
-    <property name="work.dir" value="C:\electric_source_094\project\electric_094" />
+    <property name="work.dir" value="C:\electric_sources\electric_source_094\project\electric_094" />
     <property name="jdk.launcher.addexports.2" value="java.desktop/java.awt.peer=ALL-UNNAMED" />
     <property name="libs.jaxb.classpath" value="C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\jaxb-impl.jar;C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\jaxb-xjc.jar;C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\jaxb1-impl.jar;C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\activation.jar;C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\api\jaxb-api.jar;C:\Program Files\NetBeans 8.2\ide\modules\ext\jaxb\api\jsr173_1.0_api.jar" />
     <property name="jdk.launcher.addexports.1" value="java.base/jdk.internal.jrtfs=ALL-UNNAMED" />
@@ -326,7 +326,7 @@
     <property name="junit.forkmode" value="perTest" />
     <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.8.0_161\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_161\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_161\jre\classes" />
     <property name="javac.target" value="1.8" />
-    <property name="built-jar.properties" value="C:\electric_source_094\project\electric_094\build\built-jar.properties" />
+    <property name="built-jar.properties" value="C:\electric_sources\electric_source_094\project\electric_094\build\built-jar.properties" />
     <property name="build.test.classes.dir" value="build/test/classes" />
     <property name="sun.awt.keepWorkingSetOnMinimize" value="true" />
     <property name="libs.jpa2-persistence.src" value="" />
@@ -372,7 +372,7 @@
     <property name="libs.restlib.maven-pom" value="" />
     <property name="libs.jpa2-persistence.javadoc" value="C:\Program Files\NetBeans 8.2\java\modules\ext\docs\javax.persistence-2.1.0-doc.zip" />
     <property name="apple.laf.useScreenMenuBar" value="true" />
-    <property name="java.class.path" value="C:\electric_source_094\ext;C:\electric_source_094\project\electric_094\build\classes;C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar;C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar;C:\electric_source_094\project\electric_094\build\test\classes;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-launcher.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-junit.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-junit4.jar" />
+    <property name="java.class.path" value="C:\electric_sources\electric_source_094\ext;C:\electric_sources\electric_source_094\project\electric_094\build\classes;C:\Program Files\NetBeans 8.2\platform\modules\ext\junit-4.12.jar;C:\Program Files\NetBeans 8.2\platform\modules\ext\hamcrest-core-1.3.jar;C:\electric_sources\electric_source_094\project\electric_094\build\test\classes;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-launcher.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-junit.jar;C:\Program Files\NetBeans 8.2\extide\ant\lib\ant-junit4.jar" />
     <property name="do.mkdist" value="true" />
     <property name="libs.absolutelayout.src" value="" />
     <property name="libs.jpa20-persistence.classpath" value="C:\Program Files\NetBeans 8.2\java\modules\ext\eclipselink\javax.persistence_2.1.0.v201304241213.jar" />
@@ -427,7 +427,7 @@
     <property name="awt.toolkit" value="sun.awt.windows.WToolkit" />
     <property name="libs.javaee-web-api-7.0.javadoc" value="C:\Program Files\NetBeans 8.2\enterprise\docs\javaee-doc-api.jar" />
   </properties>
-  <testcase classname="com.sun.electric.tool.dcs.autotracing.BinaryHeapTest" name="testGetKeyOfMinValueElement" time="0.002" />
+  <testcase classname="com.sun.electric.tool.dcs.autotracing.BinaryHeapTest" name="testGetValueOfMinKeyElement" time="0.002" />
   <system-out><![CDATA[getKeyOfMinValueElement
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>

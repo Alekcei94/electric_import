@@ -18,9 +18,10 @@ public class BinaryHeapTest {
      * Test of getKeyOfMinValueElement method, of class BinaryHeap.
      */
     @Test
-    public void testGetKeyOfMinValueElement() {
+    public void testGetValueOfMinKeyElement() {
         System.out.println("getKeyOfMinValueElement");
         BinaryHeap heap = new BinaryHeap();
+        // value, key.
         heap.add(141, 0);
         heap.add(183, 15);
         heap.add(84, 31);

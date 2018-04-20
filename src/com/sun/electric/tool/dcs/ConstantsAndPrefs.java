@@ -17,9 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.dcs;
 
 import com.sun.electric.database.text.Pref;
+import com.sun.electric.tool.dcs.autotracing.Autotracing;
 import java.io.File;
 import java.io.IOException;
 
@@ -29,12 +30,12 @@ import java.io.IOException;
  */
 public class ConstantsAndPrefs {
 
-    /*
+    /**
     * Pref shows user choice about should app draw line between ports of key when cursor is nearby or not.
     */
     private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
             Autotracing.getAutotracingTool().prefs, false);
-    /*
+    /**
     * Pref shows user choice about should app show logs or not.
     */
     private static final Pref logging = Pref.makeBooleanPref("traceLogging",

@@ -17,9 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.autotracing;
 
-import com.sun.electric.tool.dcs.Accessory;
+import java.io.IOException;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
@@ -33,6 +37,8 @@ import javax.swing.*;
  * just links for other classes' methods (MV model)
  */
 public class Autotracing extends Tool {
+    
+    private static MakeTrace makeObject;
 
     /**
      * the Autotracing tool.
@@ -62,13 +68,95 @@ public class Autotracing extends Tool {
         return tool;
     }
 
+    /**
+     * Method to make path from one point to another using autotracing system.
+     */
+    public static void makePathOrClean() {
+        File startingPointFile = new File(Accessory.POINTS_PATH);
+        Accessory.cleanFile(Accessory.CONFIG_PATH);
+        if (Accessory.getStringCount(startingPointFile) != 2) {
+            Accessory.cleanFile(Accessory.POINTS_PATH);
+            try {
+                ExportKeysWithIndication();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                assert false;
+            }
+            System.out.println("Cleaning file and width changing.");
+        } else {
+            NonOrientedGlobalGraph nogg = new NonOrientedGlobalGraph("EleventhApril");
+            try {
+                nogg.setStartingAndEndingPoint(importFile(startingPointFile)[0], importFile(startingPointFile)[1]);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                assert false;
+            }
+            nogg.deikstra(false);
+            try {
+                ImportKeys.controller(null);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                assert false;
+            }
+            Accessory.cleanFile(Accessory.POINTS_PATH);
+        }
+    }
 
     /**
-     * This class starts the autotracing proccess as Job;
+     * Exporting keys from scheme to file, link to ExportKeysFromScheme method.
+     * @throws java.io.IOException
+     */
+    public static void ExportKeys() throws IOException {
+        ExportKeys.ExportKeysFromScheme();
+    }
+
+    /**
+     * Exporting keys from scheme to file and indicate all using nets on scheme,
+     * link to ExportKeysFromSchemeWithIndication method.
+     * @throws java.io.IOException
+     */
+    public static void ExportKeysWithIndication() throws IOException {
+        ExportKeys.ExportKeysFromSchemeWithIndication();
+    }
+
+    /**
+     * Link to MakeTrace method
+     */
+    public static void makeTrace() {
+        makeObject = new MakeTrace();
+    }
+
+    /**
+     * Link to getAdvice method
+     */
+    public static void getAdvice() {
+        PrecisionExpert.getAdvice();
+    }
+
+    /**
+     * Method uses external file to set first and last points... ***Develop***,
+     * SHOULD BE UNIT TEST HERE
+     */
+    private static String[] importFile(File graphList) throws IOException {
+        String[] line;
+        try (BufferedReader graphListBufReader = new BufferedReader(new FileReader(graphList))) {
+            line = new String[2];
+            line[0] = graphListBufReader.readLine();
+            line[1] = graphListBufReader.readLine();
+        }
+        return line;
+    }
+    
+    public void createAndShowGUI(boolean start) {
+        makeObject.createAndShowGUI(start);
+    }
+
+    /**
+     *
      */
     private static class MakeTrace extends Job {
 
-        private JFrame frame;
+        private JFrame frame = null;
 
         protected MakeTrace() {
             super("Make Trace", Autotracing.getAutotracingTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
@@ -78,7 +166,7 @@ public class Autotracing extends Tool {
         @Override
         public boolean doIt() throws JobException {
             createAndShowGUI(true);
-            //SimpleAutotracing.getSimpleAutotracing().startTrace();
+            SimpleAutotracing.getSimpleAutotracing().startTrace();
             createAndShowGUI(false);
             return true;
         }
@@ -101,7 +189,7 @@ public class Autotracing extends Tool {
                     @Override
                     public void windowClosing(WindowEvent e) {
                         e.getWindow().dispose();
-                        //SimpleAutotracing.getSimpleAutotracing().setExitPressed();
+                        SimpleAutotracing.getSimpleAutotracing().setExitPressed();
                         Accessory.showMessage("Autotracing will be stopped after 1 step.");
                     }
                 });
