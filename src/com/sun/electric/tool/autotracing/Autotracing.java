@@ -19,6 +19,7 @@
  */
 package com.sun.electric.tool.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.NonOrientedGlobalGraph;
 import java.io.IOException;
 import java.io.File;
 import java.io.BufferedReader;

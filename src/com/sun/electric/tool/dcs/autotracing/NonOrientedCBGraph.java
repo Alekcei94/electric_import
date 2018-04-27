@@ -19,9 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.autotracing.Accessory;
-import com.sun.electric.tool.autotracing.BinaryHeapNew;
-import com.sun.electric.tool.autotracing.NonOrientedGlobalGraph;
+import com.sun.electric.tool.dcs.Accessory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +38,6 @@ public final class NonOrientedCBGraph extends NonOrientedGraph {
 
     private final int VERTEX_MAX = 54;
     private final int GLOBAL_VERTS = 56;
-    private final String LABEL;
     private final String[] globVerts = {"X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12", "X13",
                                         "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13",
                                         "Z0", "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12", "Z13",
@@ -59,7 +56,7 @@ public final class NonOrientedCBGraph extends NonOrientedGraph {
      * matrix with size of GLOBAL_VERTS. @param graphName @param graphName
      */
     public NonOrientedCBGraph(String graphName, NonOrientedGlobalGraph creator) {
-        this.LABEL = graphName;
+        this.graphName = graphName;
         this.creator = creator;
         Init(VERTEX_MAX);
         importGraphFromFile();
@@ -75,6 +72,13 @@ public final class NonOrientedCBGraph extends NonOrientedGraph {
             System.out.println("IOException found.");
             ioe.printStackTrace();
         }
+    }
+    
+    /**
+     * Method to get the name of this CB graph.
+     */
+    public String getLabel() {
+        return graphName;
     }
 
     /**
@@ -353,7 +357,7 @@ public final class NonOrientedCBGraph extends NonOrientedGraph {
      * of the ways, one of the local deikstraFindAll methods.
      */
     private void deikstra(int startPoint) {
-        BinaryHeapNew heap = new BinaryHeapNew();
+        BinaryHeap heap = new BinaryHeap();
         int curPathCount;
         Integer closestVertex;
         int currentVertex = startPoint;
@@ -405,7 +409,7 @@ public final class NonOrientedCBGraph extends NonOrientedGraph {
             a = getCloseVerteces(currentVertex);
             for (Integer a1 : a) {
                 if (((vertexArray[currentVertex].getPathCount() - vertexArray[a1].getPathCount()) == matrix[currentVertex][a1]) && (matrix[currentVertex][a1] != 0)) {
-                    int labelNumber = Integer.parseInt(LABEL.split("<")[1]);
+                    int labelNumber = Integer.parseInt(getLabel().split("<")[1]);
                     labelNumber += Integer.parseInt(keyMatrix[currentVertex][a1]);
                     Accessory.write(Accessory.CONFIG_PATH, String.valueOf(labelNumber));
                     currentVertex = a1;

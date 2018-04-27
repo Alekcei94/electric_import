@@ -17,8 +17,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.autotracing;
+package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.Pair;
 import com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph;
 import com.sun.electric.tool.dcs.autotracing.NonOrientedGraph;
 import com.sun.electric.tool.dcs.autotracing.Chain;
@@ -40,14 +42,14 @@ import java.util.regex.Pattern;
  */
 public final class NonOrientedGlobalGraph extends NonOrientedGraph {
 
-    private Chain[] vertexArray; 															// Array of Vertices
-    private Set<String> UsedBlockList = new HashSet<>();							// Used to avoid double-using blocks in autotracing
+    private Chain[] vertexArray; 						// Array of Vertices
+    private Set<String> UsedBlockList = new HashSet<>();			// Used to avoid double-using blocks in autotracing
     private List<NonOrientedCBGraph> noCBgList = new ArrayList<>();		// List of all local(CB) graphs linked to this global graph
-    private List<Integer> VertToDeleteList = new ArrayList<>();						//
-    private List<Integer> VertToAffectList = new ArrayList<>();	                                        // For SPM double-used ports
-    private List<Integer> VertToIncreaseList = new ArrayList<>();					//
-    private final int VERTEX_MAX = 950;  													// 867 is the real number of verteces.
-    private int startingPoint, endingPoint;													// set points those describe (vertexArray[int]) chain
+    private List<Integer> VertToDeleteList = new ArrayList<>();			//
+    private List<Integer> VertToAffectList = new ArrayList<>();	                // For SPM double-used ports
+    private List<Integer> VertToIncreaseList = new ArrayList<>();		//
+    private final int VERTEX_MAX = 950;  					// 867 is the real number of verteces.
+    private int startingPoint, endingPoint;                                     // set points those describe (vertexArray[int]) chain
 
     /**
      * Constructor: base constructor to create new global graph object, forming
@@ -56,7 +58,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param graphName
      */
     public NonOrientedGlobalGraph(String graphName) {
-        super(graphName);
+        this.graphName = graphName;
         Init(VERTEX_MAX);
         File fileForImport = new File(Accessory.GLOBAL_PATH);
         try {
@@ -73,7 +75,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param noggToCopy
      */
     public NonOrientedGlobalGraph(NonOrientedGlobalGraph noggToCopy) {
-        super(noggToCopy.getLabel());
+        this.graphName = noggToCopy.getLabel();
         Init(VERTEX_MAX);
         for (Chain chain : noggToCopy.getVertexArray()) {
             if (chain == null) {
@@ -82,6 +84,13 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
                 this.vertexArray[vertexCount++] = new Chain(chain);
             }
         }
+    }
+    
+    /**
+     * Method to get the name of graph.
+     */
+    public String getLabel() {
+        return graphName;
     }
 
     /**
@@ -273,7 +282,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @Param startPoint shows the edges labels of needed way.
      */
     public Pair<String, Integer> deikstra(int startPoint, String niName, String param, boolean doDelete, boolean doWrite, boolean SPMAffected) {
-        BinaryHeapNew heap = new BinaryHeapNew();
+        BinaryHeap heap = new BinaryHeap();
         boolean ion = niName.contains("ION");
         int curPathCount;
         Integer closestVertex;
@@ -303,7 +312,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
             }
         }
 
-        while (((closestVertex = heap.getMinKey()) != -1)) {
+        while (((closestVertex = heap.getValueOfMinKeyElement()) != -1)) {
             vertexArray[closestVertex].setVisited(true);
             Integer[] a = getCloseVerteces(closestVertex);
             if (a == null) {
@@ -688,7 +697,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @Params startPoint and endPoint show the edges labels of needed way.
      */
     private boolean deikstra(int startPoint, int endPoint, boolean doDelete) {
-        BinaryHeapNew heap = new BinaryHeapNew();
+        BinaryHeap heap = new BinaryHeap();
         int curPathCount;
         Integer closestVertex;
         int currentVertex = startPoint;
@@ -700,7 +709,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
 
         heap.add(vertexArray[currentVertex].getPathCount(), currentVertex);
 
-        while (((closestVertex = heap.getMinKey()) != -1)) {
+        while (((closestVertex = heap.getValueOfMinKeyElement()) != -1)) {
             if (closestVertex == endPoint) {
                 break;									// not sure if this is still optimal solution
             }

@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: BinaryHeap.java
+ * File: Pair.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *
@@ -75,49 +75,4 @@ public final class Pair<T, V> {
     public void setSecondObject(V second) {
         this.second = second;
     }
-
-    /**
-     * Typically it's just equals for both objects in pair but when
-     * equalling NodeInst, PortInst or ArcInst we're using object.toString().
-     * @param o
-     * @return 
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        if (getClass() != o.getClass()) {
-            return false;
-        }
-        Pair<T, V> pair = (Pair<T, V>) o;
-        if (o instanceof NodeInst || o instanceof PortInst || o instanceof ArcInst) {
-            if (this.getFirstObject().toString().equals(pair.getFirstObject().toString())) {
-                if (this.getSecondObject().toString().equals(pair.getSecondObject().toString())) {
-                    return true;
-                }
-            }
-        } else {
-            if (this.getFirstObject().toString().equals(pair.getFirstObject().toString())) {
-                if (this.getSecondObject().equals(pair.getSecondObject())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Hashcode only for first object shouldn't be bottleneck.
-     * @return 
-     */
-    @Override
-    public int hashCode() {
-        return first.toString().hashCode();
-    }
-
 }

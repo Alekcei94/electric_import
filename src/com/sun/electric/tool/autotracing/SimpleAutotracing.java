@@ -19,6 +19,9 @@
  */
 package com.sun.electric.tool.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.NonOrientedGlobalGraph;
+import com.sun.electric.tool.dcs.FunctionalException;
+import com.sun.electric.tool.dcs.autotracing.StepFailedException;
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;

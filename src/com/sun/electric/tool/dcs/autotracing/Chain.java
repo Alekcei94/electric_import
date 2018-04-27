@@ -19,7 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.autotracing.Accessory;
+import com.sun.electric.tool.dcs.Accessory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  *
  * @author diivanov
  */
-public class Chain {
+public class Chain extends Vertex {
 
     private final List<String> vertsList = new ArrayList<>();
     private final String vertsFromGlobalGraph;
@@ -46,7 +46,8 @@ public class Chain {
      * @param vertsFromGlobalGraph
      * @param label
      */
-    public Chain(String vertsFromGlobalGraph) {
+    public Chain(String vertsFromGlobalGraph, String label) {
+        super(label);
         this.vertsFromGlobalGraph = vertsFromGlobalGraph;
         String[] connectedVertices = vertsFromGlobalGraph.split(" ");
         for (String connectedVertice : connectedVertices) {
@@ -69,6 +70,7 @@ public class Chain {
      * @param chain
      */
     public Chain(Chain chain) {
+        super(chain.getLabel());
         this.vertsFromGlobalGraph = chain.getLine();
         String[] connectedVertices = vertsFromGlobalGraph.split(" ");
         for (String connectedVertice : connectedVertices) {
