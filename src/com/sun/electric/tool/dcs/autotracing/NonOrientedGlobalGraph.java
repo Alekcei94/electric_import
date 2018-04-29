@@ -525,7 +525,7 @@ public final class NonOrientedGlobalGraph {
                 if (spl.split("<")[0].equals("CB")) {                                      // Only CB's verteces should be deleted
                     NonOrientedCBGraph noCBg = getOrCreateLocalGraph(spl);
                     Accessory.printLog(spl + " toDelete");
-                    noCBg.deleteKeyFromCBGraph(port, true);
+                    noCBg.deleteKeyFromCBGraph(port);
                     /*if(vertexArray[count].isXYGlobal()) {
                         noCBg.deleteKeyFromCBGraph(spl, Accessory.parsePortToPort(vert));
                     }*/
@@ -903,7 +903,7 @@ public final class NonOrientedGlobalGraph {
             }
         }
 
-        NonOrientedCBGraph localGraphic = new NonOrientedCBGraph(graphLabel)!!!;
+        NonOrientedCBGraph localGraphic = (new NonOrientedCBGraph.CBFactory()).createConnectionGraph(graphLabel);
         localGraphic.refreshLinksMatrix();
         noCBgList.add(localGraphic);
         return localGraphic;
@@ -1003,12 +1003,12 @@ public final class NonOrientedGlobalGraph {
                     String[] array = vertexArray[i].searchForCB();
                     if (array.length > 2) {
                         NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
-                        localGraphic.deleteKeyFromCBGraph(array[3], false);
+                        localGraphic.deleteKeyFromCBGraph(array[3]);
                         localGraphic = getOrCreateLocalGraph(array[0]);
-                        localGraphic.deleteKeyFromCBGraph(array[1], false);
+                        localGraphic.deleteKeyFromCBGraph(array[1]);
                     } else if (array.length > 0) {
                         NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[0]);
-                        localGraphic.deleteKeyFromCBGraph(array[1], false);
+                        localGraphic.deleteKeyFromCBGraph(array[1]);
                     }
                 }
             }
@@ -1032,16 +1032,16 @@ public final class NonOrientedGlobalGraph {
                 if ((array.length > 4) && (!vertexArray[i].isDeleted())) {
                     for (int j = 0; j < array.length; j += 2) {
                         NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[j]);
-                        localGraphic.deleteKeyFromCBGraph(array[j + 1], false);
+                        localGraphic.deleteKeyFromCBGraph(array[j + 1]);
                     }
                     vertexArray[i].setDeleted();
                 } else if ((array.length > 2) && (!vertexArray[i].isDeleted())) {
                     if ((array[0].equals(block)) && (array[1].equals(key))) {
                         NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
-                        localGraphic.deleteKeyFromCBGraph(array[3], false);
+                        localGraphic.deleteKeyFromCBGraph(array[3]);
                     } else if ((array[2].equals(block)) && (array[3].equals(key))) {
                         NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[0]);
-                        localGraphic.deleteKeyFromCBGraph(array[1], false);
+                        localGraphic.deleteKeyFromCBGraph(array[1]);
                     }
                     vertexArray[i].setDeleted();
                 }
