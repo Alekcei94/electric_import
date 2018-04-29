@@ -31,13 +31,27 @@ import java.io.IOException;
 public class ConstantsAndPrefs {
 
     /**
-    * Pref shows user choice about should app draw line between ports of key when cursor is nearby or not.
-    */
+     * Path to CB graph in .trc file.
+     */
+    private static final String CB_PATH = "./autotracing/CB.trc";
+    /**
+     * Path to configuration String (list of keys), typically in /config/config.txt
+     */
+    private static String CONFIG_PATH = "../config/config.txt";
+    /**
+     * Path to global graph, typically in /electric/autotracing/global.trc
+     */
+    private static String GLOBAL_PATH = "./autotracing/global.trc";
+
+    /**
+     * Pref shows user choice about should app draw line between ports of key
+     * when cursor is nearby or not.
+     */
     private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
             Autotracing.getAutotracingTool().prefs, false);
     /**
-    * Pref shows user choice about should app show logs or not.
-    */
+     * Pref shows user choice about should app show logs or not.
+     */
     private static final Pref logging = Pref.makeBooleanPref("traceLogging",
             Autotracing.getAutotracingTool().prefs, false);
 
@@ -57,17 +71,32 @@ public class ConstantsAndPrefs {
     private ConstantsAndPrefs() {
         throw new AssertionError();
     }
-    
+
+    public static String getPathTo(String pathTo) {
+        switch (pathTo) {
+            case "connection box":
+                return CB_PATH;
+            case "config":
+                return CONFIG_PATH;
+            case "global graph":
+                return GLOBAL_PATH;
+            default:
+                return null;
+        }
+    }
+
     /**
      * Method is needed to get path to main folder e.g. C:/CYGELENG/.
+     *
      * @return "C:/CYGELENG/electric/".
      */
     public static String getPath() {
         return PATH;
     }
-    
+
     /**
      * Method is needed to get path to main folder e.g. C:/CYGELENG/.
+     *
      * @return "C:/CYGELENG/".
      */
     public static String getParentPath() {

@@ -20,10 +20,9 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.CommonMethods;
+import com.sun.electric.tool.dcs.ConstantsAndPrefs;
 import com.sun.electric.tool.dcs.Pair;
-import com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph;
-import com.sun.electric.tool.dcs.autotracing.NonOrientedGraph;
-import com.sun.electric.tool.dcs.autotracing.Chain;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;
@@ -40,7 +39,12 @@ import java.util.regex.Pattern;
  * This class is used to describe global graph, this global graph is the complex
  * of all elements in scheme, global graph is using local CB graphs as parts.
  */
-public final class NonOrientedGlobalGraph extends NonOrientedGraph {
+public final class NonOrientedGlobalGraph {
+
+    private String graphName;
+    private int vertexCount;
+
+    private static final BinaryHeap.BinaryHeapFactory HEAP_FAB = new BinaryHeap.BinaryHeapFactory();
 
     private Chain[] vertexArray; 						// Array of Vertices
     private Set<String> UsedBlockList = new HashSet<>();			// Used to avoid double-using blocks in autotracing
@@ -48,7 +52,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
     private List<Integer> VertToDeleteList = new ArrayList<>();			//
     private List<Integer> VertToAffectList = new ArrayList<>();	                // For SPM double-used ports
     private List<Integer> VertToIncreaseList = new ArrayList<>();		//
-    private final int VERTEX_MAX = 950;  					// 867 is the real number of verteces.
+    private final int VERTEX_MAX = ;                                            // 867 is the real number of verteces.
     private int startingPoint, endingPoint;                                     // set points those describe (vertexArray[int]) chain
 
     /**
@@ -60,7 +64,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
     public NonOrientedGlobalGraph(String graphName) {
         this.graphName = graphName;
         Init(VERTEX_MAX);
-        File fileForImport = new File(Accessory.GLOBAL_PATH);
+        File fileForImport = new File(ConstantsAndPrefs.getPathTo("global graph"));
         try {
             integrateChains(fileForImport);
         } catch (IOException ioe) {
@@ -79,13 +83,13 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
         Init(VERTEX_MAX);
         for (Chain chain : noggToCopy.getVertexArray()) {
             if (chain == null) {
-                this.vertexArray[vertexCount++] = null;
+                this.vertexArray[vertexCount++] = null; // copy graph with deleted verts
             } else {
                 this.vertexArray[vertexCount++] = new Chain(chain);
             }
         }
     }
-    
+
     /**
      * Method to get the name of graph.
      */
@@ -282,7 +286,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @Param startPoint shows the edges labels of needed way.
      */
     public Pair<String, Integer> deikstra(int startPoint, String niName, String param, boolean doDelete, boolean doWrite, boolean SPMAffected) {
-        BinaryHeap heap = new BinaryHeap();
+        BinaryHeap heap = HEAP_FAB.createBinaryHeap();
         boolean ion = niName.contains("ION");
         int curPathCount;
         Integer closestVertex;
@@ -308,7 +312,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
                     endPoint = currentVertex;
                     endIsFound = true;
                     lastResult = result;
-                } 
+                }
             }
         }
 
@@ -387,19 +391,15 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * with reset() method.
      */
     public void doDelete() {
-        if (!VertToDeleteList.isEmpty()) {
-            Iterator<Integer> deleteItr = VertToDeleteList.iterator();
-            while (deleteItr.hasNext()) {
-                deleteVertex(deleteItr.next());
-                deleteItr.remove();
-            }
+        Iterator<Integer> deleteItr = VertToDeleteList.iterator();
+        while (deleteItr.hasNext()) {
+            deleteVertex(deleteItr.next());
+            deleteItr.remove();
         }
-        if (!VertToAffectList.isEmpty()) {
-            Iterator<Integer> deleteItr = VertToAffectList.iterator();
-            while (deleteItr.hasNext()) {
-                affectVertex(deleteItr.next());
-                deleteItr.remove();
-            }
+        Iterator<Integer> affectItr = VertToAffectList.iterator();
+        while (affectItr.hasNext()) {
+            affectVertex(affectItr.next());
+            affectItr.remove();
         }
         for (NonOrientedCBGraph nocbg : noCBgList) {
             nocbg.doDeleteUsedVerts();
@@ -447,7 +447,6 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param v
      * @return
      */
-    @Override
     protected Integer[] getCloseVerteces(int v) {
         String[] CBLabel = getCloseCBs(v);
         Integer[] a = getCloseChains(CBLabel);
@@ -503,7 +502,6 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param label
      * @return
      */
-    @Override
     protected boolean addVertex(String line, String label) {
         vertexArray[vertexCount++] = new Chain(line, label);
         return true;
@@ -515,7 +513,6 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param count
      * @Param count is the number of vertex that should be deleted,
      */
-    @Override
     protected void deleteVertex(int count) {
         assert count >= 0;
         if (vertexArray[count] != null) {
@@ -523,8 +520,8 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
             String[] conVerts = vertexArray[count].getConnectedVerteces();
             vertexArray[count] = null;
             for (String vert : conVerts) {
-                String spl = Accessory.parsePortToBlock(vert);
-                String port = Accessory.parsePortToPort(vert);
+                String spl = CommonMethods.parsePortToBlock(vert);
+                String port = CommonMethods.parsePortToPort(vert);
                 if (spl.split("<")[0].equals("CB")) {                                      // Only CB's verteces should be deleted
                     NonOrientedCBGraph noCBg = getOrCreateLocalGraph(spl);
                     Accessory.printLog(spl + " toDelete");
@@ -559,7 +556,6 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      *
      * @param VERTEX_MAX
      */
-    @Override
     protected void Init(int VERTEX_MAX) {
         vertexArray = new Chain[VERTEX_MAX];
     }
@@ -603,7 +599,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * Method initialises CB graphs to use it's internal structure, method is
      * using external file with list of CBs.
      */
-    private void initiateCBs() throws IOException {
+    /*private void initiateCBs() throws IOException {
         String line;
         try (BufferedReader allCBsReader = new BufferedReader(new FileReader(new File(Accessory.ALL_BLOCKS)))) {
             while ((line = allCBsReader.readLine()) != null) {
@@ -621,12 +617,10 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
                 }
             }
         }
-    }
-
+    }*/
     /**
      * Method to reset all pathcounts of chains in graph.
      */
-    @Override
     protected void resetVertices() {
         for (int i = 0; i < vertexCount; i++) {
             if (vertexArray[i] != null) {
@@ -641,7 +635,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @param startLine
      * @param endLine
      */
-    protected void setStartingAndEndingPoint(String startLine, String endLine) {
+    /*protected void setStartingAndEndingPoint(String startLine, String endLine) {
         startingPoint = -1;
         endingPoint = -1;
         String[] startLabel = startLine.split(" -- ");
@@ -686,8 +680,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
             Accessory.showMessage("CBs won't be initiated.");
             assert false;
         }
-    }
-
+    }*/
     /**
      * This method implements the deikstra algorithm to find the optimal way
      * through graph, this method can delete vertices to dynamic modification of
@@ -697,7 +690,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @Params startPoint and endPoint show the edges labels of needed way.
      */
     private boolean deikstra(int startPoint, int endPoint, boolean doDelete) {
-        BinaryHeap heap = new BinaryHeap();
+        BinaryHeap heap = HEAP_FAB.createBinaryHeap();
         int curPathCount;
         Integer closestVertex;
         int currentVertex = startPoint;
@@ -904,15 +897,13 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * @Param graphLabel is the "CB<216" type of label.
      */
     private NonOrientedCBGraph getOrCreateLocalGraph(String graphLabel) {
-        int graphExists;
         for (int z = 0; z < noCBgList.size(); z++) {
             if (noCBgList.get(z).getLabel().equals(graphLabel)) {
-                graphExists = z;
-                return noCBgList.get(graphExists);
+                return noCBgList.get(z);
             }
         }
 
-        NonOrientedCBGraph localGraphic = new NonOrientedCBGraph(graphLabel, this);
+        NonOrientedCBGraph localGraphic = new NonOrientedCBGraph(graphLabel)!!!;
         localGraphic.refreshLinksMatrix();
         noCBgList.add(localGraphic);
         return localGraphic;
@@ -923,7 +914,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
      * class) method to dynamically change the state of local CB graphs, methods
      * is used only in "point to point".
      */
-    private void prepareChains(String blockName) throws IOException {
+    /*private void prepareChains(String blockName) throws IOException {
         String[] p = blockName.split("<");
         assert p.length > 1; 																								// blockName xxx<1234
         Integer localNumber = Integer.valueOf(p[1]);
@@ -954,13 +945,12 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
                 prepareChainsForBlock(p[0], localConfigurationReader, localNumber);
             }
         }
-    }
-
+    }*/
     /**
      * Method is using by prepareChains method to deal with other blocks than
      * CB, methods is used only in "point to point".
      */
-    private void prepareChainsForBlock(String blockName, BufferedReader localConfigurationReader, Integer localNumber) throws IOException {
+    /*private void prepareChainsForBlock(String blockName, BufferedReader localConfigurationReader, Integer localNumber) throws IOException {
         int numberOfKeys = -1;
         switch (blockName) {
             case "PPC":
@@ -995,8 +985,7 @@ public final class NonOrientedGlobalGraph extends NonOrientedGraph {
                 }
             }
         }
-    }
-
+    }*/
     /**
      * Method to delete verteces from another block those have direct links with
      * these CB's verteces.

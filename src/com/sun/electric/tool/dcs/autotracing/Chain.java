@@ -20,6 +20,7 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.CommonMethods;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -93,9 +94,9 @@ public class Chain extends Vertex {
     public String[] searchForCB() {
         List<String> cbChains = new ArrayList<>();
         for (String vert : vertsList) {
-            if (Accessory.parsePortToBlock(vert).contains("CB")) {
-                cbChains.add(Accessory.parsePortToBlock(vert));
-                cbChains.add(Accessory.parsePortToPort(vert));
+            if (CommonMethods.parsePortToBlock(vert).contains("CB")) {
+                cbChains.add(CommonMethods.parsePortToBlock(vert));
+                cbChains.add(CommonMethods.parsePortToPort(vert));
             }
         }
         assert (cbChains.size() > 0);
@@ -112,7 +113,7 @@ public class Chain extends Vertex {
      */
     public String searchForBlock(String blockPiece) {
         for (String vert : vertsList) {
-            if (Accessory.parsePortToBlock(vert).contains(blockPiece)) {
+            if (CommonMethods.parsePortToBlock(vert).contains(blockPiece)) {
                 return vert;
             }
         }
@@ -159,7 +160,7 @@ public class Chain extends Vertex {
      * check if String @Vert contains String @port.
      */
     private boolean contains(String Vert, String port) {
-        return Accessory.parsePortToBlock(Vert).equals(port);
+        return CommonMethods.parsePortToBlock(Vert).equals(port);
     }
 
     /**

@@ -50,7 +50,7 @@ public class Accessory {
     private Accessory() {
         throw new AssertionError();
     }
-
+    
     /**
      * Method to append string @text to file @fileName.
      *
@@ -82,9 +82,9 @@ public class Accessory {
      * @param s
      */
     public static void printLog(String s) {
-        /*if (Constants.isLogging()) {
+        if (ConstantsAndPrefs.isLogging()) {
             System.out.println(s);
-        }*/
+        }
     }
 
     /**
@@ -142,7 +142,7 @@ public class Accessory {
     /**
      * Timer starts here.
      */
-    public static void timeStart(String s) {
+    public static void timeStart() {
         if (timeStart != 0L) {
             deltaTime = (System.currentTimeMillis() - timeStart);
             timeStart = System.currentTimeMillis();

@@ -93,6 +93,9 @@ public class Vertex {
         this.pathCount = MAXPATHCOUNT;
     }
 
+    /**
+     * Get pathcount of untouched vertex.
+     */
     public int getMaxPathCount() {
         return MAXPATHCOUNT;
     }

@@ -105,4 +105,30 @@ public class CommonMethods {
             }
         }
     }
+    
+
+    /**
+     * method implemets parsing of Port String to get Block Name.
+     *
+     * @param port
+     * @return
+     */
+    public static String parsePortToBlock(String port) {
+        assert port != null;
+        return port.substring(port.indexOf(":")+1, port.indexOf("{"));
+        // port '5400TP035:ION{ic}[ION<1].ION'
+    }
+ 
+
+    /**
+     * method implemets parsing of Port String to get Port Name.
+     *
+     * @param port
+     * @return
+     */
+    public static String parsePortToPort(String port) {
+        assert port != null;
+        return port.substring(port.indexOf(".") + 1, port.lastIndexOf("'")); // name smth like CB<7454
+        // port '5400TP035:ION{ic}[ION<1].ION'
+    }
 }
