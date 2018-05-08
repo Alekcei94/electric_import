@@ -33,7 +33,7 @@ public class ConstantsAndPrefs {
     /**
      * Path to CB graph in .trc file.
      */
-    private static final String CB_PATH = "./autotracing/CB.trc";
+    private static final String CB_PATH = "./autotracing/CBGraph.trc";
     /**
      * Path to configuration String (list of keys), typically in /config/config.txt
      */

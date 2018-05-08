@@ -286,7 +286,11 @@ public final class NonOrientedGlobalGraph {
      * @Param startPoint shows the edges labels of needed way.
      */
     public Pair<String, Integer> deikstra(int startPoint, String niName, String param, boolean doDelete, boolean doWrite, boolean SPMAffected) {
+<<<<<<< HEAD
         GraphHeapInterface heap = HEAP_FAB.createBinaryHeap();
+=======
+        BinaryHeap heap = HEAP_FAB.createBinaryHeap();
+>>>>>>> 48903e0e29a0d0b2c301713c7d51f013ac600060
         boolean ion = niName.contains("ION");
         int curPathCount;
         Integer closestVertex;
@@ -690,7 +694,11 @@ public final class NonOrientedGlobalGraph {
      * @Params startPoint and endPoint show the edges labels of needed way.
      */
     private boolean deikstra(int startPoint, int endPoint, boolean doDelete) {
+<<<<<<< HEAD
         GraphHeapInterface heap = HEAP_FAB.createBinaryHeap();
+=======
+        BinaryHeap heap = HEAP_FAB.createBinaryHeap();
+>>>>>>> 48903e0e29a0d0b2c301713c7d51f013ac600060
         int curPathCount;
         Integer closestVertex;
         int currentVertex = startPoint;
