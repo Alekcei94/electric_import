@@ -20,7 +20,7 @@ public class BinaryHeapTest {
     @Test
     public void testGetValueOfMinKeyElement() {
         System.out.println("getKeyOfMinValueElement");
-        BinaryHeap heap = new BinaryHeap();
+        GraphHeapInterface heap = (new BinaryHeap.BinaryHeapFactory()).createBinaryHeap();
         // value, key.
         heap.add(141, 0);
         heap.add(183, 15);

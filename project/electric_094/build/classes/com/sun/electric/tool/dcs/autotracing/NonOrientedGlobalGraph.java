@@ -52,7 +52,7 @@ public final class NonOrientedGlobalGraph {
     private List<Integer> VertToDeleteList = new ArrayList<>();			//
     private List<Integer> VertToAffectList = new ArrayList<>();	                // For SPM double-used ports
     private List<Integer> VertToIncreaseList = new ArrayList<>();		//
-    private final int VERTEX_MAX = 10000;                                       // $TODO_important change names
+    private final int VERTEX_MAX = 10000;                                            // 867 is the real number of verteces.
     private int startingPoint, endingPoint;                                     // set points those describe (vertexArray[int]) chain
 
     /**
