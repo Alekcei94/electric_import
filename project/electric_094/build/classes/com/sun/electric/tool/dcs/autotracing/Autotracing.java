@@ -19,6 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;

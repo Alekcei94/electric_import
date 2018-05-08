@@ -19,6 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.Pair;
 import java.util.ArrayList;
 
 /**
@@ -26,14 +27,14 @@ import java.util.ArrayList;
  * Value sorting was added as extension to basic functionality.
  * 0 11 2222 3333333 tree.
  */
-public class BinaryHeap {
+public class BinaryHeap implements GraphHeapInterface {
 
     private ArrayList<Pair<Integer, Integer>> pairList;
 
     /**
      * Constructor of heap.
      */
-    public BinaryHeap() {
+    private BinaryHeap() {
         pairList = new ArrayList<>();
     }
 
@@ -50,6 +51,7 @@ public class BinaryHeap {
      * @param value
      * @param key
      */
+    @Override
     public void add(int value, int key) {
         boolean exist = false;
         Pair<Integer, Integer> existingPair = null;
@@ -130,6 +132,7 @@ public class BinaryHeap {
      * 
      * @return
      */
+    @Override
     public int getValueOfMinKeyElement() {
         if (getKeyHeapSize() == 0) {
             return -1;
@@ -142,5 +145,11 @@ public class BinaryHeap {
         heapifyDown(0);
         return result;
     }
-
+    
+    public static class BinaryHeapFactory implements GraphHeapFactory {
+        @Override
+        public BinaryHeap createBinaryHeap() {
+            return new BinaryHeap();
+        }
+    }
 }

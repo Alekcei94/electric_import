@@ -23,4 +23,6 @@ public interface ConnectionGraphInterface {
     public void getConfigurationPath(String elemFrom, String elemTo);
     
     public List<Pair<String, String>> doDeleteUsedVerts();
+    
+    
 }
