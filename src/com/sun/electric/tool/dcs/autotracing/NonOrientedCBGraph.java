@@ -46,13 +46,10 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
     private Vertex[] vertexArray; // Array of Vertices
     private int vertexCount;
 
-    private final int VERTEX_MAX = 124;
+    private final int VERTEX_MAX;
+    private final int GLOBAL_VERTS;
 
-    private final int GLOBAL_VERTS = 52;
-    private final String[] globVerts = {"X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12", "X13",
-        "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13",
-        "Z0", "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12", "Z13",
-        "K0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "K11", "K12", "K13"};
+    private final String[] globVerts;
 
     private int[][] matrix; // Adjacency matrix
     private String[][] keyMatrix; // matrix for key values (key number in CB.trc)
@@ -68,11 +65,39 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @param graphName the name of graph
      * @param creator the creator of graph
      */
-    NonOrientedCBGraph(String graphName) {
+    private NonOrientedCBGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
         this.graphName = graphName;
+        this.globVerts = globVerts;
+        this.GLOBAL_VERTS = globVerts.length;
+        this.VERTEX_MAX = VERTEX_MAX;
         Init();
         importGraphFromFile();
         linksMatrix = new int[GLOBAL_VERTS][GLOBAL_VERTS];
+    }
+
+    /**
+     * Constructor: Copy constructor from NonOrientedCBGraph.
+     * LINKS MATRIX WILL NOT BE COPIED, BE CAREFUL.
+     */
+    private NonOrientedCBGraph(NonOrientedCBGraph nocbg, String graphName) {
+        this.graphName = graphName;
+        //vertexArray = nocbg.vertexArray;
+        vertexArray = new Vertex[nocbg.vertexArray.length];
+        System.arraycopy(nocbg.vertexArray, 0, vertexArray, 0, vertexArray.length);
+        //matrix = nocbg.matrix;
+        matrix = new int[nocbg.matrix.length][nocbg.matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            System.arraycopy(nocbg.matrix[i], 0, matrix[i], 0, nocbg.matrix[0].length);
+        }
+        vertexCount = nocbg.vertexCount;
+        VERTEX_MAX = nocbg.VERTEX_MAX;
+        GLOBAL_VERTS = nocbg.GLOBAL_VERTS;
+        
+        //globVerts = nocbg.globVerts;
+        globVerts = new String[nocbg.globVerts.length];
+        System.arraycopy(nocbg.globVerts, 0, globVerts, 0, globVerts.length);
+        Init();
+        linksMatrix = nocbg.linksMatrix;
     }
 
     /**
@@ -248,6 +273,11 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         }
     }
 
+    /**
+     * Method to get external pins those are connected to used internal pins.
+     * Potentially may cause memory leak because of using local collections for external method.
+     * @return 
+     */
     public List<Pair<String, String>> getAdditionalUsedExternalPins() {//*
         List<Pair<String, String>> newArrayList = new ArrayList<>();
         for (Pair<String, String> pair : usedExternalPinsInGraph) {
@@ -275,7 +305,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             vertexArray[count] = null;
         }
     }*/
-
     /**
      * Method to reset all pathcounts of vertices in graph.
      */
@@ -419,8 +448,8 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * imports CB graph file.
      */
     private void importGraphFromFile() {//*
-       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
-       // File fileForImport = new File("./autotracing/CBGraph.trc");
+        File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+        //File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);
         } catch (IOException | FunctionalException ioe) {
@@ -528,6 +557,8 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                     for (int j = 0; j < conVertsLength; j++) {
                         if ((numConnectedVertices[i] < numConnectedVertices[j]) && (Math.abs(i - j) == 1)) {
                             addPoint(numConnectedVertices[i], numConnectedVertices[j], 1);
+                            //System.out.println(String.valueOf(numConnectedVertices[i]) + " " + String.valueOf(numConnectedVertices[j])
+                            //        + " " + String.valueOf(connectsAndNumbers[0]));
                             addKeyPoint(numConnectedVertices[i], numConnectedVertices[j], connectsAndNumbers[0]);
                         }
                     }
@@ -538,9 +569,27 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
 
     public static class CBFactory implements ConnectionGraphFactory {
 
+        private static NonOrientedCBGraph largeCB;
+
         @Override
-        public NonOrientedCBGraph createConnectionGraph(String graphName) {
-            return new NonOrientedCBGraph(graphName);
+        public NonOrientedCBGraph createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
+            return new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
+        }
+
+        @Override
+        public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {
+            String[] globVerts = {"X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12", "X13",
+                "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13",
+                "Z0", "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12", "Z13",
+                "K0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "K11", "K12", "K13"};
+            int VERTEX_MAX = 124;
+            if (largeCB == null) {
+                largeCB = new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
+                return largeCB;
+            } else {
+                return new NonOrientedCBGraph(largeCB, graphName);
+            }
+
         }
     }
 

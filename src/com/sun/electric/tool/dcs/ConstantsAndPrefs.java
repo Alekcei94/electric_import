@@ -47,13 +47,13 @@ public class ConstantsAndPrefs {
      * Pref shows user choice about should app draw line between ports of key
      * when cursor is nearby or not.
      */
-    private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
-            Autotracing.getAutotracingTool().prefs, false);
+    //private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
+    //        Autotracing.getAutotracingTool().prefs, false);
     /**
      * Pref shows user choice about should app show logs or not.
      */
-    private static final Pref logging = Pref.makeBooleanPref("traceLogging",
-            Autotracing.getAutotracingTool().prefs, false);
+    //private static final Pref logging = Pref.makeBooleanPref("traceLogging",
+    //        Autotracing.getAutotracingTool().prefs, false);
 
     /**
      * Path to electric folder (.../electric/).
@@ -121,34 +121,34 @@ public class ConstantsAndPrefs {
      *
      * @return
      */
-    public static boolean isKeysIndicated() {
+    /*public static boolean isKeysIndicated() {
         return keysIndicated.getBoolean();
-    }
+    }*/
 
     /**
      * set keysIndicated variable
      *
      * @param indicate
      */
-    public static void setKeysIndicated(boolean indicate) {
+   /* public static void setKeysIndicated(boolean indicate) {
         keysIndicated.setBoolean(indicate);
-    }
+    }*/
 
     /**
      * get keysIndicated variable
      *
      * @return
      */
-    public static boolean isLogging() {
+    /*public static boolean isLogging() {
         return logging.getBoolean();
-    }
+    }*/
 
     /**
      * set keysIndicated variable
      *
      * @param writeLog
      */
-    public static void setLogging(boolean writeLog) {
+    /*public static void setLogging(boolean writeLog) {
         logging.setBoolean(writeLog);
-    }
+    }*/
 }

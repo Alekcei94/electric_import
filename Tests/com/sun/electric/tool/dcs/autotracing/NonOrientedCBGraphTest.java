@@ -6,7 +6,6 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Pair;
-import java.io.File;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -14,8 +13,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  *
@@ -53,7 +50,7 @@ public class NonOrientedCBGraphTest {
     public void testGetLabel() {//+
         System.out.println("getLabel");
 
-        ConnectionGraphInterface instance = fab.createConnectionGraph("CB<100");
+        ConnectionGraphInterface instance = fab.createConnectionGraphCBLarge("CB<100");
 
         String expResult = "CB<100";
         String result = instance.getLabel();
@@ -121,39 +118,26 @@ public class NonOrientedCBGraphTest {
     @Test
     public void testGetAdditionalUsedExternalPins() {
         System.out.println("getAdditionalUsedExternalPins");
-        NonOrientedCBGraph instance = (NonOrientedCBGraph) fab.createConnectionGraph("CB<100");
+        NonOrientedCBGraph instance = (NonOrientedCBGraph) fab.createConnectionGraphCBLarge("CB<100");
         // NonOrientedCBGraph instance = null;
-        List<Pair<String, String>> expResult = ;
+        //List<Pair<String, String>> expResult = ;
         List<Pair<String, String>> result = instance.getAdditionalUsedExternalPins();
-        assertEquals(expResult, result);
+        //assertEquals(expResult, result);
+        assert false;
     }
 
     @Test
-    public void testimportGraphFromFile() throws ClassNotFoundException {
+    public void testimportGraphFromFile() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         System.out.println("importGraphFromFile()");
         Class example = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
         NonOrientedCBGraph sc = (NonOrientedCBGraph) example.newInstance();
-
-        // Обращение к методу
-        demoReflectionMethod(example, sc);
-        //NonOrientedCBGraph instance = (NonOrientedCBGraph) fab.createConnectionGraph("CB<100");
-        File expResult = new File("./autotracing/CBGraph.trc");
-        demoReflectionMethod();
-        assertEquals(expResult, result);
-    }
-
-    private static void demoReflectionMethod(Class example, NonOrientedCBGraph sc) throws Exception {
-        Method method1 = example.getMethod("importGraphFromFile");
-        String importGraphFromFile = (String) method1.invoke(sc);
-
-        Class[] paramTypes = new Class[]{String.class, String.class};
-        Method concat = example.getMethod("concat", paramTypes);
-        String answer = (String) concat.invoke(sc, "1", "2");
-        System.out.println("Concat:" + answer);
-    }
-
-    private static void demoReflection() throws Exception {
-        // Заружаем описание класса
         
+        // Обращение к методу
+        //demoReflectionMethod(example, sc);
+        NonOrientedCBGraph instance = (NonOrientedCBGraph) fab.createConnectionGraph("CB<100", new String[]{"a", "b"}, 124);
+        //File expResult = new File("./autotracing/CBGraph.trc");
+        //demoReflectionMethod();
+        //assertEquals(expResult, result);
+        assert false;
     }
 }

@@ -82,9 +82,9 @@ public class Accessory {
      * @param s
      */
     public static void printLog(String s) {
-        if (ConstantsAndPrefs.isLogging()) {
+        //if (ConstantsAndPrefs.isLogging()) {
             System.out.println(s);
-        }
+        //}
     }
 
     /**

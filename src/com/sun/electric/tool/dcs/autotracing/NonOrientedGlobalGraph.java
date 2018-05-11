@@ -51,12 +51,10 @@ public final class NonOrientedGlobalGraph {
     private List<NonOrientedCBGraph> noCBgList = new ArrayList<>();		// List of all local(CB) graphs linked to this global graph
     private List<Integer> VertToDeleteList = new ArrayList<>();			//
     private List<Integer> VertToAffectList = new ArrayList<>();	                // For SPM double-used ports
-    private List<Integer> VertToIncreaseList = new ArrayList<>();		//
-<<<<<<< HEAD
+    private List<Integer> VertToIncreaseList = new ArrayList<>();//
+    
     private final int VERTEX_MAX = 10000;                                       // $TODO_important change names
-=======
-    private final int VERTEX_MAX = 10000;                                            // 867 is the real number of verteces.
->>>>>>> 48903e0e29a0d0b2c301713c7d51f013ac600060
+
     private int startingPoint, endingPoint;                                     // set points those describe (vertexArray[int]) chain
 
     /**
@@ -96,6 +94,7 @@ public final class NonOrientedGlobalGraph {
 
     /**
      * Method to get the name of graph.
+     * @return 
      */
     public String getLabel() {
         return graphName;
@@ -907,7 +906,7 @@ public final class NonOrientedGlobalGraph {
             }
         }
 
-        NonOrientedCBGraph localGraphic = (new NonOrientedCBGraph.CBFactory()).createConnectionGraph(graphLabel);
+        NonOrientedCBGraph localGraphic = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge(graphLabel);
         localGraphic.refreshLinksMatrix();
         noCBgList.add(localGraphic);
         return localGraphic;
