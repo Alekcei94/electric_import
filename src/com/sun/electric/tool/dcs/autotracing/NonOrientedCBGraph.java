@@ -448,7 +448,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * imports CB graph file.
      */
     private void importGraphFromFile() {//*
-        File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
         //File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);
@@ -557,8 +557,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                     for (int j = 0; j < conVertsLength; j++) {
                         if ((numConnectedVertices[i] < numConnectedVertices[j]) && (Math.abs(i - j) == 1)) {
                             addPoint(numConnectedVertices[i], numConnectedVertices[j], 1);
-                            //System.out.println(String.valueOf(numConnectedVertices[i]) + " " + String.valueOf(numConnectedVertices[j])
-                            //        + " " + String.valueOf(connectsAndNumbers[0]));
                             addKeyPoint(numConnectedVertices[i], numConnectedVertices[j], connectsAndNumbers[0]);
                         }
                     }
