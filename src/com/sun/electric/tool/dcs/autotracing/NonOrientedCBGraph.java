@@ -68,13 +68,13 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @param graphName the name of graph
      * @param creator the creator of graph
      */
-    NonOrientedCBGraph(String graphName) {
+    private NonOrientedCBGraph(String graphName) {
         this.graphName = graphName;
         Init();
         importGraphFromFile();
         linksMatrix = new int[GLOBAL_VERTS][GLOBAL_VERTS];
     }
-
+    
     /**
      * Initialise matrix and vertexArray, should be overriden for another
      * matrixes.
@@ -239,8 +239,8 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             }
             String label = vertexArray[count].getLabel();
             vertexArray[count] = null;
-            Accessory.printLog(graphName);
-            Accessory.printLog("label " + label);
+            //Accessory.printLog(graphName);
+           // Accessory.printLog("label " + label);
 
             Pair<String, String> pairToDelete = new Pair<>(graphName, label);
             usedExternalPinsInGraph.add(pairToDelete);
@@ -295,7 +295,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @return
      * @Param v is the current vertex in graph.
      */
-    private Integer[] getCloseVerteces(int v) {//*
+    private Integer[] getCloseVerteces(int v) {//+-
         List<Integer> Verts = new ArrayList<>();
         for (int j = 0; j < vertexCount; j++) {
             if (vertexArray[j] != null) {
@@ -418,9 +418,9 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
     /**
      * imports CB graph file.
      */
-    private void importGraphFromFile() {//*
-       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
-       // File fileForImport = new File("./autotracing/CBGraph.trc");
+    private void importGraphFromFile() {
+       //File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+       File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);
         } catch (IOException | FunctionalException ioe) {
@@ -461,7 +461,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      *
      * @Param find this is the label of vertex in arrays.
      */
-    private int findIntForLinksMatrix(String findThis) {//*
+    private int findIntForLinksMatrix(String findThis) {//+
         for (int j = 0; j < globVerts.length; j++) {
             String vert = globVerts[j];
             if (findThis.equals(vert)) {
@@ -493,7 +493,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
     /**
      * Method to find the number of vertex from it's label.
      */
-    private int findVertex(String label) {//*
+    private int findVertex(String label) {//+
         for (int i = 0; i < vertexCount; i++) {
             if ((vertexArray[i] != null) && (vertexArray[i].getLabel().equals(label))) {
                 return i;
@@ -508,7 +508,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      *
      * @Param graphList is file with adj list.
      */
-    private void importGraphFromFile(File graphList) throws IOException, FunctionalException {//*
+    private void importGraphFromFile(File graphList) throws IOException, FunctionalException {//+
         try (BufferedReader graphListBufReader = new BufferedReader(new FileReader(graphList))) {
             String line;
             while ((line = graphListBufReader.readLine()) != null) {
