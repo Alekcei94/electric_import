@@ -264,8 +264,8 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             }
             String label = vertexArray[count].getLabel();
             vertexArray[count] = null;
-            Accessory.printLog(graphName);
-            Accessory.printLog("label " + label);
+            //Accessory.printLog(graphName);
+           // Accessory.printLog("label " + label);
 
             Pair<String, String> pairToDelete = new Pair<>(graphName, label);
             usedExternalPinsInGraph.add(pairToDelete);
