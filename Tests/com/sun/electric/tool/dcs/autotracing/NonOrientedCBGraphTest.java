@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -22,7 +21,6 @@ import static org.junit.Assert.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import org.junit.Assert;
 
 /**
  *
@@ -87,7 +85,7 @@ public class NonOrientedCBGraphTest {
     /*
     * Method reflection global variable int[][] Matrix.
      */
-    private int[][] getReflectionMatrix(Class example, NonOrientedCBGraph sc) throws Exception {
+    private int[][] getReflectionMatrix(Class example, ConnectionGraphInterface sc) throws Exception {
         Field varible = example.getDeclaredField("matrix");
         varible.setAccessible(true);
         int[][] matrix = (int[][]) varible.get(sc);
@@ -156,53 +154,32 @@ public class NonOrientedCBGraphTest {
      * Test of deleteKeyFromCBGraph method, of class NonOrientedCBGraph.
      */
     @Test
-    public void testDeleteKeyFromCBGraph() {
+    public void testDeleteKeyFromCBGraph() throws Exception {
         System.out.println("deleteKeyFromCBGraph");
-        String key = "";
+
+        Class example = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
+        ConnectionGraphInterface sc = fab.createConnectionGraphCBLarge("CB");
+
+       /* Method importGraphFromFile = example.getDeclaredMethod("importGraphFromFile");
+        importGraphFromFile.setAccessible(true);
+        importGraphFromFile.invoke(sc);*/
+
+        Field varible = example.getDeclaredField("matrix");
+        varible.setAccessible(true);
+        int[][] matrix = (int[][]) varible.get(sc);
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                if (matrix[i][j] != 0) {
+                    System.out.print(" 12 ");
+                }
+            }
+        }
+
         NonOrientedCBGraph instance = null;
         List<Pair<String, String>> expResult = null;
-        List<Pair<String, String>> result = instance.deleteKeyFromCBGraph(key);
-        assertEquals(expResult, result);
-    }
-
-    /**
-     * Test of getConfigurationPath method, of class NonOrientedCBGraph.
-     */
-    @Test
-    public void testGetConfigurationPath() {
-        System.out.println("getConfigurationPath");
-        String elemFrom = "";
-        String elemTo = "";
-        NonOrientedCBGraph instance = null;
-        instance.getConfigurationPath(elemFrom, elemTo);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of doDeleteUsedVerts method, of class NonOrientedCBGraph.
-     */
-    @Test
-    public void testDoDeleteUsedVerts() {
-        System.out.println("doDeleteUsedVerts");
-        NonOrientedCBGraph instance = null;
-        List<Pair<String, String>> expResult = null;
-        List<Pair<String, String>> result = instance.doDeleteUsedVerts();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of refreshLinksMatrix method, of class NonOrientedCBGraph.
-     */
-    @Test
-    public void testRefreshLinksMatrix() {
-        System.out.println("refreshLinksMatrix");
-        NonOrientedCBGraph instance = null;
-        instance.refreshLinksMatrix();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        // List<Pair<String, String>> result = instance.deleteKeyFromCBGraph(key);
+        //assertEquals(expResult, result);
     }
 
     /**
@@ -298,48 +275,9 @@ public class NonOrientedCBGraphTest {
 
         String vertex = vertexFromFile.get(11);
         result = getReflectionMethodFindVertex(example, sc, vertex);
-        
-       assertEquals(result, expectedResult);
 
-    }
+        assertEquals(result, expectedResult);
 
-    @Test
-    public void testImportGraphFromFile() throws ClassNotFoundException, Exception {
-        System.out.println("importGraphFromFile");
-
-        NonOrientedCBGraph sc = (NonOrientedCBGraph) fab.createConnectionGraphCBLarge("CB");
-        Class example = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
-
-        getReflectionMethodImportGraphFromFile(example, sc);
-
-        List<Pair<String, String>> arrayVerticesInFile = new ArrayList<>(readFileWritedArrayPair());
-        List<Pair<String, String>> arrayVerticesInTest = new ArrayList<>(listPairInTest(new int[]{52, 1, 25, 35, 100, 11, 21, 10, 15, 123}, arrayVerticesInFile));
-
-        String[] getNameVetricesFerstPair = new String[arrayVerticesInTest.size()];
-        String[] getNameVetricesSecondPair = new String[arrayVerticesInTest.size()];
-
-        for (int i = 0; i < arrayVerticesInTest.size(); i++) {
-            getNameVetricesFerstPair[i] = arrayVerticesInTest.get(i).getFirstObject();
-            getNameVetricesSecondPair[i] = arrayVerticesInTest.get(i).getSecondObject();
-        }
-
-        int[] coordinatesMatrixI = getIntReflectionMethodFindVertex(example, sc, getNameVetricesFerstPair);
-        int[] coordinatesMatrixJ = getIntReflectionMethodFindVertex(example, sc, getNameVetricesSecondPair);
-        int[][] matrix = getReflectionMatrix(example, sc);
-
-        int[] result_0 = new int[coordinatesMatrixI.length];
-        int[] result_1 = new int[coordinatesMatrixJ.length];
-
-        int[] realResult = new int[coordinatesMatrixJ.length];
-
-        for (int i = 0; i < coordinatesMatrixI.length; i++) {
-            result_0[i] = matrix[coordinatesMatrixI[i]][coordinatesMatrixJ[i]];
-            result_1[i] = matrix[coordinatesMatrixJ[i]][coordinatesMatrixI[i]];
-            realResult[i] = 1;
-        }
-
-        assertArrayEquals(result_0, realResult);
-        assertArrayEquals(result_1, realResult);
     }
 
     /*

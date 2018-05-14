@@ -583,7 +583,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             int VERTEX_MAX = 124;
             if (largeCB == null) {
                 largeCB = new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
-                return largeCB;
+                return new NonOrientedCBGraph(largeCB, graphName);
             } else {
                 return new NonOrientedCBGraph(largeCB, graphName);
             }
