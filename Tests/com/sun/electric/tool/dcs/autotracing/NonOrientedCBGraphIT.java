@@ -52,7 +52,7 @@ public class NonOrientedCBGraphIT {
     }
 
     /**
-     * Test of getLabel method, of class NonOrientedCBGraph.
+     * Integration test of all public methods in class NonOrientedCBGraph.
      */
     @Test
     public void testCreateAndGetResult() throws IOException, ClassNotFoundException,
@@ -67,15 +67,6 @@ public class NonOrientedCBGraphIT {
 
         System.out.println("testGetWeight");
         int weight = testGetWeight(nocbg, elemFrom, elemTo);
-        System.out.println(weight);
-        
-        //Check links matrix here
-        /*Class CBClass = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
-        Class[] paramTypes = new Class[]{};
-        Method getLinksMatrix = CBClass.getDeclaredMethod("getLinksMatrix", paramTypes);
-        getLinksMatrix.setAccessible(true);
-        getLinksMatrix.invoke(nocbg, null);*/
-        
         assert weight == listOfPathes.size();
 
     }
@@ -119,8 +110,9 @@ public class NonOrientedCBGraphIT {
     }
 
     /**
-     * Test of getLabel method, of class NonOrientedCBGraph.
+     * Test of getWeight method of class NonOrientedCBGraph.
      *
+     * @param nocbg input graph(object)
      * @param elemFrom path from this element
      * @param elemTo path to this element
      * @return return the number of elements in path from one to another
@@ -129,4 +121,15 @@ public class NonOrientedCBGraphIT {
         int i = nocbg.getWeight(elemFrom, elemTo);
         return i;
     }
+
+    /* Get matrix field
+            Field matrixField = CBClass.getDeclaredField("matrix");
+        matrixField.setAccessible(true);
+        int[][] matrix = (int[][]) matrixField.get(nocbg);
+        for(int i=0;i<matrix.length;i++) {
+            for(int j=0;j<matrix.length;j++) {
+                System.out.println(matrix[i][j]);
+            }
+        }
+     */
 }

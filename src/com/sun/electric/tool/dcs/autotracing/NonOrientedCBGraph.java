@@ -81,22 +81,29 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      */
     private NonOrientedCBGraph(NonOrientedCBGraph nocbg, String graphName) {
         this.graphName = graphName;
-        //vertexArray = nocbg.vertexArray;
+        this.globVerts = new String[nocbg.globVerts.length];
+        this.GLOBAL_VERTS = nocbg.GLOBAL_VERTS;
+        this.VERTEX_MAX = nocbg.VERTEX_MAX;
+        
+        System.arraycopy(nocbg.globVerts, 0, globVerts, 0, globVerts.length);
+        
+        Init();
+        
         this.vertexArray = new Vertex[nocbg.vertexArray.length];
         System.arraycopy(nocbg.vertexArray, 0, vertexArray, 0, vertexArray.length);
-        //matrix = nocbg.matrix;
+        
         this.matrix = new int[nocbg.matrix.length][nocbg.matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
             System.arraycopy(nocbg.matrix[i], 0, matrix[i], 0, nocbg.matrix[0].length);
         }
-        this.vertexCount = nocbg.vertexCount;
-        this.VERTEX_MAX = nocbg.VERTEX_MAX;
-        this.GLOBAL_VERTS = nocbg.GLOBAL_VERTS;
         
-        //globVerts = nocbg.globVerts;
-        this.globVerts = new String[nocbg.globVerts.length];
-        System.arraycopy(nocbg.globVerts, 0, globVerts, 0, globVerts.length);
-        Init();
+        this.keyMatrix = new String[nocbg.keyMatrix.length][nocbg.keyMatrix[0].length];
+        for (int i = 0; i < keyMatrix.length; i++) {
+            System.arraycopy(nocbg.keyMatrix[i], 0, keyMatrix[i], 0, nocbg.keyMatrix[0].length);
+        }
+        
+        this.vertexCount = nocbg.vertexCount;
+        
         this.linksMatrix = new int[this.GLOBAL_VERTS][this.GLOBAL_VERTS];
         refreshLinksMatrix();
     }
@@ -582,7 +589,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         }
 
         @Override
-        public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {
+        public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {          
             String[] globVerts = {"X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12",
                 "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12",
                 "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12",
@@ -591,11 +598,10 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             int VERTEX_MAX = 124;
             if (largeCB == null) {
                 largeCB = new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
-                return largeCB;
+                return new NonOrientedCBGraph(largeCB, graphName);
             } else {
                 return new NonOrientedCBGraph(largeCB, graphName);
             }
-
         }
     }
 
