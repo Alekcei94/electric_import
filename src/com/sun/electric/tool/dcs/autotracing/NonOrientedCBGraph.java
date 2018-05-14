@@ -462,7 +462,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * imports CB graph file.
      */
     private void importGraphFromFile() {//*
-        File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
         //File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);

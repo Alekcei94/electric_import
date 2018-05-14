@@ -55,6 +55,7 @@ public class NonOrientedCBGraphTest {
     }
 
     /*
+
     * Method reflection global variable String[] globVerts.
      */
     private String[] getReflectionGlobVerts(Class example, NonOrientedCBGraph sc) throws Exception {
@@ -78,7 +79,7 @@ public class NonOrientedCBGraphTest {
     /*
     *Use Reflection metod getCloseVerteces original
      */
-    private Integer[] getCloseVerteces(Class example, NonOrientedCBGraph sc, int getCloseVertecesParametr) throws Exception {
+    private Integer[] getReflectionCloseVerteces(Class example, NonOrientedCBGraph sc, int getCloseVertecesParametr) throws Exception {
         Class[] paramTypes = new Class[]{int.class};
         Method getCloseVerteces = example.getDeclaredMethod("getCloseVerteces", paramTypes);
         getCloseVerteces.setAccessible(true);
@@ -89,7 +90,7 @@ public class NonOrientedCBGraphTest {
     /*
     *Use Reflection metod findIntForLinksMatrix original
      */
-    private int findIntForLinksMatrix(Class example, NonOrientedCBGraph sc, String findThis) throws Exception {
+    private int getReflectionFindIntForLinksMatrix(Class example, NonOrientedCBGraph sc, String findThis) throws Exception {
         Class[] paramTypes = new Class[]{String.class};
         Method findIntForLinksMatrix = example.getDeclaredMethod("findIntForLinksMatrix", paramTypes);
         findIntForLinksMatrix.setAccessible(true);
@@ -117,15 +118,8 @@ public class NonOrientedCBGraphTest {
     public void testFindIntForLinksMatrix() throws Exception {
         System.out.println("findIntForLinksMatrix");
         
-        
-        /*Class[] paramTypes = new Class[]{String.class};
-        Constructor Constrct = example.getDeclaredConstructor(paramTypes);
-        Constrct.setAccessible(true);
-        NonOrientedCBGraph sc = (NonOrientedCBGraph) Constrct.newInstance("CB");*/
-        
         Class CBGraph = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
         NonOrientedCBGraph sc = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
-
         String[] globVerts = getReflectionGlobVerts(CBGraph, sc);
 
         int[] result = new int[10];
@@ -133,7 +127,7 @@ public class NonOrientedCBGraphTest {
         for (int i = 0; i < 10; i++) {
             int randomNumber = 0 + (int) (Math.random() * globVerts.length);
             String parametr = globVerts[randomNumber];
-            result[i] = findIntForLinksMatrix(CBGraph, sc, parametr);
+            result[i] = getReflectionFindIntForLinksMatrix(CBGraph, sc, parametr);
             expectedResult[i] = randomNumber;
         }
         assertArrayEquals(result, expectedResult);
@@ -195,25 +189,30 @@ public class NonOrientedCBGraphTest {
     @Test
     public void testFindVertex() throws ClassNotFoundException, Exception {
         System.out.println("findVertex");
-        
-        Class CBGraph = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
-        ConnectionGraphInterface sc = fab.createConnectionGraphCBLarge("CB<0");
+
+        Class example = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
+        NonOrientedCBGraph sc = (NonOrientedCBGraph) fab.createConnectionGraphCBLarge("CB");
 
         List<String> vertexFromFile = new ArrayList<>(testReadFileFromMethodFindVertex());
 
-        int[] result = new int[10];
-        int[] expectedResult = new int[10];
-        for (int j = 0; j < 10; j++) {
-            int randomNumber = 0 + (int) (Math.random() * vertexFromFile.size());
-            String vertex = vertexFromFile.get(randomNumber);
-            result[j] = getReflectionMethodFindVertex(CBGraph, sc, vertex);
-            for (int i = 0; i < vertexFromFile.size(); i++) {
-                if (vertexFromFile.get(i).equals(vertex)) {
-                    expectedResult[j] = i;
-                }
-            }
-        }
-        assertArrayEquals(result, expectedResult);
+        int result;
+        int expectedResult = 3;
+        Vertex[] vertexArrayq = new Vertex[5];
+
+        Field varible = example.getDeclaredField("vertexArray");
+        varible.setAccessible(true);
+        vertexArrayq[0] = new Vertex("X1");
+        vertexArrayq[1] = new Vertex("a3");
+        vertexArrayq[2] = new Vertex("k7");
+        vertexArrayq[3] = new Vertex("a4");
+        vertexArrayq[4] = new Vertex("a1");
+        varible.set(sc, vertexArrayq);
+        Vertex[] vertexArray = (Vertex[]) varible.get(sc);
+
+        String vertex = vertexFromFile.get(11);
+        result = getReflectionMethodFindVertex(example, sc, vertex);
+        
+       assertEquals(result, expectedResult);
 
     }
 
@@ -228,7 +227,9 @@ public class NonOrientedCBGraphTest {
             while ((line = graphListBufReader.readLine()) != null) {
                 String[] connectedVertices = line.split(" ");
                 for (int i = 0; i < connectedVertices.length; i++) {
-                    vertexFromFile.add(connectedVertices[i]);
+                    if (connectedVertices[i] != null) {
+                        vertexFromFile.add(connectedVertices[i]);
+                    }
                 }
             }
             return vertexFromFile;
