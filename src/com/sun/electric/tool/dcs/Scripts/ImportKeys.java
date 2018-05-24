@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: ExportKeys.java
+ * File: ImportKeys.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *

@@ -53,7 +53,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
 
     private int[][] matrix; // Adjacency matrix
     private String[][] keyMatrix; // matrix for key values (key number in CB.trc)
-    private int linksMatrix[][];
+    private final int linksMatrix[][];
 
     private List<Integer> VertToDeleteList = new ArrayList<>();
 
@@ -63,7 +63,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * matrix with size of GLOBAL_VERTS. @param graphName @param graphName.
      *
      * @param graphName the name of graph
-     * @param creator the creator of graph
      */
     private NonOrientedCBGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
         this.graphName = graphName;
@@ -73,31 +72,40 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         Init();
         importGraphFromFile();
         linksMatrix = new int[GLOBAL_VERTS][GLOBAL_VERTS];
+        refreshLinksMatrix();
     }
 
     /**
-     * Constructor: Copy constructor from NonOrientedCBGraph.
-     * LINKS MATRIX WILL NOT BE COPIED, BE CAREFUL.
+     * Constructor: Copy constructor from NonOrientedCBGraph. LINKS MATRIX WILL
+     * NOT BE COPIED, BE CAREFUL.
      */
     private NonOrientedCBGraph(NonOrientedCBGraph nocbg, String graphName) {
         this.graphName = graphName;
-        //vertexArray = nocbg.vertexArray;
-        vertexArray = new Vertex[nocbg.vertexArray.length];
+        this.globVerts = new String[nocbg.globVerts.length];
+        this.GLOBAL_VERTS = nocbg.GLOBAL_VERTS;
+        this.VERTEX_MAX = nocbg.VERTEX_MAX;
+
+        System.arraycopy(nocbg.globVerts, 0, globVerts, 0, globVerts.length);
+
+        Init();
+
+        this.vertexArray = new Vertex[nocbg.vertexArray.length];
         System.arraycopy(nocbg.vertexArray, 0, vertexArray, 0, vertexArray.length);
-        //matrix = nocbg.matrix;
-        matrix = new int[nocbg.matrix.length][nocbg.matrix[0].length];
+
+        this.matrix = new int[nocbg.matrix.length][nocbg.matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
             System.arraycopy(nocbg.matrix[i], 0, matrix[i], 0, nocbg.matrix[0].length);
         }
-        vertexCount = nocbg.vertexCount;
-        VERTEX_MAX = nocbg.VERTEX_MAX;
-        GLOBAL_VERTS = nocbg.GLOBAL_VERTS;
-        
-        //globVerts = nocbg.globVerts;
-        globVerts = new String[nocbg.globVerts.length];
-        System.arraycopy(nocbg.globVerts, 0, globVerts, 0, globVerts.length);
-        Init();
-        linksMatrix = nocbg.linksMatrix;
+
+        this.keyMatrix = new String[nocbg.keyMatrix.length][nocbg.keyMatrix[0].length];
+        for (int i = 0; i < keyMatrix.length; i++) {
+            System.arraycopy(nocbg.keyMatrix[i], 0, keyMatrix[i], 0, nocbg.keyMatrix[0].length);
+        }
+
+        this.vertexCount = nocbg.vertexCount;
+
+        this.linksMatrix = new int[this.GLOBAL_VERTS][this.GLOBAL_VERTS];
+        refreshLinksMatrix();
     }
 
     /**
@@ -190,6 +198,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @return external pins which should be marked as used coz there is USED
      * DIRECT connection to them in CB graph.
      */
+    @Override
     public List<Pair<String, String>> doDeleteUsedVerts() {//*
         Iterator<Integer> deleteItr = VertToDeleteList.iterator();
         while (deleteItr.hasNext()) {
@@ -221,6 +230,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
     /**
      * Reset for using in another Global graph.
      */
+    @Override
     public void reset() {
         VertToDeleteList = new ArrayList<>();
     }
@@ -242,7 +252,10 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                 }
             }
         }
+
         vertexArray[vertexCount++] = new Vertex(label);
+        /*System.out.println(vertexCount);
+        System.out.println(vertexArray[vertexCount-1].getLabel());*/
         return true;
     }
 
@@ -265,20 +278,30 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             String label = vertexArray[count].getLabel();
             vertexArray[count] = null;
             //Accessory.printLog(graphName);
-           // Accessory.printLog("label " + label);
-
-            Pair<String, String> pairToDelete = new Pair<>(graphName, label);
-            usedExternalPinsInGraph.add(pairToDelete);
+            // Accessory.printLog("label " + label);
+            boolean isExternal = false;
+            for (String vert : globVerts) {
+                if (vert.equals(label)) {
+                    isExternal = true;
+                    break;
+                }
+            }
+            if (isExternal) {
+                Pair<String, String> pairToDelete = new Pair<>(graphName, label);
+                usedExternalPinsInGraph.add(pairToDelete);
+            }
             //CREATOR.deleteChainCozUsedVertex(graphName, label); // DELETED COZ NEEDED INDEPENDENT MODULE
         }
     }
 
     /**
      * Method to get external pins those are connected to used internal pins.
-     * Potentially may cause memory leak because of using local collections for external method.
-     * @return 
+     * Potentially may cause memory leak because of using local collections for
+     * external method.
+     *
+     * @return
      */
-    public List<Pair<String, String>> getAdditionalUsedExternalPins() {//*
+    public List<Pair<String, String>> getAdditionalUsedExternalPins() {
         List<Pair<String, String>> newArrayList = new ArrayList<>();
         for (Pair<String, String> pair : usedExternalPinsInGraph) {
             newArrayList.add(pair);
@@ -448,7 +471,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * imports CB graph file.
      */
     private void importGraphFromFile() {//*
-       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+        File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
         //File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);
@@ -576,10 +599,11 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
 
         @Override
         public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {
-            String[] globVerts = {"X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12", "X13",
-                "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13",
-                "Z0", "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12", "Z13",
-                "K0", "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "K11", "K12", "K13"};
+            String[] globVerts = {"X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12",
+                "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12",
+                "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12",
+                "K1", "K2", "K3", "K4", "K5", "K6", "K7", "K8", "K9", "K10", "K11", "K12",
+                "K0/Y0", "X0/Z0", "X13/Z13", "K13/Y13"};
             int VERTEX_MAX = 124;
             if (largeCB == null) {
                 largeCB = new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
@@ -587,7 +611,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             } else {
                 return new NonOrientedCBGraph(largeCB, graphName);
             }
-
         }
     }
 

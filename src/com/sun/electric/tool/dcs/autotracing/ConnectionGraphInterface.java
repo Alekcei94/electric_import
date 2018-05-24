@@ -24,5 +24,5 @@ public interface ConnectionGraphInterface {
     
     public List<Pair<String, String>> doDeleteUsedVerts();
     
-    
+    public void reset();
 }
