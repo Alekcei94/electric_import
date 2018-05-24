@@ -5,6 +5,12 @@
  */
 package com.sun.electric.tool.dcs.FilterDesign;
 
+import com.sun.electric.tool.Job;
+import com.sun.electric.tool.JobException;
+import com.sun.electric.tool.user.User;
+import java.awt.CardLayout;
+import javax.swing.JPanel;
+
 /**
  *
  * @author diivanov
@@ -34,8 +40,28 @@ public class FilterDesignWindowUI extends javax.swing.JDialog {
         EllipticRadioButton = new javax.swing.JRadioButton();
         BesselRadioButton = new javax.swing.JRadioButton();
         StartButton = new javax.swing.JButton();
+        jPanelAfc = new javax.swing.JPanel();
+        jPanelForCardLayout = new javax.swing.JPanel();
+        jPanelForButter = new javax.swing.JPanel();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jPanelForCheby = new javax.swing.JPanel();
+        jTextField3 = new javax.swing.JTextField();
+        jTextField4 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jPanelForElliptic = new javax.swing.JPanel();
+        jTextField5 = new javax.swing.JTextField();
+        jTextField6 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jPanelForBessel = new javax.swing.JPanel();
+        jTextField7 = new javax.swing.JTextField();
+        jTextField8 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
+        setResizable(false);
 
         ChooseFilterType.add(ButterRadioButton);
         ButterRadioButton.setSelected(true);
@@ -48,34 +74,264 @@ public class FilterDesignWindowUI extends javax.swing.JDialog {
 
         ChooseFilterType.add(ChebyRadioButton);
         ChebyRadioButton.setText("Chebyshev");
+        ChebyRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ChebyRadioButtonActionPerformed(evt);
+            }
+        });
 
         ChooseFilterType.add(EllipticRadioButton);
         EllipticRadioButton.setText("Elliptic");
+        EllipticRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EllipticRadioButtonActionPerformed(evt);
+            }
+        });
 
         ChooseFilterType.add(BesselRadioButton);
         BesselRadioButton.setText("Bessel");
+        BesselRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BesselRadioButtonActionPerformed(evt);
+            }
+        });
 
         StartButton.setText("Build Fiilter");
+
+        jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanelAfcLayout = new javax.swing.GroupLayout(jPanelAfc);
+        jPanelAfc.setLayout(jPanelAfcLayout);
+        jPanelAfcLayout.setHorizontalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 596, Short.MAX_VALUE)
+        );
+        jPanelAfcLayout.setVerticalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        jPanelForCardLayout.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelForCardLayout.setLayout(new java.awt.CardLayout());
+
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setText("Butterworth Filter");
+        jTextField1.setToolTipText("Create and modify");
+
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField2.setToolTipText("Maximum order is 8");
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Gabriola", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 153, 255));
+        jLabel1.setText("Order");
+        jLabel1.setToolTipText("Maximum order is 8");
+
+        javax.swing.GroupLayout jPanelForButterLayout = new javax.swing.GroupLayout(jPanelForButter);
+        jPanelForButter.setLayout(jPanelForButterLayout);
+        jPanelForButterLayout.setHorizontalGroup(
+            jPanelForButterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForButterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelForButterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addGroup(jPanelForButterLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField2)))
+                .addContainerGap())
+        );
+        jPanelForButterLayout.setVerticalGroup(
+            jPanelForButterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForButterLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanelForButterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addContainerGap(303, Short.MAX_VALUE))
+        );
+
+        jPanelForCardLayout.add(jPanelForButter, "card2");
+
+        jTextField3.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField3.setText("Chebyshev Filter");
+        jTextField3.setToolTipText("Create and modify");
+
+        jTextField4.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField4.setToolTipText("Maximum order is 8");
+        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField4ActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Gabriola", 0, 24)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 153, 255));
+        jLabel2.setText("Order");
+        jLabel2.setToolTipText("Maximum order is 8");
+
+        javax.swing.GroupLayout jPanelForChebyLayout = new javax.swing.GroupLayout(jPanelForCheby);
+        jPanelForCheby.setLayout(jPanelForChebyLayout);
+        jPanelForChebyLayout.setHorizontalGroup(
+            jPanelForChebyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForChebyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelForChebyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addGroup(jPanelForChebyLayout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField4)))
+                .addContainerGap())
+        );
+        jPanelForChebyLayout.setVerticalGroup(
+            jPanelForChebyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForChebyLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanelForChebyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addContainerGap(303, Short.MAX_VALUE))
+        );
+
+        jPanelForCardLayout.add(jPanelForCheby, "card3");
+
+        jTextField5.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField5.setText("Elliptic filter");
+        jTextField5.setToolTipText("Create and modify");
+        jTextField5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField5ActionPerformed(evt);
+            }
+        });
+
+        jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField6.setToolTipText("Maximum order is 8");
+        jTextField6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField6ActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Gabriola", 0, 24)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 153, 255));
+        jLabel3.setText("Order");
+        jLabel3.setToolTipText("Maximum order is 8");
+
+        javax.swing.GroupLayout jPanelForEllipticLayout = new javax.swing.GroupLayout(jPanelForElliptic);
+        jPanelForElliptic.setLayout(jPanelForEllipticLayout);
+        jPanelForEllipticLayout.setHorizontalGroup(
+            jPanelForEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForEllipticLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelForEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addGroup(jPanelForEllipticLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField6)))
+                .addContainerGap())
+        );
+        jPanelForEllipticLayout.setVerticalGroup(
+            jPanelForEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForEllipticLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanelForEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addContainerGap(303, Short.MAX_VALUE))
+        );
+
+        jPanelForCardLayout.add(jPanelForElliptic, "card4");
+
+        jTextField7.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField7.setText("Bessel filter");
+        jTextField7.setToolTipText("Create and modify");
+
+        jTextField8.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField8.setToolTipText("Maximum order is 8");
+        jTextField8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField8ActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setFont(new java.awt.Font("Gabriola", 0, 24)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 153, 255));
+        jLabel4.setText("Order");
+        jLabel4.setToolTipText("Maximum order is 8");
+
+        javax.swing.GroupLayout jPanelForBesselLayout = new javax.swing.GroupLayout(jPanelForBessel);
+        jPanelForBessel.setLayout(jPanelForBesselLayout);
+        jPanelForBesselLayout.setHorizontalGroup(
+            jPanelForBesselLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForBesselLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelForBesselLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jTextField7, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                    .addGroup(jPanelForBesselLayout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField8)))
+                .addContainerGap())
+        );
+        jPanelForBesselLayout.setVerticalGroup(
+            jPanelForBesselLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelForBesselLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanelForBesselLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addContainerGap(303, Short.MAX_VALUE))
+        );
+
+        jPanelForCardLayout.add(jPanelForBessel, "card5");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(BesselRadioButton)
                     .addComponent(EllipticRadioButton)
                     .addComponent(ChebyRadioButton)
                     .addComponent(ButterRadioButton))
-                .addGap(305, 305, 305)
-                .addComponent(StartButton)
-                .addContainerGap(485, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(38, 38, 38)
+                .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(31, 31, 31))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(86, 86, 86))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(53, 53, 53)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelAfc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(26, 26, 26))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(99, 99, 99)
                 .addComponent(ButterRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(ChebyRadioButton)
@@ -83,22 +339,53 @@ public class FilterDesignWindowUI extends javax.swing.JDialog {
                 .addComponent(EllipticRadioButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(BesselRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 290, Short.MAX_VALUE)
-                .addComponent(StartButton)
-                .addGap(42, 42, 42))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void ButterRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButterRadioButtonActionPerformed
-        // TODO add your handling code here:
+        /*CardLayout card = (CardLayout) jPanelForCardLayout.getLayout();
+        card.show(jPanelForCardLayout, "jPanelForButter");*/
     }//GEN-LAST:event_ButterRadioButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void ChebyRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ChebyRadioButtonActionPerformed
+        /*CardLayout card = (CardLayout) jPanelForCardLayout.getLayout();
+        card.show(jPanelForCardLayout, "jPanelForCheby");*/
+    }//GEN-LAST:event_ChebyRadioButtonActionPerformed
+
+    private void EllipticRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EllipticRadioButtonActionPerformed
+        /*CardLayout card = (CardLayout) jPanelForCardLayout.getLayout();
+        card.show(jPanelForCardLayout, "jPanelForElliptic");*/
+    }//GEN-LAST:event_EllipticRadioButtonActionPerformed
+
+    private void BesselRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BesselRadioButtonActionPerformed
+        /*CardLayout card = (CardLayout) jPanelForCardLayout.getLayout();
+        card.show(jPanelForCardLayout, "jPanelForBessel");*/
+    }//GEN-LAST:event_BesselRadioButtonActionPerformed
+
+    private void jTextField8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField8ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField8ActionPerformed
+
+    private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField6ActionPerformed
+
+    private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField5ActionPerformed
+
+    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField4ActionPerformed
+
+    public static void invokeFilterUI() {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -125,11 +412,11 @@ public class FilterDesignWindowUI extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                FilterDesignWindowUI dialog = new FilterDesignWindowUI(new javax.swing.JFrame(), true);
+                final FilterDesignWindowUI dialog = new FilterDesignWindowUI(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
+                        dialog.dispose();
                     }
                 });
                 dialog.setVisible(true);
@@ -144,5 +431,27 @@ public class FilterDesignWindowUI extends javax.swing.JDialog {
     private javax.swing.ButtonGroup ChooseFilterType;
     private javax.swing.JRadioButton EllipticRadioButton;
     private javax.swing.JButton StartButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanelAfc;
+    private javax.swing.JPanel jPanelForBessel;
+    private javax.swing.JPanel jPanelForButter;
+    private javax.swing.JPanel jPanelForCardLayout;
+    private javax.swing.JPanel jPanelForCheby;
+    private javax.swing.JPanel jPanelForElliptic;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField jTextField6;
+    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField jTextField8;
     // End of variables declaration//GEN-END:variables
+
+    
+    
+    
 }

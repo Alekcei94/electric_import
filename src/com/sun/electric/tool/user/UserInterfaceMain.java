@@ -95,14 +95,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class to build the UserInterface for the main GUI version of the user interface.
+ * Class to build the UserInterface for the main GUI version of the user
+ * interface.
  */
 public class UserInterfaceMain extends AbstractUserInterface {
 
     static final Logger logger = LoggerFactory.getLogger("com.sun.electric.tool.user");
 
     /**
-     * Describe the windowing mode.  The current modes are MDI and SDI.
+     * Describe the windowing mode. The current modes are MDI and SDI.
      */
     public static enum Mode {
 
@@ -118,7 +119,9 @@ public class UserInterfaceMain extends AbstractUserInterface {
     private static Snapshot currentSnapshot = IdManager.stdIdManager.getInitialSnapshot();
     private static GraphicsPreferences currentGraphicsPreferences = null;
 //    private static EDatabase database = EDatabase.clientDatabase();
-    /** The progress during input. */
+    /**
+     * The progress during input.
+     */
     protected static Progress progress = null;
     private SplashWindow sw = null;
 //    private PrintStream stdout = System.out;
@@ -215,18 +218,17 @@ public class UserInterfaceMain extends AbstractUserInterface {
                 oldSnapshot = oldUndoSnapshot;
                 oldUndoSnapshot = null;
             }
-        	// checking if something went wrong with the GUI initialization process
-        	if (Job.getUserInterface() == null)
-        	{
+            // checking if something went wrong with the GUI initialization process
+            if (Job.getUserInterface() == null) {
                 System.out.println("Error in GUI Initialization '" + jobName + "'");
                 try {
-					throw new Exception("Can't start GUI");
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					ActivityLogger.logException(e);
-				}
+                    throw new Exception("Can't start GUI");
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    ActivityLogger.logException(e);
+                }
                 return;
-        	}
+            }
             int restoredHighlights = Undo.endChanges(oldSnapshot, tool, jobName, newSnapshot);
             showSnapshot(newSnapshot, undoRedo);
             restoreHighlights(restoredHighlights);
@@ -377,7 +379,6 @@ public class UserInterfaceMain extends AbstractUserInterface {
             }
 
             //runThreadStatusTimer();
-
             if (showSplash) {
                 sw = new SplashWindow();
             }
@@ -678,6 +679,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to show an error message.
+     *
      * @param message the error message to show.
      * @param title the title of a dialog with the error message.
      */
@@ -702,47 +704,56 @@ public class UserInterfaceMain extends AbstractUserInterface {
     private static final int LINELIMIT = 20;
 
     /**
-     * Method to break long messages into multiple lines so they fit in a dialog.
+     * Method to break long messages into multiple lines so they fit in a
+     * dialog.
+     *
      * @param message the original message
      * @return the message, broken into shorter lines.
      */
-    private String breakLongMessage(String message)
-    {
-    	if (message.length() <= WIDTHLIMIT) return message;
-    	StringBuffer sb = new StringBuffer();
-    	int numberOfLines = 0;
-    	while (message.length() > WIDTHLIMIT)
-    	{
-    		int blankPos = message.lastIndexOf(' ', WIDTHLIMIT);
-    		if (blankPos < 0) blankPos = WIDTHLIMIT;
-    		sb.append(message.substring(0, blankPos));
-    		sb.append("\n");
-    		if (message.charAt(blankPos) == ' ') blankPos++;
-    		message = message.substring(blankPos);
-    		numberOfLines++;
-    		if (numberOfLines > LINELIMIT)
-    			break; // reached limit of # of lines
-    	}
-    	// line limit not reached
-    	if (numberOfLines < LINELIMIT)
-    		sb.append(message);
-    	else
-    		sb.append(" and more ...");
-    	return sb.toString();
+    private String breakLongMessage(String message) {
+        if (message.length() <= WIDTHLIMIT) {
+            return message;
+        }
+        StringBuffer sb = new StringBuffer();
+        int numberOfLines = 0;
+        while (message.length() > WIDTHLIMIT) {
+            int blankPos = message.lastIndexOf(' ', WIDTHLIMIT);
+            if (blankPos < 0) {
+                blankPos = WIDTHLIMIT;
+            }
+            sb.append(message.substring(0, blankPos));
+            sb.append("\n");
+            if (message.charAt(blankPos) == ' ') {
+                blankPos++;
+            }
+            message = message.substring(blankPos);
+            numberOfLines++;
+            if (numberOfLines > LINELIMIT) {
+                break; // reached limit of # of lines
+            }
+        }
+        // line limit not reached
+        if (numberOfLines < LINELIMIT) {
+            sb.append(message);
+        } else {
+            sb.append(" and more ...");
+        }
+        return sb.toString();
     }
 
     /**
      * Method to show an informational message.
+     *
      * @param message the message to show.
      * @param title the title of a dialog with the message.
      */
-    public void showInformationMessage(final String message, final String title) 
-    {
-    	showInformationMessage(TopLevel.getCurrentJFrame(), message, title);
+    public void showInformationMessage(final String message, final String title) {
+        showInformationMessage(TopLevel.getCurrentJFrame(), message, title);
     }
 
     /**
      * Method to show an informational message.
+     *
      * @param frame top window to use. It could be null
      * @param message the message to show.
      * @param title the title of a dialog with the message.
@@ -759,9 +770,10 @@ public class UserInterfaceMain extends AbstractUserInterface {
             });
         }
     }
-    
+
     /**
      * Method print a message.
+     *
      * @param message the message to show.
      * @param newLine add new line after the message
      */
@@ -781,6 +793,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to start saving messages.
+     *
      * @param filePath file to save
      */
     public void saveMessages(final String filePath) {
@@ -814,9 +827,9 @@ public class UserInterfaceMain extends AbstractUserInterface {
     private static int commandNumber = 1;
 
     /**
-     * Method to report that the user issued a new command (click, keystroke, pulldown menu).
-     * The messages window separates output by command so that each command's results
-     * can be distinguished from others.
+     * Method to report that the user issued a new command (click, keystroke,
+     * pulldown menu). The messages window separates output by command so that
+     * each command's results can be distinguished from others.
      */
     public static void userCommandIssued() {
         newCommand = true;
@@ -841,6 +854,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to show a message and ask for confirmation.
+     *
      * @param message the message to show.
      * @return true if "yes" was selected, false if "no" was selected.
      */
@@ -851,6 +865,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to ask for a choice among possibilities.
+     *
      * @param message the message to show.
      * @param title the title of the dialog with the query.
      * @param choices an array of choices to present, each in a button.
@@ -891,6 +906,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to ask for a line of text.
+     *
      * @param message the prompt message.
      * @param title the title of a dialog with the message.
      * @param def the default response.
@@ -904,7 +920,9 @@ public class UserInterfaceMain extends AbstractUserInterface {
         return ret.toString();
     }
 
-    /** For Preference */
+    /**
+     * For Preference
+     */
     public static void importPrefs(URL fileURL) {
         assert Job.isClientThread();
         if (fileURL == null) {
@@ -959,6 +977,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Free highlights of specified EditWindow
+     *
      * @param wnd specified EditWindow
      */
     public static void freeHighlights(EditWindow_ wnd) {
@@ -971,6 +990,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Show status of undo/redo buttons
+     *
      * @param newUndoEnabled new status of undo button.
      * @param newRedoEnabled new status of redo button.
      */
@@ -991,6 +1011,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Show new database snapshot.saveh
+     *
      * @param newSnapshot new snapshot.
      */
     public void showSnapshot(Snapshot newSnapshot, boolean undoRedo) {
@@ -1050,8 +1071,9 @@ public class UserInterfaceMain extends AbstractUserInterface {
     }
 
     /**
-     * Method to tell whether undo can be done.
-     * This is used by the tool bar to determine whether the undo button should be available.
+     * Method to tell whether undo can be done. This is used by the tool bar to
+     * determine whether the undo button should be available.
+     *
      * @return true if undo can be done.
      */
     public static boolean getUndoEnabled() {
@@ -1059,8 +1081,9 @@ public class UserInterfaceMain extends AbstractUserInterface {
     }
 
     /**
-     * Method to tell whether redo can be done.
-     * This is used by the tool bar to determine whether the undo button should be available.
+     * Method to tell whether redo can be done. This is used by the tool bar to
+     * determine whether the undo button should be available.
+     *
      * @return true if redo can be done.
      */
     public static boolean getRedoEnabled() {
@@ -1123,21 +1146,26 @@ public class UserInterfaceMain extends AbstractUserInterface {
         }
     }
 
-    /** Add a DatabaseChangeListener. It will be notified when
-     * state of the database changes.
+    /**
+     * Add a DatabaseChangeListener. It will be notified when state of the
+     * database changes.
+     *
      * @param l the listener
      */
     public static synchronized void addDatabaseChangeListener(DatabaseChangeListener l) {
         listenerList.add(DatabaseChangeListener.class, l);
     }
 
-    /** Remove a DatabaseChangeListener. */
+    /**
+     * Remove a DatabaseChangeListener.
+     */
     public static synchronized void removeDatabaseChangeListener(DatabaseChangeListener l) {
         listenerList.remove(DatabaseChangeListener.class, l);
     }
 
     /**
      * Fire DatabaseChangeEvent to DatabaseChangeListeners.
+     *
      * @param e DatabaseChangeEvent.
      */
     public static void fireDatabaseChangeEvent(DatabaseChangeEvent e) {
@@ -1209,13 +1237,21 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     private static class SavedHighlights {
 
-        /** id of this saved state */
+        /**
+         * id of this saved state
+         */
         private final int id;
-        /** EditWindow_ of highlights */
+        /**
+         * EditWindow_ of highlights
+         */
         private final EditWindow_ wnd;
-        /** list of saved Highlights */
+        /**
+         * list of saved Highlights
+         */
         private final List<Highlight> savedHighlights;
-        /** saved Highlight offset */
+        /**
+         * saved Highlight offset
+         */
         private final Point2D savedHighlightsOffset;
 
         private SavedHighlights(int id, EditWindow_ wnd) {
@@ -1274,7 +1310,8 @@ public class UserInterfaceMain extends AbstractUserInterface {
     }
 
     /**
-     * This class handles deactivation of the splash screen and forces it back to the top.
+     * This class handles deactivation of the splash screen and forces it back
+     * to the top.
      */
     private static class WindowsEvents implements WindowListener {
 
@@ -1336,6 +1373,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 //    }
     /**
      * Method to start the display of a progress dialog.
+     *
      * @param msg the message to show in the progress dialog.
      * @param filePath the file being read (null if not reading a file).
      */
@@ -1367,6 +1405,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to update the progress bar
+     *
      * @param pct the percentage done (from 0 to 100).
      */
     public void setProgressValue(int pct) {
@@ -1378,6 +1417,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to set a text message in the progress dialog.
+     *
      * @param message the new progress message.
      */
     public void setProgressNote(String message) {
@@ -1389,6 +1429,7 @@ public class UserInterfaceMain extends AbstractUserInterface {
 
     /**
      * Method to get text message in the progress dialog.
+     *
      * @return text message in the progress dialog.
      */
     public String getProgressNote() {

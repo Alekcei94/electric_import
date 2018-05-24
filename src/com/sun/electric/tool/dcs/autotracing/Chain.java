@@ -35,9 +35,6 @@ public class Chain extends Vertex {
     private final List<String> vertsList = new ArrayList<>();
     private final String vertsFromGlobalGraph;
     private int weight = 1;
-    private boolean affected;
-    private boolean isIonChain;
-    private boolean isXYGlobal;
     private boolean isDeleted;
 
     /**
@@ -179,15 +176,6 @@ public class Chain extends Vertex {
     }
 
     /**
-     * Check if vert from vertsList contains ION.
-     *
-     * @return
-     */
-    public boolean checkForContainsION() {
-        return isIonChain;
-    }
-
-    /**
      * Method to get String line of chain.
      *
      * @return
@@ -248,24 +236,4 @@ public class Chain extends Vertex {
         Accessory.printLog("WIncrease. " + weight);
         weight += 4;
     }
-
-    public boolean isAffected() {
-        return affected;
-    }
-
-    public void setAffected() {
-        Iterator<String> vertItr = vertsList.iterator();
-        while (vertItr.hasNext()) {
-            String vert = vertItr.next();
-            if ((!vert.contains("CB")) && (!vert.contains("SPM"))) {
-                vertItr.remove();
-            }
-        }
-        this.affected = true;
-    }
-
-    public boolean isXYGlobal() {
-        return isXYGlobal;
-    }
-
 }

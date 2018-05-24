@@ -39,20 +39,20 @@ import java.util.regex.Pattern;
  * This class is used to describe global graph, this global graph is the complex
  * of all elements in scheme, global graph is using local CB graphs as parts.
  */
-public final class NonOrientedGlobalGraph {
+public final class NonOrientedGlobalGraph implements GlobalGraphInterface {
 
     private String graphName;
     private int vertexCount;
 
     private static final BinaryHeap.BinaryHeapFactory HEAP_FAB = new BinaryHeap.BinaryHeapFactory();
+    private static final NonOrientedCBGraph.CBFactory CB_FAB = new NonOrientedCBGraph.CBFactory();
 
     private Chain[] vertexArray; 						// Array of Vertices
     private Set<String> UsedBlockList = new HashSet<>();			// Used to avoid double-using blocks in autotracing
-    private List<NonOrientedCBGraph> noCBgList = new ArrayList<>();		// List of all local(CB) graphs linked to this global graph
-    private List<Integer> VertToDeleteList = new ArrayList<>();			//
-    private List<Integer> VertToAffectList = new ArrayList<>();	                // For SPM double-used ports
-    private List<Integer> VertToIncreaseList = new ArrayList<>();//
-    
+    private List<ConnectionGraphInterface> noCBgList = new ArrayList<>();		// List of all local(CB) graphs linked to this global graph
+    private List<Integer> VertToDeleteList = new ArrayList<>();
+    private List<Integer> VertToIncreaseList = new ArrayList<>();
+
     private final int VERTEX_MAX = 10000;                                       // $TODO_important change names
 
     private int startingPoint, endingPoint;                                     // set points those describe (vertexArray[int]) chain
@@ -94,7 +94,8 @@ public final class NonOrientedGlobalGraph {
 
     /**
      * Method to get the name of graph.
-     * @return 
+     *
+     * @return
      */
     public String getLabel() {
         return graphName;
@@ -326,17 +327,6 @@ public final class NonOrientedGlobalGraph {
                 continue;
             }
             for (Integer a1 : a) {
-                if (!ion) {
-                    if (vertexArray[a1].checkForContainsION()) { // method to optimize checkForContains("ION")
-                        continue;
-                    }
-                }
-                if (vertexArray[a1].isAffected()) {
-                    String res = vertexArray[a1].searchForPattern(niName); // method optimized
-                    if (res == null) {
-                        continue;
-                    }
-                }
                 currentVertex = a1;
                 int prewe = getWeight(currentVertex, closestVertex);
                 int weight = prewe + vertexArray[currentVertex].getWeight();
@@ -399,12 +389,7 @@ public final class NonOrientedGlobalGraph {
             deleteVertex(deleteItr.next());
             deleteItr.remove();
         }
-        Iterator<Integer> affectItr = VertToAffectList.iterator();
-        while (affectItr.hasNext()) {
-            affectVertex(affectItr.next());
-            affectItr.remove();
-        }
-        for (NonOrientedCBGraph nocbg : noCBgList) {
+        for (ConnectionGraphInterface nocbg : noCBgList) {
             nocbg.doDeleteUsedVerts();
         }
     }
@@ -415,7 +400,6 @@ public final class NonOrientedGlobalGraph {
      */
     public void resetLists() {
         VertToDeleteList = new ArrayList<>();
-        VertToAffectList = new ArrayList<>();
     }
 
     /**
@@ -478,10 +462,7 @@ public final class NonOrientedGlobalGraph {
     protected Integer[] getCloseChains(String[] CBLabel) {
         Set<Integer> cbChains = new HashSet<>();
         for (int v = 0; v < vertexCount; v++) {
-            if (vertexArray[v] == null) {
-                continue;
-            }
-            if (vertexArray[v].getVisited() == true) {
+            if ((vertexArray[v] == null)||(vertexArray[v].getVisited() == true)) {
                 continue;
             }
             for (String cbl : CBLabel) {
@@ -505,7 +486,7 @@ public final class NonOrientedGlobalGraph {
      * @param label
      * @return
      */
-    protected boolean addVertex(String line, String label) {
+    private boolean addVertex(String line, String label) {
         vertexArray[vertexCount++] = new Chain(line, label);
         return true;
     }
@@ -516,7 +497,7 @@ public final class NonOrientedGlobalGraph {
      * @param count
      * @Param count is the number of vertex that should be deleted,
      */
-    protected void deleteVertex(int count) {
+    private void deleteVertex(int count) {
         assert count >= 0;
         if (vertexArray[count] != null) {
             Accessory.printLog("Deleted Vertex " + vertexArray[count].getLine());
@@ -526,30 +507,12 @@ public final class NonOrientedGlobalGraph {
                 String spl = CommonMethods.parsePortToBlock(vert);
                 String port = CommonMethods.parsePortToPort(vert);
                 if (spl.split("<")[0].equals("CB")) {                                      // Only CB's verteces should be deleted
-                    NonOrientedCBGraph noCBg = getOrCreateLocalGraph(spl);
+                    ConnectionGraphInterface noCBg = getOrCreateLocalGraph(spl);
                     Accessory.printLog(spl + " toDelete");
                     noCBg.deleteKeyFromCBGraph(port);
-                    /*if(vertexArray[count].isXYGlobal()) {
-                        noCBg.deleteKeyFromCBGraph(spl, Accessory.parsePortToPort(vert));
-                    }*/
                 }
 
             }
-        }
-    }
-
-    /**
-     * Method to affect vertex in graph, SPM affected vertex was used in SPM but
-     * wasn't used by other blocks
-     *
-     * @param count
-     * @Param count is the number of vertex that should be deleted,
-     */
-    public void affectVertex(int count) {
-        assert count >= 0;
-        if (vertexArray[count] != null) {
-            Accessory.printLog("Affected Vertex " + vertexArray[count].getLine());
-            vertexArray[count].setAffected();
         }
     }
 
@@ -559,7 +522,7 @@ public final class NonOrientedGlobalGraph {
      *
      * @param VERTEX_MAX
      */
-    protected void Init(int VERTEX_MAX) {
+    private void Init(int VERTEX_MAX) {
         vertexArray = new Chain[VERTEX_MAX];
     }
 
@@ -687,7 +650,7 @@ public final class NonOrientedGlobalGraph {
     /**
      * This method implements the deikstra algorithm to find the optimal way
      * through graph, this method can delete vertices to dynamic modification of
-     * graph,
+     * graph.
      *
      * @Param doDelete is true to delete all vertices on the way,
      * @Params startPoint and endPoint show the edges labels of needed way.
@@ -760,11 +723,7 @@ public final class NonOrientedGlobalGraph {
     private int deikstra_backway_with_delete(int endPoint, int startPoint, boolean doDelete, boolean doWrite, boolean SPMAffected) {
         int currentVertex = endPoint;
         if (doDelete) {
-            if ((SPMAffected) && (vertexArray[currentVertex].checkForContains("SPM"))) {
-                VertToAffectList.add(currentVertex);
-            } else {
-                VertToDeleteList.add(currentVertex);
-            }
+            VertToDeleteList.add(currentVertex);
         }
 
         int counter = 1;
@@ -791,11 +750,7 @@ public final class NonOrientedGlobalGraph {
                     counter++;
                     if (currentVertex == startPoint) {
                         if (doDelete) {
-                            if ((SPMAffected) && (vertexArray[currentVertex].searchForPattern("SPM") != null)) {
-                                VertToAffectList.add(currentVertex);
-                            } else {
-                                VertToDeleteList.add(currentVertex);
-                            }
+                            VertToDeleteList.add(currentVertex);
                         }
                     }
 
@@ -817,10 +772,10 @@ public final class NonOrientedGlobalGraph {
      */
     private int getWeight(int currentVertex, int closestVertex) {
         String[] array = getStringParamsFromChain(currentVertex, closestVertex);
-        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
+        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[2]);
         int result = localGraphic.getWeight(array[0], array[1]);
         if (array.length > 3) {
-            NonOrientedCBGraph localGraphic2 = getOrCreateLocalGraph(array[5]);
+            ConnectionGraphInterface localGraphic2 = getOrCreateLocalGraph(array[5]);
             int result2Equal = localGraphic2.getWeight(array[3], array[4]);
             if ((result2Equal < result) && (result2Equal != 0)) {
                 return result2Equal;
@@ -841,10 +796,10 @@ public final class NonOrientedGlobalGraph {
      */
     private void getConfigurationKeys(int currentVertex, int closestVertex) {
         String[] array = getStringParamsFromChain(currentVertex, closestVertex);
-        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
+        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[2]);
         int result = localGraphic.getWeight(array[0], array[1]);
         if (array.length > 3) {                                                               // 2nd CB found
-            NonOrientedCBGraph localGraphic2 = getOrCreateLocalGraph(array[5]);
+            ConnectionGraphInterface localGraphic2 = getOrCreateLocalGraph(array[5]);
             int result2Equal = localGraphic2.getWeight(array[3], array[4]);                  // check if another way is better
             if ((result2Equal < result) && (result2Equal != 0)) {
                 localGraphic2.getConfigurationPath(array[3], array[4]);
@@ -899,15 +854,15 @@ public final class NonOrientedGlobalGraph {
      *
      * @Param graphLabel is the "CB<216" type of label.
      */
-    private NonOrientedCBGraph getOrCreateLocalGraph(String graphLabel) {
+    private ConnectionGraphInterface getOrCreateLocalGraph(String graphLabel) {
         for (int z = 0; z < noCBgList.size(); z++) {
             if (noCBgList.get(z).getLabel().equals(graphLabel)) {
                 return noCBgList.get(z);
             }
         }
 
-        NonOrientedCBGraph localGraphic = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge(graphLabel);
-        localGraphic.refreshLinksMatrix();
+        ConnectionGraphInterface localGraphic = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge(graphLabel);
+        //localGraphic.refreshLinksMatrix();
         noCBgList.add(localGraphic);
         return localGraphic;
     }
@@ -1005,12 +960,12 @@ public final class NonOrientedGlobalGraph {
                     }
                     String[] array = vertexArray[i].searchForCB();
                     if (array.length > 2) {
-                        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
+                        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[2]);
                         localGraphic.deleteKeyFromCBGraph(array[3]);
                         localGraphic = getOrCreateLocalGraph(array[0]);
                         localGraphic.deleteKeyFromCBGraph(array[1]);
                     } else if (array.length > 0) {
-                        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[0]);
+                        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[0]);
                         localGraphic.deleteKeyFromCBGraph(array[1]);
                     }
                 }
@@ -1034,16 +989,16 @@ public final class NonOrientedGlobalGraph {
                 String[] array = vertexArray[i].searchForCB();
                 if ((array.length > 4) && (!vertexArray[i].isDeleted())) {
                     for (int j = 0; j < array.length; j += 2) {
-                        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[j]);
+                        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[j]);
                         localGraphic.deleteKeyFromCBGraph(array[j + 1]);
                     }
                     vertexArray[i].setDeleted();
                 } else if ((array.length > 2) && (!vertexArray[i].isDeleted())) {
                     if ((array[0].equals(block)) && (array[1].equals(key))) {
-                        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[2]);
+                        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[2]);
                         localGraphic.deleteKeyFromCBGraph(array[3]);
                     } else if ((array[2].equals(block)) && (array[3].equals(key))) {
-                        NonOrientedCBGraph localGraphic = getOrCreateLocalGraph(array[0]);
+                        ConnectionGraphInterface localGraphic = getOrCreateLocalGraph(array[0]);
                         localGraphic.deleteKeyFromCBGraph(array[1]);
                     }
                     vertexArray[i].setDeleted();
@@ -1077,6 +1032,21 @@ public final class NonOrientedGlobalGraph {
             String line;
             while ((line = graphListBufReader.readLine()) != null) {
                 addVertex(line, line.split(" ")[0]);
+            }
+        }
+    }
+    
+    public static class GlobalGraphFactory implements GlobalGraphFactoryInterface {
+
+        private static NonOrientedGlobalGraph nogg;
+
+        @Override
+        public GlobalGraphInterface createGlobalGraph(String graphName) {          
+            if (nogg == null) {
+                nogg = new NonOrientedGlobalGraph(graphName);
+                return new NonOrientedGlobalGraph(nogg);
+            } else {
+                return new NonOrientedGlobalGraph(nogg);
             }
         }
     }
