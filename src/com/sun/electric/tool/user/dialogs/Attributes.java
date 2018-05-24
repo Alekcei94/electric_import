@@ -76,8 +76,8 @@ import javax.swing.event.ListSelectionListener;
 /**
  * Class to handle the "Attributes" dialog.
  */
-public class Attributes extends EModelessDialog implements HighlightListener, DatabaseChangeListener
-{
+public class Attributes extends EModelessDialog implements HighlightListener, DatabaseChangeListener {
+
     private static Attributes theDialog = null;
     private DefaultListModel listModel;
     private JList list;
@@ -92,7 +92,7 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
 
     private String initialName;
     private String initialValue;
-	private boolean showParamsOnly = !Job.getDebug();
+    private boolean showParamsOnly = !Job.getDebug();
 
     private TextAttributesPanel attrPanel;
     private TextInfoPanel textPanel;
@@ -103,62 +103,67 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Method to show the Attributes dialog.
      */
-    public static void showDialog()
-    {
-        if (theDialog == null)
-        {
-        	JFrame jf = null;
-            if (TopLevel.isMDIMode()) jf = TopLevel.getCurrentJFrame();
+    public static void showDialog() {
+        if (theDialog == null) {
+            JFrame jf = null;
+            if (TopLevel.isMDIMode()) {
+                jf = TopLevel.getCurrentJFrame();
+            }
             theDialog = new Attributes(jf);
         }
         theDialog.loadAttributesInfo(false);
-        if (!theDialog.isVisible())
-		{
-        	theDialog.pack();
-        	theDialog.ensureProperSize();
-    		theDialog.setVisible(true);
-		}
-		theDialog.toFront();
-   }
+        if (!theDialog.isVisible()) {
+            theDialog.pack();
+            theDialog.ensureProperSize();
+            theDialog.setVisible(true);
+        }
+        theDialog.toFront();
+    }
 
     /**
      * Reloads the dialog when Highlights change
      */
-    public void highlightChanged(Highlighter which)
-    {
-        if (!isVisible()) return;
+    public void highlightChanged(Highlighter which) {
+        if (!isVisible()) {
+            return;
+        }
         loadAttributesInfo(false);
     }
 
     /**
-     * Called when by a Highlighter when it loses focus. The argument
-     * is the Highlighter that has gained focus (may be null).
-     * @param highlighterGainedFocus the highlighter for the current window (may be null).
+     * Called when by a Highlighter when it loses focus. The argument is the
+     * Highlighter that has gained focus (may be null).
+     *
+     * @param highlighterGainedFocus the highlighter for the current window (may
+     * be null).
      */
     public void highlighterLostFocus(Highlighter highlighterGainedFocus) {
-        if (!isVisible()) return;
+        if (!isVisible()) {
+            return;
+        }
         loadAttributesInfo(false);
     }
 
     /**
      * Reload if the database has changed in a way we care about
+     *
      * @param e database change event
      */
     public void databaseChanged(DatabaseChangeEvent e) {
-        if (!isVisible()) return;
+        if (!isVisible()) {
+            return;
+        }
 
-		// update dialog
-		if (e.objectChanged(selectedObject))
-		{
+        // update dialog
+        if (e.objectChanged(selectedObject)) {
             loadAttributesInfo(true);
-		}
+        }
     }
 
     /**
      * Creates new form Attributes.
      */
-    private Attributes(Frame parent)
-    {
+    private Attributes(Frame parent) {
         super(parent);
         initComponents();
 
@@ -182,31 +187,37 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         cellRenderer = new VariableCellRenderer();
         list.setCellRenderer(cellRenderer);
         listPane.setViewportView(list);
-        list.addListSelectionListener(new ListSelectionListener()
-		{
-			public void valueChanged(ListSelectionEvent evt) { listClick(); }
-		});
+        list.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                listClick();
+            }
+        });
 
         // have the radio buttons at the top reevaluate
-        currentCell.addActionListener(new ActionListener()
-		{
-            public void actionPerformed(ActionEvent evt) { objectSelectorActionPerformed(evt); }
+        currentCell.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                objectSelectorActionPerformed(evt);
+            }
         });
-        currentNode.addActionListener(new ActionListener()
-		{
-            public void actionPerformed(ActionEvent evt) { objectSelectorActionPerformed(evt); }
+        currentNode.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                objectSelectorActionPerformed(evt);
+            }
         });
-        currentArc.addActionListener(new ActionListener()
-		{
-            public void actionPerformed(ActionEvent evt) { objectSelectorActionPerformed(evt); }
+        currentArc.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                objectSelectorActionPerformed(evt);
+            }
         });
-        currentExport.addActionListener(new ActionListener()
-		{
-            public void actionPerformed(ActionEvent evt) { objectSelectorActionPerformed(evt); }
+        currentExport.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                objectSelectorActionPerformed(evt);
+            }
         });
-        currentPort.addActionListener(new ActionListener()
-		{
-            public void actionPerformed(ActionEvent evt) { objectSelectorActionPerformed(evt); }
+        currentPort.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                objectSelectorActionPerformed(evt);
+            }
         });
 
         currentPort.setEnabled(false);
@@ -237,51 +248,70 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         finishInitialization();
     }
 
-	protected void escapePressed() { done(null); }
+    protected void escapePressed() {
+        done(null);
+    }
 
-	/**
-	 * Class to handle special changes to changes to a Attributes edit fields.
-	 */
-	private static class TextInfoDocumentListener implements DocumentListener
-	{
-		Attributes dialog;
+    /**
+     * Class to handle special changes to changes to a Attributes edit fields.
+     */
+    private static class TextInfoDocumentListener implements DocumentListener {
 
-		TextInfoDocumentListener(Attributes dialog) { this.dialog = dialog; }
+        Attributes dialog;
 
-		public void changedUpdate(DocumentEvent e) { dialog.fieldChanged(); }
-		public void insertUpdate(DocumentEvent e) { dialog.fieldChanged(); }
-		public void removeUpdate(DocumentEvent e) { dialog.fieldChanged(); }
-	}
+        TextInfoDocumentListener(Attributes dialog) {
+            this.dialog = dialog;
+        }
 
-	private void fieldChanged()
-	{
-		if (loading) return;
+        public void changedUpdate(DocumentEvent e) {
+            dialog.fieldChanged();
+        }
+
+        public void insertUpdate(DocumentEvent e) {
+            dialog.fieldChanged();
+        }
+
+        public void removeUpdate(DocumentEvent e) {
+            dialog.fieldChanged();
+        }
+    }
+
+    private void fieldChanged() {
+        if (loading) {
+            return;
+        }
 
         Variable var = getSelectedVariable();
-        if (var == null) return;
+        if (var == null) {
+            return;
+        }
 
         // see if value changed
         String varValue = value.getText().trim();
-        if (!varValue.equals(initialValue))
-        {
+        if (!varValue.equals(initialValue)) {
             // generate Job to update value
             new ChangeAttribute(var.getKey(), selectedObject, getVariableObject(varValue));
             initialValue = varValue;
         }
-	}
+    }
 
     /**
      * Method called when the user clicks on one of the top radio buttons.
      * Changes the object being examined for attributes.
      */
-    private void objectSelectorActionPerformed(ActionEvent evt)
-    {
-        currentButton = (JRadioButton)evt.getSource();
-        if (currentButton == currentCell) selectedObject = selectedCell;
-        else if (currentButton == currentNode) selectedObject = selectedNode;
-        else if (currentButton == currentArc) selectedObject = selectedArc;
-        else if (currentButton == currentExport) selectedObject = selectedExport;
-        else if (currentButton == currentPort) selectedObject = selectedPort;
+    private void objectSelectorActionPerformed(ActionEvent evt) {
+        currentButton = (JRadioButton) evt.getSource();
+        if (currentButton == currentCell) {
+            selectedObject = selectedCell;
+        } else if (currentButton == currentNode) {
+            selectedObject = selectedNode;
+        } else if (currentButton == currentArc) {
+            selectedObject = selectedArc;
+        } else if (currentButton == currentExport) {
+            selectedObject = selectedExport;
+        } else if (currentButton == currentPort) {
+            selectedObject = selectedPort;
+        }
         updateList();
         checkName();
     }
@@ -289,101 +319,104 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Method called when the user clicks in the list of attribute names.
      */
-    private void listClick()
-    {
+    private void listClick() {
         showSelectedAttribute(null);
     }
 
     /**
      * Method to reload the entire dialog from the current highlighting.
      */
-    private void loadAttributesInfo(boolean keepObj)
-    {
-    	loading = true;
+    private void loadAttributesInfo(boolean keepObj) {
+        loading = true;
 
-    	if (!keepObj)
-    	{
-	        // determine what attributes can be set
-	        selectedObject = null;
-	        selectedCell = null;
-	        selectedNode = null;
-	        selectedArc = null;
-	        selectedExport = null;
-	        selectedPort = null;
-	        selectedVarKey = null;
+        if (!keepObj) {
+            // determine what attributes can be set
+            selectedObject = null;
+            selectedCell = null;
+            selectedNode = null;
+            selectedArc = null;
+            selectedExport = null;
+            selectedPort = null;
+            selectedVarKey = null;
 
-	        currentButton = currentCell;
+            currentButton = currentCell;
 
-	        // update current window
-	        EditWindow curWnd = EditWindow.getCurrent();
-	        selectedCell = WindowFrame.needCurCell();   selectedObject = selectedCell;
-	        if (curWnd == null) selectedCell = null;
-	        if (selectedCell != null)
-	        {
+            // update current window
+            EditWindow curWnd = EditWindow.getCurrent();
+            selectedCell = WindowFrame.needCurCell();
+            selectedObject = selectedCell;
+            if (curWnd == null) {
+                selectedCell = null;
+            }
+            if (selectedCell != null) {
                 if (showParamsOnly) {
                     if (!selectedCell.isIcon() && !selectedCell.isSchematic()) {
                         selectedCell = null;
                     } else {
                         mainLabel.setText("Parameters on " + selectedCell.getName() + ":");
                     }
-                }
-                else if (curWnd.getHighlighter().getNumHighlights() == 1)
-	            {
-	                Highlight high = curWnd.getHighlighter().getHighlights().iterator().next();
-	                ElectricObject eobj = high.getElectricObject();
-	                if (high.isHighlightEOBJ())
-	                {
-	                    if (eobj instanceof ArcInst)
-	                    {
-	                        selectedArc = (ArcInst)eobj;   selectedObject = selectedArc;   currentButton = currentArc;
-	                    } else if (eobj instanceof NodeInst)
-	                    {
-	                        selectedNode = (NodeInst)eobj;   selectedObject = selectedNode;   currentButton = currentNode;
-	                    } else if (eobj instanceof PortInst)
-	                    {
-	                        PortInst pi = (PortInst)eobj;
-	                        selectedNode = pi.getNodeInst();   selectedObject = selectedNode;   currentButton = currentNode;
-	                        selectedPort = pi;
-	                    }
-	                } else if (high.isHighlightText())
-	                {
-	                	selectedVarKey = high.getVarKey();
-	                    if (selectedVarKey != null)
-	                    {
-	                        if (eobj instanceof NodeInst)
-	                        {
-	                            selectedNode = (NodeInst)eobj;   selectedObject = selectedNode;   currentButton = currentNode;
-	                        } else if (eobj instanceof ArcInst)
-	                        {
-	                            selectedArc = (ArcInst)eobj;   selectedObject = selectedArc;   currentButton = currentArc;
-	                        } else if (eobj instanceof PortInst)
-	                        {
-	                            selectedPort = (PortInst)eobj;   selectedObject = selectedPort;   currentButton = currentPort;
-	                            selectedNode = selectedPort.getNodeInst();
-	                        } else if (eobj instanceof Export)
-	                        {
-	                            selectedExport = (Export)eobj;   selectedObject = selectedExport;   currentButton = currentExport;
-	                        }
-	                    } else if (high.getVarKey() == NodeInst.NODE_NAME || high.getVarKey() == NodeInst.NODE_PROTO)
-	                    {
+                } else if (curWnd.getHighlighter().getNumHighlights() == 1) {
+                    Highlight high = curWnd.getHighlighter().getHighlights().iterator().next();
+                    ElectricObject eobj = high.getElectricObject();
+                    if (high.isHighlightEOBJ()) {
+                        if (eobj instanceof ArcInst) {
+                            selectedArc = (ArcInst) eobj;
+                            selectedObject = selectedArc;
+                            currentButton = currentArc;
+                        } else if (eobj instanceof NodeInst) {
+                            selectedNode = (NodeInst) eobj;
+                            selectedObject = selectedNode;
+                            currentButton = currentNode;
+                        } else if (eobj instanceof PortInst) {
+                            PortInst pi = (PortInst) eobj;
+                            selectedNode = pi.getNodeInst();
+                            selectedObject = selectedNode;
+                            currentButton = currentNode;
+                            selectedPort = pi;
+                        }
+                    } else if (high.isHighlightText()) {
+                        selectedVarKey = high.getVarKey();
+                        if (selectedVarKey != null) {
+                            if (eobj instanceof NodeInst) {
+                                selectedNode = (NodeInst) eobj;
+                                selectedObject = selectedNode;
+                                currentButton = currentNode;
+                            } else if (eobj instanceof ArcInst) {
+                                selectedArc = (ArcInst) eobj;
+                                selectedObject = selectedArc;
+                                currentButton = currentArc;
+                            } else if (eobj instanceof PortInst) {
+                                selectedPort = (PortInst) eobj;
+                                selectedObject = selectedPort;
+                                currentButton = currentPort;
+                                selectedNode = selectedPort.getNodeInst();
+                            } else if (eobj instanceof Export) {
+                                selectedExport = (Export) eobj;
+                                selectedObject = selectedExport;
+                                currentButton = currentExport;
+                            }
+                        } else if (high.getVarKey() == NodeInst.NODE_NAME || high.getVarKey() == NodeInst.NODE_PROTO) {
                             // node name
-                            selectedNode = (NodeInst)eobj;   selectedObject = selectedNode;   currentButton = currentNode;
-	                    } else if (high.getVarKey() == ArcInst.ARC_NAME)
-	                    {
+                            selectedNode = (NodeInst) eobj;
+                            selectedObject = selectedNode;
+                            currentButton = currentNode;
+                        } else if (high.getVarKey() == ArcInst.ARC_NAME) {
                             // arc name
-                            selectedArc = (ArcInst)eobj;   selectedObject = selectedArc;   currentButton = currentArc;
-	                    } else if (high.getVarKey() == Export.EXPORT_NAME)
-	                    {
-	                        selectedExport = (Export)eobj;   selectedObject = selectedExport;   currentButton = currentExport;
-	                    }
-	                }
-	            }
-	        }
-    	}
+                            selectedArc = (ArcInst) eobj;
+                            selectedObject = selectedArc;
+                            currentButton = currentArc;
+                        } else if (high.getVarKey() == Export.EXPORT_NAME) {
+                            selectedExport = (Export) eobj;
+                            selectedObject = selectedExport;
+                            currentButton = currentExport;
+                        }
+                    }
+                }
+            }
+        }
 
         // show initial values in the dialog
-        if (selectedCell == null)
-        {
+        if (selectedCell == null) {
             // nothing can be done: dim the entire dialog
             currentCell.setEnabled(false);
             cellName.setText("NO CURRENT CELL");
@@ -403,7 +436,7 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
             renameButton.setEnabled(false);
             textPanel.setTextDescriptor(null, null);
             attrPanel.setVariable(null, null);
-        	loading = false;
+            loading = false;
             return;
         }
 
@@ -421,11 +454,12 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
 
         // show all attributes on the selected object
         updateList();
-        if (selectedVarKey != null)
+        if (selectedVarKey != null) {
             showSelectedAttribute(selectedVarKey);
-        else
+        } else {
             checkName();
-    	loading = false;
+        }
+        loading = false;
     }
 
     private void checkName() {
@@ -442,16 +476,17 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
             return;
         }
 
-        if (showParamsOnly)
+        if (showParamsOnly) {
             varName = "ATTR_" + varName;
+        }
 
         // try to find variable
         Variable.Key varKey = Variable.newKey(varName);
-        if (selectedObject.getParameterOrVariable(varKey) != null)
-        {
+        if (selectedObject.getParameterOrVariable(varKey) != null) {
             // make sure var is selected
-            if (varKey != null)
-            	list.setSelectedValue(varKey, true);
+            if (varKey != null) {
+                list.setSelectedValue(varKey, true);
+            }
         } else {
             // no such var, remove selection and enable new buttons
             newButton.setEnabled(true);
@@ -466,76 +501,71 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Updates List of attributes on selected object
      */
-    private void updateList()
-    {
+    private void updateList() {
         list.clearSelection();
         listModel.clear();
 
         // show the parameters
         Set<Variable.Key> seen = new HashSet<Variable.Key>();
         Iterator<Variable> it = null;
-        if (selectedObject instanceof Cell)
-        {
-        	Cell cell = (Cell)selectedObject;
-        	it = cell.getParameters();
+        if (selectedObject instanceof Cell) {
+            Cell cell = (Cell) selectedObject;
+            it = cell.getParameters();
         }
-        if (selectedObject instanceof NodeInst)
-        {
-        	NodeInst ni = (NodeInst)selectedObject;
-        	it = ni.getParameters();
+        if (selectedObject instanceof NodeInst) {
+            NodeInst ni = (NodeInst) selectedObject;
+            it = ni.getParameters();
         }
-        if (it != null)
-        {
-        	List<Variable.Key> params = new ArrayList<Variable.Key>();
-            for( ; it.hasNext(); )
-            {
-	            Variable var = it.next();
-	            params.add(var.getKey());
+        if (it != null) {
+            List<Variable.Key> params = new ArrayList<Variable.Key>();
+            for (; it.hasNext();) {
+                Variable var = it.next();
+                params.add(var.getKey());
             }
-            if (params.size() > 0)
-            {
-            	if (!showParamsOnly)
+            if (params.size() > 0) {
+                if (!showParamsOnly) {
                     listModel.addElement("------------ PARAMETERS ------------");
-            	for(Variable.Key key : params)
-            	{
-		            listModel.addElement(key);
-		            seen.add(key);
-            	}
+                }
+                for (Variable.Key key : params) {
+                    listModel.addElement(key);
+                    seen.add(key);
+                }
             }
         }
 
         // show variables if requested
-        if (!showParamsOnly)
-        {
-        	List<Variable.Key> variables = new ArrayList<Variable.Key>();
-	        for(Iterator<Variable> vIt = selectedObject.getVariables(); vIt.hasNext(); )
-	        {
-	            Variable var = vIt.next();
-	            if (seen.contains(var.getKey())) continue;
-	            variables.add(var.getKey());
-	        }
-	        if (variables.size() > 0)
-	        {
-	            listModel.addElement("------------ VARIABLES ------------");
-		        for(Variable.Key key : variables)
-		            listModel.addElement(key);
-	        }
+        if (!showParamsOnly) {
+            List<Variable.Key> variables = new ArrayList<Variable.Key>();
+            for (Iterator<Variable> vIt = selectedObject.getVariables(); vIt.hasNext();) {
+                Variable var = vIt.next();
+                if (seen.contains(var.getKey())) {
+                    continue;
+                }
+                variables.add(var.getKey());
+            }
+            if (variables.size() > 0) {
+                listModel.addElement("------------ VARIABLES ------------");
+                for (Variable.Key key : variables) {
+                    listModel.addElement(key);
+                }
+            }
         }
     }
 
     /**
      * Method to return the Variable that is selected in the dialog.
-     * @return the Variable that is selected.  Returns null if none are.
+     *
+     * @return the Variable that is selected. Returns null if none are.
      */
-    Variable getSelectedVariable()
-    {
+    Variable getSelectedVariable() {
         int i = list.getSelectedIndex();
-        if (i < 0) return null;
+        if (i < 0) {
+            return null;
+        }
         Object selectedObj = list.getSelectedValue();
-        if (selectedObj instanceof Variable.Key)
-        {
-	        Variable.Key key = (Variable.Key)selectedObj;
-	        return selectedObject.getParameterOrVariable(key);
+        if (selectedObj instanceof Variable.Key) {
+            Variable.Key key = (Variable.Key) selectedObj;
+            return selectedObject.getParameterOrVariable(key);
         }
         return null;
     }
@@ -543,42 +573,45 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Method to convert a string to a proper Object for storage in a Variable.
      * Currently knows only Integer, Double, and String.
+     *
      * @param text the text describing the Variable's value.
      * @return an Object that contains the value.
      */
-    private Object getVariableObject(String text)
-    {
-        if (TextUtils.isANumber(text))
-        {
+    private Object getVariableObject(String text) {
+        if (TextUtils.isANumber(text)) {
             int i = TextUtils.atoi(text);
             double d = TextUtils.atof(text);
-            if (i == d) return new Integer(i);
+            if (i == d) {
+                return new Integer(i);
+            }
             return new Double(d);
         }
         return text;
     }
 
     /**
-     * Method to display the aspects of the currently selected Variable in the dialog.
-     * @param selectThisKey if non-null, select this variable first, and then update dialog.
+     * Method to display the aspects of the currently selected Variable in the
+     * dialog.
+     *
+     * @param selectThisKey if non-null, select this variable first, and then
+     * update dialog.
      */
-    void showSelectedAttribute(Variable.Key selectThisKey)
-    {
-        if (selectThisKey != null)
+    void showSelectedAttribute(Variable.Key selectThisKey) {
+        if (selectThisKey != null) {
             list.setSelectedValue(selectThisKey, true);
+        }
 
         Variable var = getSelectedVariable();
-        if (var == null)
-        {
+        if (var == null) {
             renameButton.setEnabled(false);
             deleteButton.setEnabled(false);
-        	return;
+            return;
         }
         selectedVarKey = var.getKey();
 
         // set the Name field
-		boolean oldLoading = loading;
-		loading = true;
+        boolean oldLoading = loading;
+        loading = true;
         initialName = getVariableText(var.getKey());
         String pt = initialName;
         name.setText(pt);
@@ -587,32 +620,35 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         initialValue = var.getPureValue(-1);
 
         // set the Value field
-		String oldValue = value.getText();
-		if (!oldValue.equals(initialValue))
-			value.setText(initialValue);
-        if (var.getObject() instanceof Object []) {
+        String oldValue = value.getText();
+        if (!oldValue.equals(initialValue)) {
+            value.setText(initialValue);
+        }
+        if (var.getObject() instanceof Object[]) {
             value.setEditable(false);
         } else {
             value.setEditable(true);
         }
-		loading = oldLoading;
+        loading = oldLoading;
 
         // set the evaluation field
         if (var.isCode()) {
             Object eval = VarContext.globalContext.evalVar(var);
-            if (eval == null)
+            if (eval == null) {
                 evaluation.setText("");
-            else
+            } else {
                 evaluation.setText(eval.toString());
+            }
         } else {
             evaluation.setText("");
         }
 
         // set the text info panel
-		if (var.isDisplay())
-			textPanel.setTextDescriptor(var.getKey(), selectedObject);
-		else
-			textPanel.setTextDescriptor(null, null);
+        if (var.isDisplay()) {
+            textPanel.setTextDescriptor(var.getKey(), selectedObject);
+        } else {
+            textPanel.setTextDescriptor(null, null);
+        }
         attrPanel.setVariable(var.getKey(), selectedObject);
 
         // enable buttons
@@ -624,29 +660,32 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Class to delete an attribute in a new thread.
      */
-    private static class DeleteAttribute extends Job
-	{
+    private static class DeleteAttribute extends Job {
+
         private Variable var;
         private ElectricObject owner;
 
-        private DeleteAttribute(Variable var, ElectricObject owner)
-        {
+        private DeleteAttribute(Variable var, ElectricObject owner) {
             super("Delete Attribute", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
             this.var = var;
             this.owner = owner;
             startJob();
         }
 
-        public boolean doIt() throws JobException
-        {
-            if (var == null) return false;
+        public boolean doIt() throws JobException {
+            if (var == null) {
+                return false;
+            }
             Variable.Key varKey = var.getKey();
             if (owner.isParam(varKey)) {
                 if (owner instanceof Cell) {
-                	CellGroup cg = ((Cell)owner).getCellGroup();
-                    if (cg != null) cg.delParam((Variable.AttrKey)varKey);
-                } else if (owner instanceof NodeInst)
-                    ((NodeInst)owner).delParameter(varKey);
+                    CellGroup cg = ((Cell) owner).getCellGroup();
+                    if (cg != null) {
+                        cg.delParam((Variable.AttrKey) varKey);
+                    }
+                } else if (owner instanceof NodeInst) {
+                    ((NodeInst) owner).delParameter(varKey);
+                }
             } else {
                 owner.delVar(varKey);
             }
@@ -662,8 +701,7 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         private transient Attributes dialog;
 
         private CreateAttribute(String newName, Object newValue, ElectricObject owner, Attributes dialog,
-        	boolean addToInstances, TextDescriptor useThis, EditingPreferences ep)
-        {
+                boolean addToInstances, TextDescriptor useThis, EditingPreferences ep) {
             super("Create Attribute", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
             this.owner = owner;
             this.dialog = dialog;
@@ -671,35 +709,30 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
 
             // determine textdescriptor for the variable
             TextDescriptor td = useThis;
-            if (useThis == null)
-            {
-	            if (owner instanceof Cell)
-	            {
-	            	td = ep.getCellTextDescriptor().withParam(true).withInherit(true);
-	            } else if (owner instanceof NodeInst)
-	            {
-	            	td = ep.getNodeTextDescriptor();
-	            } else if (owner instanceof ArcInst)
-	            {
-	            	td = ep.getArcTextDescriptor();
-	            } else if (owner instanceof Export)
-	            {
-	            	td = ep.getExportTextDescriptor();
-	            } else if (owner instanceof PortInst)
-	            {
-	            	td = ep.getPortInstTextDescriptor();
-	            } else return;
+            if (useThis == null) {
+                if (owner instanceof Cell) {
+                    td = ep.getCellTextDescriptor().withParam(true).withInherit(true);
+                } else if (owner instanceof NodeInst) {
+                    td = ep.getNodeTextDescriptor();
+                } else if (owner instanceof ArcInst) {
+                    td = ep.getArcTextDescriptor();
+                } else if (owner instanceof Export) {
+                    td = ep.getExportTextDescriptor();
+                } else if (owner instanceof PortInst) {
+                    td = ep.getPortInstTextDescriptor();
+                } else {
+                    return;
+                }
 
-	            // add in specified factors
-	            td = dialog.attrPanel.withPanelValues(td);
-	            td = dialog.textPanel.withPanelValues(td);
+                // add in specified factors
+                td = dialog.attrPanel.withPanelValues(td);
+                td = dialog.textPanel.withPanelValues(td);
 
-	            if (owner instanceof Cell)
-	            {
-	            	// find nonconflicting location of this cell attribute
-	            	Point2D offset = ((Cell)owner).newVarOffset();
-	            	td = td.withOff(offset.getX(), offset.getY());
-	            }
+                if (owner instanceof Cell) {
+                    // find nonconflicting location of this cell attribute
+                    Point2D offset = ((Cell) owner).newVarOffset();
+                    td = td.withOff(offset.getX(), offset.getY());
+                }
             }
 
             newValue = dialog.attrPanel.withPanelCode(newValue);
@@ -710,42 +743,39 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         }
 
         @Override
-        public boolean doIt() throws JobException
-        {
+        public boolean doIt() throws JobException {
             EditingPreferences ep = getEditingPreferences();
             // check if var of this name already exists on object
-            if (owner.getParameterOrVariable(newVar.getKey()) != null)
-                throw new JobException("Can't create new attribute "+newVar+", already exists");
+            if (owner.getParameterOrVariable(newVar.getKey()) != null) {
+                throw new JobException("Can't create new attribute " + newVar + ", already exists");
+            }
 
-            if (owner instanceof Cell && newVar.getTextDescriptor().isParam())
-            {
-            	Cell c = (Cell)owner;
-            	if (c.isLayout())
-            	{
-            		System.out.println("Paramters are only valid for schematic/icon cells");
-            		return false;
-            	}
-            	// create the parameter
-            	CellGroup group = c.getCellGroup();
-            	if (group != null) group.addParam(newVar);
-            	owner.setTextDescriptor(newVar.getKey(), newVar.getTextDescriptor());
-                if (addToInstances)
-                {
-	                for (Cell cell : ((Cell)owner).getCellsInGroup())
-	                {
-	                    if (!cell.isIcon()) continue;
-	                    for(Iterator<NodeInst> nIt = cell.getInstancesOf(); nIt.hasNext(); )
-	                    {
-	                    	NodeInst ni = nIt.next();
-		                    CircuitChangeJobs.inheritCellParameter(newVar, ni, ep);
-	                    }
-	                }
+            if (owner instanceof Cell && newVar.getTextDescriptor().isParam()) {
+                Cell c = (Cell) owner;
+                if (c.isLayout()) {
+                    System.out.println("Paramters are only valid for schematic/icon cells");
+                    return false;
                 }
-            } else if (owner instanceof NodeInst && ((NodeInst)owner).isParam(newVar.getKey()))
-            {
-                ((NodeInst)owner).addParameter(newVar.withParam(true));
-            } else
-            {
+                // create the parameter
+                CellGroup group = c.getCellGroup();
+                if (group != null) {
+                    group.addParam(newVar);
+                }
+                owner.setTextDescriptor(newVar.getKey(), newVar.getTextDescriptor());
+                if (addToInstances) {
+                    for (Cell cell : ((Cell) owner).getCellsInGroup()) {
+                        if (!cell.isIcon()) {
+                            continue;
+                        }
+                        for (Iterator<NodeInst> nIt = cell.getInstancesOf(); nIt.hasNext();) {
+                            NodeInst ni = nIt.next();
+                            CircuitChangeJobs.inheritCellParameter(newVar, ni, ep);
+                        }
+                    }
+                }
+            } else if (owner instanceof NodeInst && ((NodeInst) owner).isParam(newVar.getKey())) {
+                ((NodeInst) owner).addParameter(newVar.withParam(true));
+            } else {
                 // create the attribute
                 owner.addVar(newVar);
             }
@@ -753,21 +783,19 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         }
 
         @Override
-        public void terminateOK()
-        {
-        	dialog.updateList();
+        public void terminateOK() {
+            dialog.updateList();
             dialog.showSelectedAttribute(newVar.getKey());
         }
     }
 
-    private static class RenameAttribute extends Job
-    {
+    private static class RenameAttribute extends Job {
+
         private String varName;
         private String newVarName;
         private ElectricObject owner;
 
-        protected RenameAttribute(String varName, String newVarName, ElectricObject owner)
-        {
+        protected RenameAttribute(String varName, String newVarName, ElectricObject owner) {
             super("Rename Attribute", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
             this.varName = varName;
             this.newVarName = newVarName;
@@ -775,20 +803,18 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
             startJob();
         }
 
-        public boolean doIt() throws JobException
-        {
+        public boolean doIt() throws JobException {
             Variable.Key varKey = Variable.newKey(varName);
             if (owner.isParam(varKey)) {
                 if (owner instanceof Cell) {
-                    Variable.AttrKey newParamKey = (Variable.AttrKey)Variable.newKey(newVarName);
-                    ((Cell)owner).getCellGroup().renameParam((Variable.AttrKey)varKey, newParamKey);
+                    Variable.AttrKey newParamKey = (Variable.AttrKey) Variable.newKey(newVarName);
+                    ((Cell) owner).getCellGroup().renameParam((Variable.AttrKey) varKey, newParamKey);
                 } else if (owner instanceof NodeInst) {
                     System.out.println("Can't rename parameter on instance. Rename it on icon cell.");
                 }
             } else {
                 Variable var = owner.renameVar(varName, newVarName);
-                if (var == null)
-                {
+                if (var == null) {
                     System.out.println("Rename of variable failed");
                     return false;
                 }
@@ -800,14 +826,13 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     /**
      * Class to create or modify an attribute in a new thread.
      */
-    private static class ChangeAttribute extends Job
-	{
+    private static class ChangeAttribute extends Job {
+
         private Variable.Key varKey;
         private ElectricObject owner;
         private Object newValue;
 
-        protected ChangeAttribute(Variable.Key varKey, ElectricObject owner, Object newValue)
-        {
+        protected ChangeAttribute(Variable.Key varKey, ElectricObject owner, Object newValue) {
             super("Change Attribute", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
             this.varKey = varKey;
             this.owner = owner;
@@ -816,85 +841,84 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         }
 
         @Override
-        public boolean doIt() throws JobException
-        {
+        public boolean doIt() throws JobException {
             EditingPreferences ep = getEditingPreferences();
             // get Variable by name
             Variable var = owner.getParameterOrVariable(varKey);
-            if (var == null)
-				throw new JobException("Could not update Attribute " + varKey + ": it does not exist");
+            if (var == null) {
+                throw new JobException("Could not update Attribute " + varKey + ": it does not exist");
+            }
 
             // change the Value field if a new Variable is being created or if the value changed
             newValue = Variable.withCode(newValue, var.getCode());
             if (owner instanceof Cell && owner.isParam(varKey)) {
-            	CellGroup cg = ((Cell)owner).getCellGroup();
-            	cg.updateParam((Variable.AttrKey)varKey, newValue, var.getUnit());
+                CellGroup cg = ((Cell) owner).getCellGroup();
+                cg.updateParam((Variable.AttrKey) varKey, newValue, var.getUnit());
             } else {
                 var = owner.updateVar(varKey, newValue, ep);
-                if (var == null)
+                if (var == null) {
                     throw new JobException("Error updating Attribute " + varKey);
+                }
             }
             return true;
         }
     }
 
-	/**
-	 * Used to display Variables in the JList
-	 */
-	private class VariableCellRenderer extends JLabel implements ListCellRenderer {
+    /**
+     * Used to display Variables in the JList
+     */
+    private class VariableCellRenderer extends JLabel implements ListCellRenderer {
 
-		private VariableCellRenderer() { }
+        private VariableCellRenderer() {
+        }
 
-		public Component getListCellRendererComponent(JList list, Object value, int index,
-			boolean isSelected, boolean cellHasFocus)
-		{
-			if (value instanceof Variable.Key)
-			{
-				setText(getVariableText((Variable.Key)value));
-			} else if (value instanceof Variable)
-			{
-				setText(getVariableText(((Variable)value).getKey()));
-			} else
-			{
-				setText(value.toString());
-			}
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            if (value instanceof Variable.Key) {
+                setText(getVariableText((Variable.Key) value));
+            } else if (value instanceof Variable) {
+                setText(getVariableText(((Variable) value).getKey()));
+            } else {
+                setText(value.toString());
+            }
 
-			if (isSelected) {
-				setBackground(list.getSelectionBackground());
-				setForeground(list.getSelectionForeground());
-			} else {
-				setBackground(list.getBackground());
-				setForeground(list.getForeground());
-			}
-			setEnabled(list.isEnabled());
-			setFont(list.getFont());
-			setOpaque(true);
-			return this;
-		}
-	}
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+            setEnabled(list.isEnabled());
+            setFont(list.getFont());
+            setOpaque(true);
+            return this;
+        }
+    }
 
-	private String getVariableText(Variable.Key varKey)
-	{
-		String varName = varKey.getName();
+    private String getVariableText(Variable.Key varKey) {
+        String varName = varKey.getName();
 
-		// two modes: show attributes only, and show everything
-		if (showParamsOnly)
-		{
-			if (varName.startsWith("ATTR_"))
-				return varName.substring(5);
-		}
+        // two modes: show attributes only, and show everything
+        if (showParamsOnly) {
+            if (varName.startsWith("ATTR_")) {
+                return varName.substring(5);
+            }
+        }
 
-		// else this is not an attribute
-		// see if any cell, node, or arc variables are available to the user
-		String betterName = Variable.betterVariableName(varName);
-		if (betterName != null) return betterName;
-		return varName;
-	}
+        // else this is not an attribute
+        // see if any cell, node, or arc variables are available to the user
+        String betterName = Variable.betterVariableName(varName);
+        if (betterName != null) {
+            return betterName;
+        }
+        return varName;
+    }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -1195,54 +1219,61 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     }// </editor-fold>//GEN-END:initComponents
 
     private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
-		CellBrowser dialog = new CellBrowser(TopLevel.getCurrentJFrame(), true, CellBrowser.DoAction.selectCellToCopy);
-		dialog.setVisible(true);
-		Cell cell = dialog.getSelectedCell();
-		if (cell == null) return;
-		Set<Variable.Key> seen = new HashSet<Variable.Key>(); 
-		for(Iterator<Variable> it = cell.getParameters(); it.hasNext(); )
-		{
-			Variable var = it.next();
-	        new CreateAttribute(var.getKey().getName(), var.getObject(), selectedObject, this, applyToInstances.isSelected(),
-	        	var.getTextDescriptor(), UserInterfaceMain.getEditingPreferences());
-	        seen.add(var.getKey());
-		}
-        if (!showParamsOnly)
-        {
-	        for(Iterator<Variable> vIt = cell.getVariables(); vIt.hasNext(); )
-	        {
-	            Variable var = vIt.next();
-	            if (seen.contains(var.getKey())) continue;
-		        new CreateAttribute(var.getKey().getName(), var.getObject(), selectedObject, this, applyToInstances.isSelected(),
-		        	var.getTextDescriptor(), UserInterfaceMain.getEditingPreferences());
-	        }
+        CellBrowser dialog = new CellBrowser(TopLevel.getCurrentJFrame(), true, CellBrowser.DoAction.selectCellToCopy);
+        dialog.setVisible(true);
+        Cell cell = dialog.getSelectedCell();
+        if (cell == null) {
+            return;
+        }
+        Set<Variable.Key> seen = new HashSet<Variable.Key>();
+        for (Iterator<Variable> it = cell.getParameters(); it.hasNext();) {
+            Variable var = it.next();
+            new CreateAttribute(var.getKey().getName(), var.getObject(), selectedObject, this, applyToInstances.isSelected(),
+                    var.getTextDescriptor(), UserInterfaceMain.getEditingPreferences());
+            seen.add(var.getKey());
+        }
+        if (!showParamsOnly) {
+            for (Iterator<Variable> vIt = cell.getVariables(); vIt.hasNext();) {
+                Variable var = vIt.next();
+                if (seen.contains(var.getKey())) {
+                    continue;
+                }
+                new CreateAttribute(var.getKey().getName(), var.getObject(), selectedObject, this, applyToInstances.isSelected(),
+                        var.getTextDescriptor(), UserInterfaceMain.getEditingPreferences());
+            }
         }
 	}//GEN-LAST:event_copyButtonActionPerformed
 
 	private void editValueActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editValueActionPerformed
 	{//GEN-HEADEREND:event_editValueActionPerformed
-		String editedValue = JOptionPane.showInputDialog("New Value:", value.getText());
-		if (editedValue == null) return;
-		value.setText(editedValue);
+            String editedValue = JOptionPane.showInputDialog("New Value:", value.getText());
+            if (editedValue == null) {
+                return;
+            }
+            value.setText(editedValue);
 	}//GEN-LAST:event_editValueActionPerformed
 
     private void renameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameButtonActionPerformed
-    	String newName = (String)JOptionPane.showInputDialog(this, "New name for " + name.getText(),
-            "Rename Attribute", JOptionPane.QUESTION_MESSAGE, null, null, name.getText());
-        if (newName == null) return;
+        String newName = (String) JOptionPane.showInputDialog(this, "New name for " + name.getText(),
+                "Rename Attribute", JOptionPane.QUESTION_MESSAGE, null, null, name.getText());
+        if (newName == null) {
+            return;
+        }
         newName = newName.trim();
-        if (newName.equals(""))
-        {
+        if (newName.equals("")) {
             JOptionPane.showMessageDialog(this, "Attribute name must not be empty",
-                "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // if same name, ignore
-        if (newName.equals(name.getText())) return;
+        if (newName.equals(name.getText())) {
+            return;
+        }
 
-        if (showParamsOnly)
+        if (showParamsOnly) {
             newName = "ATTR_" + newName;
+        }
 
         // check if variable name already exists
         Variable var = selectedObject.getParameterOrVariable(Variable.newKey(newName));
@@ -1253,11 +1284,13 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         }
 
         Variable selVar = getSelectedVariable();
-        if (selVar != null)
-        	new RenameAttribute(selVar.getKey().getName(), newName, selectedObject);
+        if (selVar != null) {
+            new RenameAttribute(selVar.getKey().getName(), newName, selectedObject);
+        }
 
-        if (showParamsOnly)
+        if (showParamsOnly) {
             newName = newName.substring(5);
+        }
 
         // set current name to renamed name
         initialName = newName;
@@ -1271,7 +1304,7 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
 
 	private void done(java.awt.event.ActionEvent evt)//GEN-FIRST:event_done
 	{//GEN-HEADEREND:event_done
-        closeDialog(null);
+            closeDialog(null);
 	}//GEN-LAST:event_done
 
     private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
@@ -1280,16 +1313,17 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
         String varName = name.getText().trim();
         if (varName.trim().length() == 0) {
             JOptionPane.showMessageDialog(null, "Attribute name must not be empty",
-                "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                    "Invalid Input", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (showParamsOnly)
+        if (showParamsOnly) {
             varName = "ATTR_" + varName;
+        }
 
         // check if var of this name already exists on object
         if (selectedObject.getParameterOrVariable(Variable.newKey(varName)) != null) {
-            JOptionPane.showMessageDialog(null, "Can't create new attribute "+varName+", already exists",
-                "Invalid Action", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Can't create new attribute " + varName + ", already exists",
+                    "Invalid Action", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -1306,12 +1340,15 @@ public class Attributes extends EModelessDialog implements HighlightListener, Da
     private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deleteButtonActionPerformed
     {//GEN-HEADEREND:event_deleteButtonActionPerformed
         // delete the attribute
-    	Variable var = getSelectedVariable();
-    	if (var != null)
-    		new DeleteAttribute(var, selectedObject);
+        Variable var = getSelectedVariable();
+        if (var != null) {
+            new DeleteAttribute(var, selectedObject);
+        }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
-    /** Closes the dialog */
+    /**
+     * Closes the dialog
+     */
     private void closeDialog(java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog
     {
         setVisible(false);

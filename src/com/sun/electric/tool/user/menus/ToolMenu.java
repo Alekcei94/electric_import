@@ -69,6 +69,9 @@ import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
+import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
+import com.sun.electric.tool.dcs.FunctionalException;
+import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;
@@ -178,7 +181,8 @@ public class ToolMenu {
 
     static EMenu makeMenu() {
         /**
-         * **************************** THE TOOLS MENU *****************************
+         * **************************** THE TOOLS MENU
+         * *****************************
          */
 
         // mnemonic keys available: A CDEFGHI KLMNOPQR TUVWXYZ
@@ -376,7 +380,6 @@ public class ToolMenu {
                         FileMenu.exportCommand(FileType.SPICE, true);
                     }
                 },
-                        
                         new EMenuItem("Simulate") {
                     public void run() {
                         SimOut.exportCommand(FileType.SPICE, true);
@@ -1130,7 +1133,36 @@ public class ToolMenu {
                 listToolsCommand();
             }
         },
-                languageMenu);
+                languageMenu,
+                // ------------------- DCS
+                // mnemonic keys available: BCDEF HIJKLMN QR U XYZ
+                new EMenu("DCS scripts",
+                        new EMenuItem("Export keys") {
+                    public void run() {
+                        try {
+                            new ExportKeys().formConfigFromScheme();
+                        } catch(FunctionalException fe) {
+                            fe.printStackTrace();
+                            assert false;
+                        }
+                        
+                    }
+                },
+                        new EMenuItem("tryFilterUI") {
+                    public void run() {
+                        new FilterDesignWindowUIFrame.InitiateForm();
+                    }
+                },
+                        new EMenuItem("345") {
+                    public void run() {
+                        
+                    }
+                },
+                        new EMenuItem("567") {
+                    public void run() {
+                        
+                    }
+                }));
     }
 
     // ---------------------------- Tools Menu Commands ----------------------------

@@ -175,6 +175,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      */
     @Override
     public int getWeight(String elemFrom, String elemTo) {
+        // WE SHOULD RETURN -1 OR SMTH LIKE THAT IF WE CAN'T FIND THE WAY THROUGH GRAPH.
         return linksMatrix[findIntForLinksMatrix(elemFrom)][findIntForLinksMatrix(elemTo)];
     }
 
@@ -593,12 +594,13 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         private static NonOrientedCBGraph largeCB;
 
         @Override
-        public NonOrientedCBGraph createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
+        public ConnectionGraphInterface createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
             return new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
         }
 
         @Override
-        public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {
+
+        public ConnectionGraphInterface createConnectionGraphCBLarge(String graphName) {          
             String[] globVerts = {"X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12",
                 "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12",
                 "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12",

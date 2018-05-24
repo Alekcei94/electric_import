@@ -25,7 +25,6 @@ import com.sun.electric.database.topology.ArcInst;
 import com.sun.electric.database.topology.Connection;
 import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
-import com.sun.electric.database.variable.ElectricObject;
 import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.CommonMethods;
@@ -56,14 +55,41 @@ public class ExportKeys {
      */
     public void formConfigFromScheme() throws FunctionalException {
         Cell curcell = Job.getUserInterface().getCurrentCell();
+        ArrayList<String> configurationList = new ArrayList<>();
         Iterator<NodeInst> niItr = curcell.getNodes();
         while (niItr.hasNext()) {
             NodeInst ni = niItr.next();
-            getConfigFromOneNodeInst(ni);
+            System.out.println(ni.toString());
+            // HERE WE SHOULD AVOID OTHER BLOCKS WHICH MAYBE HAVE PARAMETERS
+            configurationList.addAll(getConfigFromOneNodeInst(ni));
+        }
+        
+        for(String str : configurationList) {
+            System.out.println("mainResult " + str);
         }
     }
 
     private ArrayList<String> getConfigFromOneNodeInst(NodeInst ni) throws FunctionalException {
+        // There are some unintersting blocks like "node generic:Facet-Center['art@0']" 
+        ArrayList<String> listOfBlocks = new ArrayList<>();
+        listOfBlocks.add("CB");
+        listOfBlocks.add("SPM");
+        listOfBlocks.add("CAPA");
+        listOfBlocks.add("RESA");
+        listOfBlocks.add("PPC");
+        listOfBlocks.add("PAM");
+        boolean isBlock = false;
+        for(String block : listOfBlocks) {
+            if(ni.toString().contains(block)) {
+                isBlock = true;
+            }
+        }
+        // return if this block is not block with keys
+        if(!isBlock) {
+            return new ArrayList<>();
+        }
+        
+        
         String parameterOfBlock = getOnlyParamOfNodeInst(ni);
 
         ArrayList<String> partConfigList = new ArrayList<>();
@@ -73,7 +99,7 @@ public class ExportKeys {
         while (niItr.hasNext()) {
             NodeInst key = niItr.next();
             if (key.getProto().getName().equals("key")) {
-                if (isClosedKey(key)) {
+                if (isClosedKey(ni, key)) {
                     partConfigList.add(getConfigForKey(key, parameterOfBlock));
                 }
             }
@@ -83,47 +109,62 @@ public class ExportKeys {
 
     /*
     * Method to show if the key is closed or not.
+    * THERE SHOULDN'T BE MORE THAN 1 
     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2.
-    */
-    private boolean isClosedKey(NodeInst key) throws FunctionalException {
+     */
+    private boolean isClosedKey(NodeInst ni, NodeInst key) throws FunctionalException {
         Iterator<PortInst> itrPorts = key.getPortInsts();
         while (itrPorts.hasNext()) {
             PortInst pi = itrPorts.next();
             String port = CommonMethods.parsePortToPort(pi.toString());
-            if ((port.equals("M1") || (port.equals("M2")))) {
+            System.out.println("port " + port);
+            if (port.equals("M1")) {
+                System.out.println(pi.getNodeInst().toString());
                 Iterator<Connection> ctnItr = pi.getConnections();
                 Connection ctn = getOnlyIteratorObject(ctnItr);
                 ArcInst ai = ctn.getArc();
-                
+                System.out.println("port " + ai.toString());
+
                 Connection ctnTail = ai.getConnection(0);
                 Connection ctnHead = ai.getConnection(1);
                 Connection ctnNext;
-                if(ctn.toString().equals(ctnTail.toString())) {
+                if (ctn.toString().equals(ctnTail.toString())) {
                     ctnNext = ctnHead;
                 } else {
                     ctnNext = ctnTail;
                 }
-                
+
                 PortInst outPort = ctnNext.getPortInst();
+
+                System.out.println("outPort " + outPort.toString());
+
                 Export outExport = getOnlyIteratorObject(outPort.getExports());
-                PortInst outsidePort = outExport.getOriginalPort();
+                PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
+
+                System.out.println("outsidePort " + outsidePort.toString());
                 
-                if(!outsidePort.hasConnections()) {
+                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"+getOnlyParamOfNodeInst(key)+"_1")) {
+                    throw new FunctionalException("Incorrect CB map");
+                }
+
+                if (!outsidePort.hasConnections()) {
                     return false;
                 }
                 Connection outsideCtn = getOnlyIteratorObject(outsidePort.getConnections());
-                
+
                 ArcInst outsideArc = outsideCtn.getArc();
-                
+                System.out.println("outsideArc " + outsideArc.toString());
+
                 ctnTail = outsideArc.getConnection(0);
                 ctnHead = outsideArc.getConnection(1);
-                if(outsideCtn.toString().equals(ctnTail.toString())) {
+                if (outsideCtn.toString().equals(ctnTail.toString())) {
                     ctnNext = ctnHead;
                 } else {
                     ctnNext = ctnTail;
                 }
                 PortInst secondPort = ctnNext.getPortInst();
-                if(CommonMethods.parsePortToPort(secondPort.toString()).contains("mAd")) {
+                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd"+getOnlyParamOfNodeInst(key)+"_2")) {
+                    System.out.println("mAd"+getOnlyParamOfNodeInst(key)+" is connected");
                     return true;
                 }
             }
@@ -140,20 +181,21 @@ public class ExportKeys {
         Iterator<Variable> varItr = ni.getParameters();
         while (varItr.hasNext()) {
             Variable var = varItr.next();
-            paramList.add((String) var.getObject());
+            paramList.add(var.getObject().toString());
+            System.out.println("var " + var.getObject().toString());
         }
         if (paramList.size() != 1) {
             throw new FunctionalException("There shouldn't be more than one parameters for global blocks");
         }
         return paramList.get(0);
     }
-    
+
     private <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) throws FunctionalException {
         ArrayList<A> objectsList = new ArrayList<>();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             objectsList.add(iterator.next());
         }
-        if(objectsList.size() != 1) {
+        if (objectsList.size() != 1) {
             throw new FunctionalException("More than one object in iterator");
         }
         return objectsList.get(0);
