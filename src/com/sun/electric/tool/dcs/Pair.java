@@ -19,12 +19,7 @@
  */
 package com.sun.electric.tool.dcs;
 
-import com.sun.electric.database.topology.ArcInst;
-import com.sun.electric.database.topology.NodeInst;
-import com.sun.electric.database.topology.PortInst;
-
 /**
- *
  * @author diivanov
  * @param <T>
  * @param <V>

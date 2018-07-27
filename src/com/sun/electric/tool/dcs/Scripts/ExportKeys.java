@@ -79,6 +79,10 @@ public class ExportKeys {
         listOfBlocks.add("PPC");
         listOfBlocks.add("PAM");
         boolean isBlock = false;
+        /*if(listOfBlocks.contains(ni.toString())) {
+            isBlock = true;
+        }*/
+        // node basic:key{ic}['key@437']
         for(String block : listOfBlocks) {
             if(ni.toString().contains(block)) {
                 isBlock = true;

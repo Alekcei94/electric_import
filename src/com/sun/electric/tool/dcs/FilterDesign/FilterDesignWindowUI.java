@@ -5,12 +5,6 @@
  */
 package com.sun.electric.tool.dcs.FilterDesign;
 
-import com.sun.electric.tool.Job;
-import com.sun.electric.tool.JobException;
-import com.sun.electric.tool.user.User;
-import java.awt.CardLayout;
-import javax.swing.JPanel;
-
 /**
  *
  * @author diivanov

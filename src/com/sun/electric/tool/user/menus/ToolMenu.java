@@ -380,7 +380,7 @@ public class ToolMenu {
                         FileMenu.exportCommand(FileType.SPICE, true);
                     }
                 },
-                        new EMenuItem("Simulate") {
+                        new EMenuItem("Simulate With Keys") {
                     public void run() {
                         SimOut.exportCommand(FileType.SPICE, true);
                     }

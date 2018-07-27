@@ -27,9 +27,13 @@ import com.sun.electric.database.topology.ArcInst;
 
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
+import com.sun.electric.tool.dcs.Pair;
 import com.sun.electric.tool.user.User;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -47,6 +51,10 @@ public class ImportKeys {
         return importKeys;
     }
 
+    /**
+     * Method to get path to configuration file with JFileChooser.
+     * @return
+     */
     private String getPathFromUser() {
         JFileChooser chooser = new JFileChooser();
         File Dir = new File("c:\\CYGELENG\\config");
@@ -55,7 +63,6 @@ public class ImportKeys {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("txt");
         chooser.setFileFilter(filter);
         chooser.setDialogTitle("Import Keys");
-        //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
 
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -74,15 +81,34 @@ public class ImportKeys {
         return pathToFile;
     }
 
-    public void ImportToCell(Cell cell) throws IOException {
+    /**
+     * Method to initiate importing to scheme proccess.
+     * @param cell
+     * @throws java.io.IOException
+     */
+    public void importToCell(Cell cell) throws IOException {
         String pathToFile = getPathFromUser();
-        if(pathToFile == null) {
+        if (pathToFile == null) {
             return;
         }
-        
-        System.out.println("Script started");
-        
 
+        System.out.println("Script started");
+
+        File configurationFile = new File(pathToFile);
+        try (BufferedReader br = new BufferedReader(new FileReader(configurationFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                importOneLine(line);
+            }
+        }
+    }
+
+    /**
+     * Method to analyse one line of configuration file and connect key for it.
+     * @return
+     */
+    private void importOneLine(String line) {
+        
     }
 
     /**
@@ -110,6 +136,39 @@ public class ImportKeys {
             EditingPreferences ep = EditingPreferences.getInstance();
             ArcInst newArc = ArcInst.makeInstance(ap, ep, firstPort, secondPort);
             newArc.setLambdaBaseWidth(size);
+            return true;
+        }
+    }
+
+    /**
+     * Class for "CreateNewArc", class realises createNewArc Job to avoid
+     * "database changes are forbidden" error.
+     */
+    private static class CreateLotsOfNewArcs extends Job {
+
+        private ArcProto ap;
+        private double size;
+        private final HashSet<Pair<PortInst, PortInst>> setOfPortPairs;
+
+        public CreateLotsOfNewArcs(ArcProto arc, HashSet<Pair<PortInst, PortInst>> setOfPortPairs, double size) {
+            super("Create New Arc", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
+            this.ap = arc;
+            this.setOfPortPairs = setOfPortPairs;
+            this.size = size;
+            startJob();
+        }
+
+        @Override
+        public boolean doIt() throws JobException {
+            EditingPreferences ep = EditingPreferences.getInstance();
+            setOfPortPairs.stream().map((portsPair) -> {
+                PortInst firstPort = portsPair.getFirstObject();
+                PortInst secondPort = portsPair.getSecondObject();
+                ArcInst newArc = ArcInst.makeInstance(ap, ep, firstPort, secondPort);
+                return newArc;
+            }).forEachOrdered((newArc) -> {
+                newArc.setLambdaBaseWidth(size);
+            });
             return true;
         }
     }
