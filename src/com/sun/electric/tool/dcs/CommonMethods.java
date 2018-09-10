@@ -28,7 +28,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- *
+ * Class is here to implement some common methods using in autotracing proccess
+ * like parsing (Node/Port)Inst into a strings with information about their base
+ * name and address or getting all ports that are connected to given point.
+ * 
  * @author diivanov
  */
 public class CommonMethods {

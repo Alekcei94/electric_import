@@ -21,7 +21,7 @@ package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
-import com.sun.electric.tool.dcs.ConstantsAndPrefs;
+import com.sun.electric.tool.dcs.Constants;
 import com.sun.electric.tool.dcs.Pair;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -66,7 +66,7 @@ public final class NonOrientedGlobalGraph implements GlobalGraphInterface {
     public NonOrientedGlobalGraph(String graphName) {
         this.graphName = graphName;
         Init(VERTEX_MAX);
-        File fileForImport = new File(ConstantsAndPrefs.getPathTo("global graph"));
+        File fileForImport = new File(Constants.getPathTo("global graph"));
         try {
             integrateChains(fileForImport);
         } catch (IOException ioe) {

@@ -70,7 +70,7 @@ import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
 import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
-import com.sun.electric.tool.dcs.FunctionalException;
+import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;

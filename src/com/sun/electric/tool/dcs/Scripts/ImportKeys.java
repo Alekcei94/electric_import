@@ -57,7 +57,7 @@ public class ImportKeys {
      */
     private String getPathFromUser() {
         JFileChooser chooser = new JFileChooser();
-        File Dir = new File("c:\\CYGELENG\\config");
+        File Dir = new File("../");
         String pathToFile;
         chooser.setCurrentDirectory(Dir);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("txt");
@@ -116,7 +116,6 @@ public class ImportKeys {
      * "database changes are forbidden" error.
      */
     private static class CreateNewArc extends Job {
-
         ArcProto ap;
         double size;
         PortInst firstPort;

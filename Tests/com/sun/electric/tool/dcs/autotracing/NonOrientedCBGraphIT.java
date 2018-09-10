@@ -6,7 +6,7 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.ConstantsAndPrefs;
+import com.sun.electric.tool.dcs.Constants;
 import com.sun.electric.tool.dcs.Pair;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,8 +36,8 @@ public class NonOrientedCBGraphIT {
     }
 
     @BeforeClass
-    public static void setUpClass() {
-        Accessory.cleanFile(ConstantsAndPrefs.getPathTo("config"));
+    public static void setUpClass() throws InterruptedException {
+        Accessory.cleanFile(Constants.getPathTo("config"));
     }
 
     @AfterClass
@@ -56,7 +57,8 @@ public class NonOrientedCBGraphIT {
      */
     @Test
     public void testCreateAndGetResult() throws IOException, ClassNotFoundException,
-            NoSuchFieldException, IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+            NoSuchFieldException, IllegalArgumentException, IllegalAccessException,
+            NoSuchMethodException, InvocationTargetException {
 
         System.out.println("testCreateAndGetResult");
         ConnectionGraphInterface nocbg = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
@@ -86,7 +88,7 @@ public class NonOrientedCBGraphIT {
         keyMatrixField.setAccessible(true);
         String[][] keyMatrix = (String[][]) keyMatrixField.get(nocbg);
 
-        File file = new File(ConstantsAndPrefs.getPathTo("config"));
+        File file = new File(Constants.getPathTo("config"));
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {

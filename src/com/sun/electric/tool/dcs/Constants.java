@@ -28,7 +28,7 @@ import java.io.IOException;
  *
  * @author diivanov
  */
-public class ConstantsAndPrefs {
+public class Constants {
 
     /**
      * Path to CB graph in .trc file.
@@ -44,18 +44,6 @@ public class ConstantsAndPrefs {
     private static String GLOBAL_PATH = "./autotracing/global.trc";
 
     /**
-     * Pref shows user choice about should app draw line between ports of key
-     * when cursor is nearby or not.
-     */
-    //private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
-    //        Autotracing.getAutotracingTool().prefs, false);
-    /**
-     * Pref shows user choice about should app show logs or not.
-     */
-    //private static final Pref logging = Pref.makeBooleanPref("traceLogging",
-    //        Autotracing.getAutotracingTool().prefs, false);
-
-    /**
      * Path to electric folder (.../electric/).
      */
     private static final String PATH = new File("").getAbsoluteFile().getAbsolutePath();
@@ -68,7 +56,7 @@ public class ConstantsAndPrefs {
     /**
      * private constructor prohibits creating objects of this class.
      */
-    private ConstantsAndPrefs() {
+    private Constants() {
         throw new AssertionError();
     }
 
@@ -116,39 +104,5 @@ public class ConstantsAndPrefs {
         return null;
     }
 
-    /**
-     * get keysIndicated variable
-     *
-     * @return
-     */
-    /*public static boolean isKeysIndicated() {
-        return keysIndicated.getBoolean();
-    }*/
-
-    /**
-     * set keysIndicated variable
-     *
-     * @param indicate
-     */
-   /* public static void setKeysIndicated(boolean indicate) {
-        keysIndicated.setBoolean(indicate);
-    }*/
-
-    /**
-     * get keysIndicated variable
-     *
-     * @return
-     */
-    /*public static boolean isLogging() {
-        return logging.getBoolean();
-    }*/
-
-    /**
-     * set keysIndicated variable
-     *
-     * @param writeLog
-     */
-    /*public static void setLogging(boolean writeLog) {
-        logging.setBoolean(writeLog);
-    }*/
+    
 }

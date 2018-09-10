@@ -28,7 +28,7 @@ import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.CommonMethods;
-import com.sun.electric.tool.dcs.FunctionalException;
+import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import java.util.ArrayList;
 import java.util.Iterator;
 

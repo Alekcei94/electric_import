@@ -1,7 +1,21 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* Electric(tm) VLSI Design System
+ *
+ * File: FilterDesignWindowUIFrame.java
+ *
+ * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
+ *
+ * Electric(tm) is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Electric(tm) is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.sun.electric.tool.dcs.FilterDesign;
 
@@ -74,9 +88,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     }
 
     private void reloadImage() throws IOException {
-        //jPanelAfc.repaint();
-        //jPanelAfc = new ResizableImagePane();
-        //((ImagePanel) jPanelAfc).refreshImage();
         this.repaint();
     }
 
@@ -135,7 +146,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jTextField11 = new javax.swing.JTextField();
         jTextField12 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
-        refreshButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1300, 800));
@@ -620,13 +630,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         jPanelForCardLayout.add(jPanelBessel, "card4");
 
-        refreshButton.setText("ffRefresh");
-        refreshButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                refreshButtonActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -645,13 +648,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                 .addGap(251, 251, 251))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(337, 337, 337))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(refreshButton)
-                        .addGap(629, 629, 629))))
+                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(337, 337, 337))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -672,9 +670,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                     .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                .addComponent(refreshButton)
-                .addGap(113, 113, 113))
+                .addContainerGap(205, Short.MAX_VALUE))
         );
 
         pack();
@@ -758,16 +754,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void ellipticFilterTypeChoiceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ellipticFilterTypeChoiceComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_ellipticFilterTypeChoiceComboBoxActionPerformed
-
-    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
-        jPanelAfc = new ResizableImagePane();
-        /*try {
-            ((ImagePanel) jPanelAfc).refreshImage();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        this.repaint();*/
-    }//GEN-LAST:event_refreshButtonActionPerformed
 
     /**
      * Invoke frame.
@@ -911,6 +897,5 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
-    private javax.swing.JButton refreshButton;
     // End of variables declaration//GEN-END:variables
 }

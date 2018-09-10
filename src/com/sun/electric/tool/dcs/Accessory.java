@@ -36,7 +36,8 @@ import com.sun.electric.tool.Job;
 import com.sun.electric.database.topology.NodeInst;
 
 /**
- *
+ * Class is needed to have constant access to utility methods like writing to text
+ * file or starting/checking 1-touch timer.
  * @author diivanov
  */
 public class Accessory {
@@ -143,7 +144,7 @@ public class Accessory {
      * Timer starts here.
      */
     public static void timeStart() {
-        if (timeStart != 0L) {
+        if ((timeStart != 0L) || (timeStart > 300000L)) {
             deltaTime = (System.currentTimeMillis() - timeStart);
             timeStart = System.currentTimeMillis();
             System.out.println(deltaTime + " ms");

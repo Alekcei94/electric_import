@@ -20,8 +20,8 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.ConstantsAndPrefs;
-import com.sun.electric.tool.dcs.FunctionalException;
+import com.sun.electric.tool.dcs.Constants;
+import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Pair;
 import java.util.ArrayList;
 import java.util.List;
@@ -448,7 +448,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                 if (((vertexArray[currentVertex].getPathCount() - vertexArray[a1].getPathCount()) == matrix[currentVertex][a1]) && (matrix[currentVertex][a1] != 0)) {
                     int labelNumber = Integer.parseInt(getLabel().split("<")[1]);
                     labelNumber += Integer.parseInt(keyMatrix[currentVertex][a1]);
-                    Accessory.write(ConstantsAndPrefs.getPathTo("config"), String.valueOf(labelNumber));
+                    Accessory.write(Constants.getPathTo("config"), String.valueOf(labelNumber));
                     currentVertex = a1;
                     VertToDeleteList.add(currentVertex);
                     break;
@@ -463,7 +463,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * imports CB graph file.
      */
     private void importGraphFromFile() {//*
-       File fileForImport = new File(ConstantsAndPrefs.getPathTo("connection box"));
+       File fileForImport = new File(Constants.getPathTo("connection box"));
         //File fileForImport = new File("./autotracing/CBGraph.trc");
         try {
             importGraphFromFile(fileForImport);

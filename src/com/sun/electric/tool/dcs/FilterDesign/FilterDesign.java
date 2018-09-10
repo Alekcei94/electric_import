@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: FunctionalException.java
+ * File: FilterDesign.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *
@@ -17,27 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs;
+package com.sun.electric.tool.dcs.FilterDesign;
 
 /**
  *
- * @author Dmitrii
+ * @author diivanov
  */
-public class FunctionalException extends Exception {
-
-    public FunctionalException() {
-        super();
-    }
-
-    public FunctionalException(String message) {
-        super(message);
-    }
-
-    public FunctionalException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public FunctionalException(Throwable cause) {
-        super(cause);
-    }
+public class FilterDesign {
+    
+   // public 
 }
