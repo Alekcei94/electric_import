@@ -7,7 +7,6 @@ package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Constants;
-import com.sun.electric.tool.dcs.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,16 +14,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 
 /**
  *
