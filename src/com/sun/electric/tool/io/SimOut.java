@@ -26,6 +26,7 @@ import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.variable.VarContext;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.io.output.Output;
 import com.sun.electric.tool.simulation.SimulationTool;
 import com.sun.electric.tool.user.User;
@@ -74,6 +75,10 @@ public class SimOut {
     
     private static void executeLTSpice(Process p, String place, String pathOutput) throws InterruptedException {
         p.waitFor();
+        if(p.exitValue() != 0) {
+            Accessory.showMessage("NgSpice terminated incorrectly.");
+            return;
+        }
         String path = "../lt/scad3.exe";
         ProcessBuilder pb = new ProcessBuilder(path,
                 pathOutput);
