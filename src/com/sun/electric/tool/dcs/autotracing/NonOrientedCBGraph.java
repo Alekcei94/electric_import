@@ -20,7 +20,7 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.Constants;
+import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Pair;
 import java.util.ArrayList;

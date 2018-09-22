@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: StepFailedException.java
+ * File: LinksHolder.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *
@@ -17,27 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.dcs.Data;
 
 /**
- *
- * @author Dmitrii
+ * Class to hold links and relative/absolute addresses
+ * @author diivanov
  */
-public class StepFailedException extends Exception {
+public class LinksHolder {
+    
+    private String memoryMapRoot = "./MAP_PACIS/";
+    
+    private static LinksHolder linksHolder;
 
-    public StepFailedException() {
-        super();
+    private LinksHolder() {
+        
     }
-
-    public StepFailedException(String message) {
-        super(message);
+    
+    public static LinksHolder getInstance() {
+        if (linksHolder == null) {
+            linksHolder = new LinksHolder();
+        }
+        return linksHolder;
     }
-
-    public StepFailedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public StepFailedException(Throwable cause) {
-        super(cause);
+    
+    public String getMemoryMapRoot() {
+        return memoryMapRoot;
     }
 }

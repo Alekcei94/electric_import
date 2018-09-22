@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs;
+package com.sun.electric.tool.dcs.Data;
 
 import com.sun.electric.database.text.Pref;
 import com.sun.electric.tool.dcs.autotracing.Autotracing;

@@ -69,6 +69,7 @@ import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
+import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
@@ -219,7 +220,13 @@ public class ToolMenu {
                 expRouters.length > 4 ? new DynamicExperimentalRoutingMenuItem(expRouters[4]) : null,
                 expRouters.length > 5 ? new DynamicExperimentalRoutingMenuItem(expRouters[5]) : null,
                 expRouters.length > 6 ? new DynamicExperimentalRoutingMenuItem(expRouters[6]) : null,
-                expRouters.length > 7 ? new DynamicExperimentalRoutingMenuItem(expRouters[7]) : null);
+                expRouters.length > 7 ? new DynamicExperimentalRoutingMenuItem(expRouters[7]) : null,
+                expRouters.length > 8 ? new DynamicExperimentalRoutingMenuItem(expRouters[8]) : null,
+                expRouters.length > 9 ? new DynamicExperimentalRoutingMenuItem(expRouters[9]) : null,
+                expRouters.length > 10 ? new DynamicExperimentalRoutingMenuItem(expRouters[10]) : null,
+                expRouters.length > 11 ? new DynamicExperimentalRoutingMenuItem(expRouters[11]) : null,
+                expRouters.length > 12 ? new DynamicExperimentalRoutingMenuItem(expRouters[12]) : null,
+                expRouters.length > 13 ? new DynamicExperimentalRoutingMenuItem(expRouters[13]) : null);
 
         // calculating boolean only once
         boolean hasIRSIM = IRSIM.hasIRSIM();
@@ -1105,6 +1112,7 @@ public class ToolMenu {
                 },
                         new EMenuItem("Simulate Autotracing Scheme") {
                     public void run() {
+                        MemoryMap.getInstance();
                     }
                 },
                         SEPARATOR,
@@ -1133,7 +1141,7 @@ public class ToolMenu {
                 listToolsCommand();
             }
         },
-                languageMenu,
+                languageMenu/*,
                 // ------------------- DCS
                 // mnemonic keys available: BCDEF HIJKLMN QR U XYZ
                 new EMenu("DCS scripts",
@@ -1162,7 +1170,7 @@ public class ToolMenu {
                     public void run() {
                         
                     }
-                }));
+                })*/);
     }
 
     // ---------------------------- Tools Menu Commands ----------------------------
@@ -2710,6 +2718,7 @@ public class ToolMenu {
     public static void javaBshScriptCommand() {
         String fileName = OpenFile.chooseInputFile(FileType.JAVA, null, null);
         if (fileName != null) {
+            System.out.println(fileName);
             // start a job to run the script
             EvalJavaBsh.runScript(fileName);
         }
@@ -2737,7 +2746,7 @@ public class ToolMenu {
     public static void setDynamicLanguageMenu() {
         for (EMenuBar.Instance menuBarInstance : TopLevel.getMenuBars()) {
             JMenu menu = (JMenu) menuBarInstance.findMenuItem(languageMenu.getPath());
-            while (menu.getMenuComponentCount() > 4) {
+            while (menu.getMenuComponentCount() > 15) {
                 menu.remove(menu.getMenuComponentCount() - 1);
             }
 

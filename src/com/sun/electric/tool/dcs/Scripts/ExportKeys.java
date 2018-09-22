@@ -92,9 +92,8 @@ public class ExportKeys {
         if(!isBlock) {
             return new ArrayList<>();
         }
+
         
-        
-        String parameterOfBlock = getOnlyParamOfNodeInst(ni);
 
         ArrayList<String> partConfigList = new ArrayList<>();
 
@@ -104,7 +103,7 @@ public class ExportKeys {
             NodeInst key = niItr.next();
             if (key.getProto().getName().equals("key")) {
                 if (isClosedKey(ni, key)) {
-                    partConfigList.add(getConfigForKey(key, parameterOfBlock));
+                    partConfigList.add(getConfigForKey(key, ni));
                 }
             }
         }
@@ -115,6 +114,7 @@ public class ExportKeys {
     * Method to show if the key is closed or not.
     * THERE SHOULDN'T BE MORE THAN 1 
     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2.
+    * Method finds the M1 outisde export, checks it for connection and get 2nd port by connection.
      */
     private boolean isClosedKey(NodeInst ni, NodeInst key) throws FunctionalException {
         Iterator<PortInst> itrPorts = key.getPortInsts();
@@ -148,7 +148,7 @@ public class ExportKeys {
                 System.out.println("outsidePort " + outsidePort.toString());
                 
                 if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"+getOnlyParamOfNodeInst(key)+"_1")) {
-                    throw new FunctionalException("Incorrect CB map");
+                    throw new FunctionalException("Incorrect block map");
                 }
 
                 if (!outsidePort.hasConnections()) {
@@ -176,10 +176,15 @@ public class ExportKeys {
         return false;
     }
 
-    private String getConfigForKey(NodeInst key, String parameterOfBlock) throws FunctionalException {
-        return parameterOfBlock + getOnlyParamOfNodeInst(key);
+    private String getConfigForKey(NodeInst key, NodeInst ni) throws FunctionalException {
+        String parameterOfBlock = getOnlyParamOfNodeInst(ni);
+        String parameterOfKey = getOnlyParamOfNodeInst(key);
+        return parameterOfBlock + parameterOfKey;
     }
 
+    /*
+    * Method to get ONE parameter of nodeInst if there are no more parameters
+    */
     private String getOnlyParamOfNodeInst(NodeInst ni) throws FunctionalException {
         ArrayList<String> paramList = new ArrayList<>();
         Iterator<Variable> varItr = ni.getParameters();
@@ -194,6 +199,9 @@ public class ExportKeys {
         return paramList.get(0);
     }
 
+    /*
+    * Method to get ONE object from any iterator if there are no more objects there.
+    */
     private <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) throws FunctionalException {
         ArrayList<A> objectsList = new ArrayList<>();
         while (iterator.hasNext()) {

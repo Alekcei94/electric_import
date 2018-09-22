@@ -43,63 +43,102 @@ import com.sun.electric.tool.user.User;
 import com.sun.electric.tool.user.ui.WindowFrame;
 
 /**
- * Used for evaluating Java expressions in Variables
- * It is meant to be invoked from the Variable context;
- * these methods should not be used from other contexts, and
- * thus are declared protected.
+ * Used for evaluating Java expressions in Variables It is meant to be invoked
+ * from the Variable context; these methods should not be used from other
+ * contexts, and thus are declared protected.
  * <P>
  * This class is thread-safe, but be warned: if multiple threads are hammering
- * the bean shell for evaluations, it will slow down a lot due to
- * contested locks.
+ * the bean shell for evaluations, it will slow down a lot due to contested
+ * locks.
  *
- * @author  gainsley
+ * @author gainsley
  */
 public class EvalJavaBsh {
 
     // ------------------------ private data ------------------------------------
-    /** The bean shell interpreter evaluation method */
+    /**
+     * The bean shell interpreter evaluation method
+     */
     private static Method evalMethod;
-    /** The bean shell interpreter source method */
+    /**
+     * The bean shell interpreter source method
+     */
     private static Method sourceMethod;
-    /** The bean shell interpreter set method */
+    /**
+     * The bean shell interpreter set method
+     */
     private static Method setMethod;
-    /** The bean shell interpreter set method */
+    /**
+     * The bean shell interpreter set method
+     */
     private static Method getMethod;
-    /** The bean shell TargetError getTarget method */
+    /**
+     * The bean shell TargetError getTarget method
+     */
     private static Method getTargetMethod;
-    /** true if reflection has already been done to find the Bean Shell */
+    /**
+     * true if reflection has already been done to find the Bean Shell
+     */
     private static boolean beanShellChecked = false;
-    /** The bean shell interpreter class */
+    /**
+     * The bean shell interpreter class
+     */
     private static Class<?> interpreterClass = null;
-    /** The bean shell TargetError class */
+    /**
+     * The bean shell TargetError class
+     */
     private static Class<?> targetErrorClass;
-    /** The bean shell EvalError class */
+    /**
+     * The bean shell EvalError class
+     */
     private static Class<?> evalErrorClass;
-    /** For replacing @variable */
+    /**
+     * For replacing @variable
+     */
     private static final Pattern atPat = Pattern.compile("@(\\w+)");
-    /** For replacing @variable */
+    /**
+     * For replacing @variable
+     */
     private static final Pattern pPat = Pattern.compile("(P|PAR)\\(\"(\\w+)\"\\)");
-    /** Results of replacing */
+    /**
+     * Results of replacing
+     */
     private static HashMap<String, String> replaceHash = new HashMap<String, String>();
-    /** The bean shell interpreter object */
+    /**
+     * The bean shell interpreter object
+     */
     private Object envObject;
-    /** Context stack for recursive evaluation calls */
+    /**
+     * Context stack for recursive evaluation calls
+     */
     private Stack<VarContext> contextStack = new Stack<VarContext>();
-    /** Info stack for recursive evaluation calls */
+    /**
+     * Info stack for recursive evaluation calls
+     */
     private Stack<Object> infoStack = new Stack<Object>();
-    /** the singleton object of this class. */
+    /**
+     * the singleton object of this class.
+     */
     public static final EvalJavaBsh evalJavaBsh = new EvalJavaBsh();
-    /** turn on Bsh verbose DEBUG statements */
+    /**
+     * turn on Bsh verbose DEBUG statements
+     */
     private static boolean DEBUG = false;
-    /** turn on stack trace statements for exceptions */
+    /**
+     * turn on stack trace statements for exceptions
+     */
     private static boolean DEBUGSTACKTRACE = false;
 
     // ------------------------ private and protected methods -------------------
-    /** the constructor */
+    /**
+     * the constructor
+     */
     public EvalJavaBsh() {
         envObject = null;
 
-        if (!hasBeanShell()) return;
+        if (!hasBeanShell()) {
+            return;
+        }
 
         // create the BSH object
         try {
@@ -136,14 +175,16 @@ public class EvalJavaBsh {
         }
     }
 
-    /** Get the interpreter so other tools may add methods to it. There is only
+    /**
+     * Get the interpreter so other tools may add methods to it. There is only
      * one interpreter, so be careful that separate tools do not conflict in
-     * terms of namespace.  I recommend when adding objects or methods to the
+     * terms of namespace. I recommend when adding objects or methods to the
      * Interpreter you prepend the object or method names with the Tool name.
      */
 //	  public static Interpreter getInterpreter() { return env; }
     /**
      * See what the current context of evaluation is.
+     *
      * @return a VarContext.
      */
     public synchronized VarContext getCurrentContext() {
@@ -152,6 +193,7 @@ public class EvalJavaBsh {
 
     /**
      * See what the current info of evaluation is.
+     *
      * @return an Object.
      */
     public synchronized Object getCurrentInfo() {
@@ -159,9 +201,9 @@ public class EvalJavaBsh {
     }
 
     /**
-     * Replaces @var calls to P("var")
-     * Replaces P("var") calls to P("ATTR_var")
+     * Replaces @var calls to P("var") Replaces P("var") calls to P("ATTR_var")
      * Replaces PAR("var") calls to PAR("ATTR_var")
+     *
      * @param expr the expression
      * @return replaced expression
      */
@@ -197,11 +239,14 @@ public class EvalJavaBsh {
         return result;
     }
 
-    /** Evaluate Object as if it were a String containing java code.
-     * Note that this function may call itself recursively.
+    /**
+     * Evaluate Object as if it were a String containing java code. Note that
+     * this function may call itself recursively.
+     *
      * @param ce the CodeExpression to be evaluates.
      * @param context the context in which the object will be evaluated.
-     * @param info used to pass additional info from Electric to the interpreter, if needed.
+     * @param info used to pass additional info from Electric to the
+     * interpreter, if needed.
      * @return the evaluated object.
      */
     public synchronized Object evalVarObject(CodeExpression ce, VarContext context, Object info) throws VarContext.EvalException {
@@ -244,8 +289,9 @@ public class EvalJavaBsh {
 
     //------------------Methods that may be called through Interpreter--------------
     /**
-     * Method to lookup a variable for evaluation.
-     * Finds that variable 1 level up the hierarchy.
+     * Method to lookup a variable for evaluation. Finds that variable 1 level
+     * up the hierarchy.
+     *
      * @param name the name of the variable to find.
      * @return the value of the variable (null if not found).
      * @throws VarContext.EvalException
@@ -260,8 +306,9 @@ public class EvalJavaBsh {
     }
 
     /**
-     * Method to lookup a variable for evaluation.
-     * Finds that variable anywhere up the hierarchy.
+     * Method to lookup a variable for evaluation. Finds that variable anywhere
+     * up the hierarchy.
+     *
      * @param name the name of the variable to find.
      * @return the value of the variable (null if not found).
      * @throws VarContext.EvalException
@@ -277,7 +324,9 @@ public class EvalJavaBsh {
     }
 
     //---------------------------Running Scripts-------------------------------------
-    /** Run a Java Bean Shell script */
+    /**
+     * Run a Java Bean Shell script
+     */
     public static void runScript(String script) {
         runScriptJob job = new runScriptJob(script);
         job.startJob();
@@ -285,6 +334,7 @@ public class EvalJavaBsh {
 
     /**
      * returns EditingPreferences with default sizes and text descriptors
+     *
      * @return EditingPreferences with default sizes and text descriptors
      */
     public static EditingPreferences getEditingPreferences() {
@@ -293,6 +343,7 @@ public class EvalJavaBsh {
 
     /**
      * Display specified Cell after termination of currently running script
+     *
      * @param cell
      */
     public static void displayCell(Cell cell) {
@@ -303,23 +354,26 @@ public class EvalJavaBsh {
     }
 
     /**
-     * Method to return the highlighted NodeInsts and ArcInsts to the currently running BSH script.
+     * Method to return the highlighted NodeInsts and ArcInsts to the currently
+     * running BSH script.
      */
-    public static List<Geometric> getHighlighted()
-    {
+    public static List<Geometric> getHighlighted() {
         Job curJob = Job.getRunningJob();
-        if (curJob instanceof runScriptJob)
-            return ((runScriptJob)curJob).highlightedEObjs;
+        if (curJob instanceof runScriptJob) {
+            return ((runScriptJob) curJob).highlightedEObjs;
+        }
         return null;
     }
 
-    /** Run a Java Bean Shell script */
+    /**
+     * Run a Java Bean Shell script
+     */
     public static Job runScriptJob(String script) {
         return new runScriptJob(script);
     }
 
     @SuppressWarnings("serial")
-	private static class runScriptJob extends Job {
+    private static class runScriptJob extends Job {
 
         private String script;
         private Cell cell;
@@ -331,18 +385,17 @@ public class EvalJavaBsh {
 
             // cache highlighted objects
             highlightedEObjs = null;
-        	WindowFrame wf = WindowFrame.getCurrentWindowFrame(false);
-        	if (wf != null)
-        	{
-        		Highlighter highlighter = wf.getContent().getHighlighter();
-        		if (highlighter != null)
-        			highlightedEObjs = highlighter.getHighlightedEObjs(true, true);
-        	}
+            WindowFrame wf = WindowFrame.getCurrentWindowFrame(false);
+            if (wf != null) {
+                Highlighter highlighter = wf.getContent().getHighlighter();
+                if (highlighter != null) {
+                    highlightedEObjs = highlighter.getHighlightedEObjs(true, true);
+                }
+            }
         }
 
         public boolean doIt() throws JobException {
-
-        	EvalJavaBsh evaluator = new EvalJavaBsh();
+            EvalJavaBsh evaluator = new EvalJavaBsh();
             evaluator.doSource(script); // May throw exception
             return true;
         }
@@ -364,10 +417,9 @@ public class EvalJavaBsh {
     }
 
     // ****************************** REFLECTION FOR ACCESSING THE BEAN SHELL ******************************
-    
     public static boolean hasBeanShell() {
         if (!beanShellChecked) {
-        	beanShellChecked = true;
+            beanShellChecked = true;
 
             // find the BSH classes
             try {
@@ -375,7 +427,7 @@ public class EvalJavaBsh {
                 targetErrorClass = Class.forName("bsh.TargetError");
                 evalErrorClass = Class.forName("bsh.EvalError");
             } catch (ClassNotFoundException e) {
-            	TextUtils.recordMissingComponent("Bean Shell");
+                TextUtils.recordMissingComponent("Bean Shell");
                 interpreterClass = null;
                 return false;
             }
@@ -397,7 +449,7 @@ public class EvalJavaBsh {
         // if already initialized, return state
         return interpreterClass != null;
     }
-    
+
 //    private void initBSH() {
 //        // if already initialized, return
 //        if (interpreterClass != null) {
@@ -428,9 +480,9 @@ public class EvalJavaBsh {
 //            return;
 //        }
 //    }
-
     /**
      * Set a variable in the Java Bean Shell
+     *
      * @param name the name of the variable
      * @param value the value to set the variable to
      */
@@ -458,6 +510,7 @@ public class EvalJavaBsh {
     // -------------------------- Private Methods -----------------------------
     /**
      * Evaluate a string containing Java Bean Shell code.
+     *
      * @param line the string to evaluate
      * @return an object representing the evaluated string, or null on error.
      * @throws VarContext.EvalException exception
@@ -495,6 +548,7 @@ public class EvalJavaBsh {
 
     /**
      * Method to determine whether a string is valid Java code.
+     *
      * @param line the string to test.
      * @return true if the string is valid, evaluatable Java code.
      */
@@ -511,15 +565,19 @@ public class EvalJavaBsh {
 
     /**
      * Execute a Java Bean Shell script file.
+     *
      * @param file the file to run.
      */
     public void doSource(String file) throws JobException {
         try {
             if (envObject != null) {
                 sourceMethod.invoke(envObject, new Object[]{file});
+            } else {
+                System.out.println("There is no beanshell interpreter.");
             }
         } catch (Exception e) {
             String description = "Java Bean shell error sourcing '" + file + "'";
+            System.out.println(description);
             if (e instanceof InvocationTargetException) {
                 // This wraps an exception thrown by the method invoked.
                 Throwable t = e.getCause();
@@ -565,8 +623,10 @@ public class EvalJavaBsh {
     }
 
     /**
-     * If the InvocationTargetException was generated because of an EvalException,
-     * get the EvalException that is wrapped by the target exception.
+     * If the InvocationTargetException was generated because of an
+     * EvalException, get the EvalException that is wrapped by the target
+     * exception.
+     *
      * @param e the invocation target exception
      * @return the initial evaluation exception, or null if none.
      */
@@ -586,9 +646,12 @@ public class EvalJavaBsh {
     }
 
     /**
-     * Handle exceptions thrown by attempting to invoke a reflected method or constructor.
+     * Handle exceptions thrown by attempting to invoke a reflected method or
+     * constructor.
+     *
      * @param e The exception thrown by the invoked method or constructor.
-     * @param description a description of the event to be printed with the error message.
+     * @param description a description of the event to be printed with the
+     * error message.
      * @return true if exception handled (error message printed), false if not
      */
     private static boolean handleInvokeException(Exception e, String description) {
@@ -620,9 +683,11 @@ public class EvalJavaBsh {
     }
 
     /**
-     * Handle Bean Shell evaluation errors.  Sends it to system.out.
+     * Handle Bean Shell evaluation errors. Sends it to system.out.
+     *
      * @param e the TargetError exception thrown.
-     * @param description a description of the event that caused the error to be thrown.
+     * @param description a description of the event that caused the error to be
+     * thrown.
      */
     private static boolean handleBshError(Exception e, String description) {
         if (targetErrorClass.isInstance(e)) {

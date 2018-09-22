@@ -6,7 +6,7 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.Constants;
+import com.sun.electric.tool.dcs.Data.Constants;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
