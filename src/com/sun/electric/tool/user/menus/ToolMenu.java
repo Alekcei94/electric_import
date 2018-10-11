@@ -73,6 +73,7 @@ import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
+import com.sun.electric.tool.dcs.Scripts.ExportFullKeys;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;
@@ -1141,7 +1142,7 @@ public class ToolMenu {
                 listToolsCommand();
             }
         },
-                languageMenu/*,
+                languageMenu,
                 // ------------------- DCS
                 // mnemonic keys available: BCDEF HIJKLMN QR U XYZ
                 new EMenu("DCS scripts",
@@ -1163,14 +1164,14 @@ public class ToolMenu {
                 },
                         new EMenuItem("345") {
                     public void run() {
-                        
+                        new ExportFullKeys().formConfig();
                     }
                 },
                         new EMenuItem("567") {
                     public void run() {
                         
                     }
-                })*/);
+                }));
     }
 
     // ---------------------------- Tools Menu Commands ----------------------------
