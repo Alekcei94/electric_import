@@ -64,11 +64,13 @@ public class MemoryMap {
                         } catch (IOException ioe) {
                             Accessory.showMessage("Your internal map files are corrupted. "
                                     + "Reinstall would be solution.");
+                            ioe.printStackTrace();
                         }
                     });
         } catch (IOException ioe) {
             Accessory.showMessage("Your internal map files are corrupted. "
                     + "Reinstall would be solution.");
+            ioe.printStackTrace();
         }
     }
 

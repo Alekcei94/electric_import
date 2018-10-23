@@ -19,6 +19,8 @@
  */
 package com.sun.electric.tool.dcs.Exceptions;
 
+import com.sun.electric.tool.dcs.Accessory;
+
 /**
  *
  * @author Dmitrii
@@ -31,6 +33,7 @@ public class StepFailedException extends Exception {
 
     public StepFailedException(String message) {
         super(message);
+        Accessory.showMessage(message);
     }
 
     public StepFailedException(String message, Throwable cause) {

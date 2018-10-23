@@ -151,7 +151,7 @@ public class SimOut {
             return;
         }
 
-        filePath = User.getWorkingDirectory() + File.separator + filePath;
+        filePath = User.getWorkingDirectory() + File.separator + "simulation" + File.separator + filePath;
         System.out.println(filePath + " simulation");
         Output.exportCellCommand(cell, context, filePath, type, override);
         new SimulateWithPath(filePath);

@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sun.electric.tool.user.dialogs;
 
 import com.sun.electric.database.change.DatabaseChangeEvent;
@@ -59,16 +58,22 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
- * Class to browse the list of cells and do specific things to them (delete, rename).
+ * Class to browse the list of cells and do specific things to them (delete,
+ * rename).
  *
- * <p>The CellBrowser is a general purpose browser that can browse
- * by Library, View, and Cell.  It can filter Cell names using a regular
- * expression.
- * <p>The DoAction class is checked to adjust several configurable features:
- * <p>- What action to perform
- * <p>- What buttons are available
- * <p>- What additional JComponents are included
- * <p>- If the Cell List is multi- or single-select.
+ * <p>
+ * The CellBrowser is a general purpose browser that can browse by Library,
+ * View, and Cell. It can filter Cell names using a regular expression.
+ * <p>
+ * The DoAction class is checked to adjust several configurable features:
+ * <p>
+ * - What action to perform
+ * <p>
+ * - What buttons are available
+ * <p>
+ * - What additional JComponents are included
+ * <p>
+ * - If the Cell List is multi- or single-select.
  */
 public class CellBrowser extends EDialog implements DatabaseChangeListener {
 
@@ -87,17 +92,18 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
     private String lastFilter = "";
     private static Pattern lastPattern = null;
     private static boolean confirmDelete = true;
-	private boolean cancelled;
+    private boolean cancelled;
 
     private DoAction action;
     private List<Cell> cellList = null;                       // list of cells displayed
     private List<String> cellListNames = null;                  // list of cells by name displayed (matches cellList)
 
-	/**
-	 * Class to do a cell browser action.
-	 */
+    /**
+     * Class to do a cell browser action.
+     */
     public static class DoAction {
-		public String title;
+
+        public String title;
         public String name;
 
         private DoAction(String name, String title) {
@@ -105,7 +111,9 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
             this.title = title;
         }
 
-        public String toString() { return name; }
+        public String toString() {
+            return name;
+        }
 
         public static final DoAction newInstance = new DoAction("New Cell Instance", "Create a Cell Instance");
         public static final DoAction editCell = new DoAction("Edit Cell", "Edit a Cell");
@@ -116,30 +124,34 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         public static final DoAction selectCellToCopy = new DoAction("Select Cell", "Copy Parameters from which Cell?");
     }
 
-    /** Creates new form CellBrowser */
+    /**
+     * Creates new form CellBrowser
+     */
     public CellBrowser(Frame parent, boolean modal, DoAction action) {
         super(parent, modal);
         this.action = action;
-		cancelled = false;
+        cancelled = false;
 
         initComponents();                       // init components (netbeans generated method)
         setTitle(action.title);                  // set the dialog title
         doAction.setText(action.name);          // set the action button's text
         getRootPane().setDefaultButton(doAction); // return will do action
-        lastFilter = prefs.get(action+prefFilter, "");
+        lastFilter = prefs.get(action + prefFilter, "");
         lastPattern = Pattern.compile(lastFilter);
-        lastSelectedCell = prefs.get(action+prefSelectedCell, null);
+        lastSelectedCell = prefs.get(action + prefSelectedCell, null);
         cellFilter.setText(lastFilter);         // restore last filter
         initExtras();                           // set up an extra components
         initComboBoxes();                       // set up the combo boxes
 
         UserInterfaceMain.addDatabaseChangeListener(this);
-		finishInitialization();
+        finishInitialization();
         pack();
     }
 
     public void databaseChanged(DatabaseChangeEvent e) {
-        if (!isVisible()) return;
+        if (!isVisible()) {
+            return;
+        }
         // would take too long to search for change we care about, just reload it
         updateCellList();
     }
@@ -149,17 +161,16 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
 //         // would take too long to search for change we care about, just reload it
 //         updateCellList();
 //     }
-
 //     public void databaseChanged(Undo.Change evt) {}
-
 //     public boolean isGUIListener() { return true; }
+    protected void escapePressed() {
+        cancelActionPerformed(null);
+    }
 
-	protected void escapePressed() { cancelActionPerformed(null); }
-
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     private void initComponents() {//GEN-BEGIN:initComponents
         java.awt.GridBagConstraints gridBagConstraints;
@@ -351,18 +362,21 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
     }//GEN-END:initComponents
 
     // ---------------------------- Extra Initialization ---------------------------------
-
-    /** Initialize Combo Boxes */
+    /**
+     * Initialize Combo Boxes
+     */
     private void initComboBoxes() {
 
         // initialize library combo box with choices
         libraryComboBox.addItem("All");
 
-        lastSelectedLib = prefs.get(action+prefSelectedLib, null);
+        lastSelectedLib = prefs.get(action + prefSelectedLib, null);
         if (lastSelectedLib == null) // only in this case uses current cell
         {
             Cell cell = WindowFrame.getCurrentCell();
-            if (cell != null) lastSelectedLib = cell.getLibrary().getName();
+            if (cell != null) {
+                lastSelectedLib = cell.getLibrary().getName();
+            }
         }
         int curLibIndex = -1;
         int curIndex = -1;
@@ -370,29 +384,38 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
 
         for (Library lib : Library.getVisibleLibraries()) {
             libraryComboBox.addItem(lib.getName());
-            if (lib.getName().equals(lastSelectedLib))
+            if (lib.getName().equals(lastSelectedLib)) {
                 curIndex = i;               // see if this is the last selected lib
-            if (lib == Library.getCurrent())
+            }
+            if (lib == Library.getCurrent()) {
                 curLibIndex = i;            // see if this is the current lib
+            }
             i++;
         }
-        if (curIndex == -1) curIndex = curLibIndex;
-        if (curIndex > 0) libraryComboBox.setSelectedIndex(curIndex);
+        if (curIndex == -1) {
+            curIndex = curLibIndex;
+        }
+        if (curIndex > 0) {
+            libraryComboBox.setSelectedIndex(curIndex);
+        }
 
         viewComboBox.addItem("All");
 
-        lastSelectedView = prefs.get(action+prefSelectedView, null);
+        lastSelectedView = prefs.get(action + prefSelectedView, null);
         curIndex = -1;
         i = 1;
 
         List<View> viewList = View.getOrderedViews();
         for (View view : viewList) {
             viewComboBox.addItem(view.getFullName());
-            if (view.getFullName().equals(lastSelectedView))
+            if (view.getFullName().equals(lastSelectedView)) {
                 curIndex = i;               // see if this is the last selected view
+            }
             i++;
         }
-        if (curIndex == -1) curIndex = 0;
+        if (curIndex == -1) {
+            curIndex = 0;
+        }
         viewComboBox.setSelectedIndex(curIndex);
 
     }
@@ -406,8 +429,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
     // ---- Delete Cell extras ----
     private JCheckBox confirmDeletions;
 
-    private void initExtras()
-    {
+    private void initExtras() {
         // extras should be added in gridboxlayout inside JPanel "extrasPanel",
         //  starting with gridx = 0, gridy=0.
         GridBagConstraints gridBagConstraints;
@@ -423,14 +445,15 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         extrasPanel.add(sortNumerically, gridBagConstraints);
         sortNumerically.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent evt) { updateCellList(); }
+            public void itemStateChanged(ItemEvent evt) {
+                updateCellList();
+            }
         });
 
         if (action == DoAction.newInstance) {
             doAction.setText("New Instance");
             done.setText("New Instance & Close");
-        }
-        else if (action == DoAction.editCell) {
+        } else if (action == DoAction.editCell) {
             // add in a check box to open in a new window
             boolean checked = prefs.getBoolean(prefEditInNewWindow, false);
             editInNewWindow = new JCheckBox("Edit in New Window", checked);
@@ -445,8 +468,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
             jPanel1.remove(done);
             // however, it would be cool to be able to pick several cells to edit
             jList1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        }
-        else if (action == DoAction.renameCell) {
+        } else if (action == DoAction.renameCell) {
             // add in a text box for the new name
             newCellNameLabel = new JLabel("New Cell Name:  ");
             gridBagConstraints = new GridBagConstraints();
@@ -470,8 +492,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
 
             // not a one-shot action:
             doAction.setText("Apply Rename");
-        }
-        else if (action == DoAction.deleteCell) {
+        } else if (action == DoAction.deleteCell) {
             confirmDeletions = new JCheckBox("Confirm Deletions", confirmDelete);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -487,8 +508,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
             // not a one-shot action:
             jList1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             doAction.setText("Apply Delete");
-        }
-        else if (action == DoAction.duplicateCell || action == DoAction.selectCellToAssoc) {
+        } else if (action == DoAction.duplicateCell || action == DoAction.selectCellToAssoc) {
             // set current cell as the default
             Cell cell = WindowFrame.getCurrentCell();
             setCell(cell);
@@ -498,14 +518,13 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         }
     }
 
-
     // --------------------------------- Actions ----------------------------------
 
     private void jList1ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList1ValueChanged
         int index = jList1.getSelectedIndex();
         jList1.ensureIndexIsVisible(index);
         if (jList1.getSelectedValue() != null) {
-            lastSelectedCell = (String)jList1.getSelectedValue();
+            lastSelectedCell = (String) jList1.getSelectedValue();
         }
         if (action == DoAction.renameCell) {
             if (lastSelectedCell != null && newCellName != null) {
@@ -528,14 +547,15 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
     }//GEN-LAST:event_libraryComboBoxItemStateChanged
 
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-    	if (evt != null)
-    	{
-    		// do action on double click, close dialog
-    		if (evt.getClickCount() >= 2) performAction();
-    	} else
-    	{
-		    if (jList1.getSelectedValue() != null)
-		        lastSelectedCell = (String)jList1.getSelectedValue();
+        if (evt != null) {
+            // do action on double click, close dialog
+            if (evt.getClickCount() >= 2) {
+                performAction();
+            }
+        } else {
+            if (jList1.getSelectedValue() != null) {
+                lastSelectedCell = (String) jList1.getSelectedValue();
+            }
         }
     }//GEN-LAST:event_jList1MouseClicked
 
@@ -544,33 +564,34 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
     }//GEN-LAST:event_doActionActionPerformed
 
     private void cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelActionPerformed
-		cancelled = true;
+        cancelled = true;
         closeDialog(null);
     }//GEN-LAST:event_cancelActionPerformed
 
     private void doneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_doneActionPerformed
-        if (action == DoAction.newInstance)
+        if (action == DoAction.newInstance) {
             performAction();
+        }
         closeDialog(null);
     }//GEN-LAST:event_doneActionPerformed
 
-    /** Closes the dialog */
+    /**
+     * Closes the dialog
+     */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
 
         // save all preferences
-        prefs.put(action+prefSelectedLib, (String)libraryComboBox.getSelectedItem());
-        prefs.put(action+prefSelectedView, (String)viewComboBox.getSelectedItem());
+        prefs.put(action + prefSelectedLib, (String) libraryComboBox.getSelectedItem());
+        prefs.put(action + prefSelectedView, (String) viewComboBox.getSelectedItem());
         if (jList1.getSelectedValue() != null) {
-            prefs.put(action+prefSelectedCell, (String)jList1.getSelectedValue());
+            prefs.put(action + prefSelectedCell, (String) jList1.getSelectedValue());
         }
-        prefs.put(action+prefFilter, lastFilter);
+        prefs.put(action + prefFilter, lastFilter);
         prefs.putBoolean(prefSortLexically, !sortNumerically.isSelected());
-        if (action == DoAction.editCell)
-        {
+        if (action == DoAction.editCell) {
             prefs.putBoolean(prefEditInNewWindow, editInNewWindow.isSelected());
-        } else if (action == DoAction.deleteCell)
-        {
-        	confirmDelete = confirmDeletions.isSelected();
+        } else if (action == DoAction.deleteCell) {
+            confirmDelete = confirmDeletions.isSelected();
         }
         setVisible(false);
         UserInterfaceMain.removeDatabaseChangeListener(this);
@@ -579,25 +600,25 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
 
     private void performAction() {
 
-        if (action == DoAction.newInstance)
-        {
+        if (action == DoAction.newInstance) {
             Cell cell = getSelectedCell();
-            if (cell == null) return;
+            if (cell == null) {
+                return;
+            }
 
             PaletteFrame.placeInstance(cell, null, false);
-        } else if (action == DoAction.editCell)
-        {
+        } else if (action == DoAction.editCell) {
             boolean newWindow = editInNewWindow.isSelected();
 
             List<Cell> cells = getSelectedCells();
             for (Cell cell : cells) {
                 WindowFrame wf = WindowFrame.getCurrentWindowFrame();
-                if (!newWindow && wf == null) newWindow = true;
-                if (newWindow)
-                {
+                if (!newWindow && wf == null) {
+                    newWindow = true;
+                }
+                if (newWindow) {
                     WindowFrame.createEditWindow(cell);
-                } else
-                {
+                } else {
                     wf.setCellWindow(cell, null);
                 }
                 // if multiple cells selected, all cells after first
@@ -605,81 +626,77 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
                 newWindow = true;
             }
             closeDialog(null);                     // we have performed the action
-        } else if (action == DoAction.deleteCell)
-        {
-        	confirmDelete = confirmDeletions.isSelected();
+        } else if (action == DoAction.deleteCell) {
+            confirmDelete = confirmDeletions.isSelected();
 
             List<Cell> cells = getSelectedCells();
             Set<String> deletedCells = new HashSet<String>();
-            for(Cell cell : cells)
-            {
-	    		// make sure the user really wants to delete the cell
-	    		if (confirmDelete)
-	    		{
-	    			int response = JOptionPane.showConfirmDialog(TopLevel.getCurrentJFrame(),
-	    				"Are you sure you want to delete '" + cell + "'?", "Confirm Cell Deletion", JOptionPane.YES_NO_OPTION);
-	    			if (response != JOptionPane.YES_OPTION) return;
-	    		}
+            for (Cell cell : cells) {
+                // make sure the user really wants to delete the cell
+                if (confirmDelete) {
+                    int response = JOptionPane.showConfirmDialog(TopLevel.getCurrentJFrame(),
+                            "Are you sure you want to delete '" + cell + "'?", "Confirm Cell Deletion", JOptionPane.YES_NO_OPTION);
+                    if (response != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
 
-	    		// delete references to cell
-	    		CircuitChanges.cleanCellRef(cell);
-	    		deletedCells.add(cell.noLibDescribe());
+                // delete references to cell
+                CircuitChanges.cleanCellRef(cell);
+                deletedCells.add(cell.noLibDescribe());
             }
 
             // delete all requested cells
-    		new CellChangeJobs.DeleteManyCells(cells);
+            new CellChangeJobs.DeleteManyCells(cells);
 
-    		// pick a new selected cell
-        	lastSelectedCell = null;
-            for (int i=cellListNames.size()-2; i>=0; i--)
-            {
+            // pick a new selected cell
+            lastSelectedCell = null;
+            for (int i = cellListNames.size() - 2; i >= 0; i--) {
                 String name = cellListNames.get(i);
-                String nextName = cellListNames.get(i+1);
-                if (deletedCells.contains(name) && !deletedCells.contains(nextName))
-                {
+                String nextName = cellListNames.get(i + 1);
+                if (deletedCells.contains(name) && !deletedCells.contains(nextName)) {
                     lastSelectedCell = nextName;
                     break;
                 }
             }
-            if (lastSelectedCell == null)
-            {
-                for (int i=0; i<cellListNames.size(); i++)
-                {
+            if (lastSelectedCell == null) {
+                for (int i = 0; i < cellListNames.size(); i++) {
                     String name = cellListNames.get(i);
-                    if (!deletedCells.contains(name))
-                    {
+                    if (!deletedCells.contains(name)) {
                         lastSelectedCell = name;
                         break;
                     }
                 }
             }
             updateCellList();
-        } else if (action == DoAction.renameCell)
-        {
+        } else if (action == DoAction.renameCell) {
             Cell cell = getSelectedCell();
-            if (cell == null) return;
+            if (cell == null) {
+                return;
+            }
 
             String newName = newCellName.getText();
-            if (newName == null || newName.equals("")) return;
+            if (newName == null || newName.equals("")) {
+                return;
+            }
 
             CircuitChanges.renameCellInJob(cell, newName);
             lastSelectedCell = newName + cell.getView().getAbbreviationExtension();
             //setCell(cell);
-        } else if (action == DoAction.duplicateCell)
-        {
+        } else if (action == DoAction.duplicateCell) {
             Cell cell = getSelectedCell();
-            if (cell == null) return;
-    		new CellMenu.NewCellName(CellMenu.NewCellName.GROUPNAME, cell, null);
+            if (cell == null) {
+                return;
+            }
+            new CellMenu.NewCellName(CellMenu.NewCellName.GROUPNAME, cell, null);
             closeDialog(null);                     // we have performed the action
             updateCellList();
-        } else if (action == DoAction.selectCellToAssoc || action == DoAction.selectCellToCopy)
-		{
+        } else if (action == DoAction.selectCellToAssoc || action == DoAction.selectCellToCopy) {
             closeDialog(null);                     // we have performed the action
-		}
+        }
     }
 
     // -------------------------------- Set State of Dialog ------------------------------
-
     private void setLibrary(Library lib) {
         String libName = lib.getName();
         libraryComboBox.setSelectedItem(libName);
@@ -694,34 +711,32 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         // clear filter
         cellFilter.setText("");
 
-        if (cell != null)
-		{
-	        // this will make cell selected on update of list
-	        lastSelectedCell = cell.noLibDescribe();
-	        Library lib = cell.getLibrary();
-	        setLibrary(lib);
-	        View view = cell.getView();
-	        setView(view);
-		}
+        if (cell != null) {
+            // this will make cell selected on update of list
+            lastSelectedCell = cell.noLibDescribe();
+            Library lib = cell.getLibrary();
+            setLibrary(lib);
+            View view = cell.getView();
+            setView(view);
+        }
         updateCellList();
     }
 
     // ---------------------------------- List ----------------------------------------
-
     /**
-     * Updates the Cell list depending on the library, view selected, and any filter in
-     * the text box.
+     * Updates the Cell list depending on the library, view selected, and any
+     * filter in the text box.
      */
     private void updateCellList() {
-        String libName = (String)libraryComboBox.getSelectedItem();
-        String viewName = (String)viewComboBox.getSelectedItem();
+        String libName = (String) libraryComboBox.getSelectedItem();
+        String viewName = (String) viewComboBox.getSelectedItem();
         String filter = cellFilter.getText();
 
         // get library if specified (all if not)
         Library lib = Library.findLibrary(libName);
         // get view if specified (all if not)
         View view = null;
-        for (Iterator<View> it = View.getViews(); it.hasNext(); ) {
+        for (Iterator<View> it = View.getViews(); it.hasNext();) {
             View v = it.next();
             if (v.getFullName().equals(viewName)) {
                 view = v;
@@ -731,13 +746,15 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
 
         // use cached (last) filter Pattern if no change
         Pattern pat;
-        if (filter.equals("*")) filter = "";
+        if (filter.equals("*")) {
+            filter = "";
+        }
         if (filter.equals(lastFilter)) {
             pat = lastPattern;
         } else {
             try {
                 pat = Pattern.compile(filter, Pattern.CASE_INSENSITIVE);
-            } catch(java.util.regex.PatternSyntaxException e) {
+            } catch (java.util.regex.PatternSyntaxException e) {
                 pat = null;
                 filter = "";
             }
@@ -748,44 +765,50 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         cellList = new ArrayList<Cell>();
         if (lib == null) {
             // do all libraries
-            for (Iterator<Library> it = Library.getLibraries(); it.hasNext(); ) {
+            for (Iterator<Library> it = Library.getLibraries(); it.hasNext();) {
                 Library library = it.next();
-                for (Iterator<Cell> it2 = library.getCells(); it2.hasNext(); ) {
+                for (Iterator<Cell> it2 = library.getCells(); it2.hasNext();) {
                     Cell c = it2.next();
                     if (view != null) {
-                        if (view != c.getView()) continue;     // skip if not filtered view
+                        if (view != c.getView()) {
+                            continue;     // skip if not filtered view
+                        }
                     }
                     if (pat != null) {
                         Matcher mat = pat.matcher(c.noLibDescribe());
-                        if (!mat.find()) continue;              // skip if doesn't match filter
+                        if (!mat.find()) {
+                            continue;              // skip if doesn't match filter
+                        }
                     }
                     cellList.add(c);
                 }
             }
         } else {
             // just do selected library
-            for (Iterator<Cell> it = lib.getCells(); it.hasNext(); ) {
+            for (Iterator<Cell> it = lib.getCells(); it.hasNext();) {
                 Cell c = it.next();
                 if (view != null) {
-                    if (view != c.getView()) continue;     // skip if not filtered view
+                    if (view != c.getView()) {
+                        continue;     // skip if not filtered view
+                    }
                 }
                 if (!filter.equals("")) {
                     Matcher mat = pat.matcher(c.noLibDescribe());
-                    if (!mat.find()) continue;              // skip if doesn't match filter
+                    if (!mat.find()) {
+                        continue;              // skip if doesn't match filter
+                    }
                 }
                 cellList.add(c);
             }
         }
 
         // sort appropriately
-        if (sortNumerically.isSelected())
-        {
-        	// sort list by name, considering numbers
-        	Collections.sort(cellList);
-        } else
-        {
-        	// sort list by name, not considering numbers
-        	Collections.sort(cellList, new TextUtils.CellsByName());
+        if (sortNumerically.isSelected()) {
+            // sort list by name, considering numbers
+            Collections.sort(cellList);
+        } else {
+            // sort list by name, not considering numbers
+            Collections.sort(cellList, new TextUtils.CellsByName());
         }
 
         cellListNames = new ArrayList<String>();
@@ -794,8 +817,8 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         }
 
         jList1.setListData(cellListNames.toArray());
-		// if nothing selected or found, then disable the button
-		doAction.setEnabled(cellListNames.size()>0);
+        // if nothing selected or found, then disable the button
+        doAction.setEnabled(cellListNames.size() > 0);
 
         // update JScrollPane's scroll bars for new size list
         jList1.setVisibleRowCount(jList1.getModel().getSize());
@@ -805,7 +828,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         // changing lists will have triggered update to cell list, go to last selected cell now
         if (lastSelectedCell != null) {
             int i;
-            for (i=0; i<cellListNames.size(); i++) {
+            for (i = 0; i < cellListNames.size(); i++) {
                 String name = cellListNames.get(i);
                 if (name.equals(lastSelectedCell)) {
                     jList1.setSelectedIndex(i);
@@ -821,7 +844,7 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
             Cell cell = WindowFrame.getCurrentCell();
             if (cell != null) {
                 String findname = cell.noLibDescribe();
-                for (int i=0; i<cellListNames.size(); i++) {
+                for (int i = 0; i < cellListNames.size(); i++) {
                     String name = cellListNames.get(i);
                     if (name.equals(findname)) {
                         jList1.setSelectedIndex(i);
@@ -833,28 +856,33 @@ public class CellBrowser extends EDialog implements DatabaseChangeListener {
         }
     }
 
-
     /**
      * Get selected Cell by user in Cell List
+     *
      * @return Cell or null if no cell is selected
      */
     public Cell getSelectedCell() {
-		if (cancelled) return null;
+        if (cancelled) {
+            return null;
+        }
         int i = jList1.getSelectedIndex();
-		return (i == -1)? null : cellList.get(i);
+        return (i == -1) ? null : cellList.get(i);
     }
 
     /**
      * Get a list of selected Cells.
+     *
      * @return a list of selected Cells, or an empty list if none selected.
      */
     private List<Cell> getSelectedCells() {
-        int [] is = jList1.getSelectedIndices();
+        int[] is = jList1.getSelectedIndices();
         ArrayList<Cell> list = new ArrayList<Cell>();
-        for (int i=0; i<is.length; i++) {
+        for (int i = 0; i < is.length; i++) {
             int celli = is[i];
             Cell cell = cellList.get(celli);
-            if (cell == null) continue;
+            if (cell == null) {
+                continue;
+            }
             list.add(cell);
         }
         return list;

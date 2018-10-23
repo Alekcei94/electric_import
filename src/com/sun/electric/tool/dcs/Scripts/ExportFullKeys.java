@@ -44,7 +44,7 @@ import java.util.Map;
 public class ExportFullKeys {
 
     private static ExportFullKeys exportFullKeys;
-    private Map<String, Map<String, String>> fullColectionAdres = new HashMap<String, Map<String, String>>();
+    private final Map<String, Map<String, String>> fullCollectionAddress = new HashMap<>();
 
     public static ExportFullKeys getInstance() {
         if (exportFullKeys == null) {
@@ -54,10 +54,10 @@ public class ExportFullKeys {
     }
 
     /*
-     * This method forms Map adress from a given file. Map<real adress, adress in electric>
+     * This method forms Map address from a given file. Map<real address, address in electric>.
      */
     private Map<String, String> formCollections(String urlFile) {
-        Map<String, String> list = new HashMap<String, String>();
+        Map<String, String> list = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
             String line;
             String[] key;
@@ -74,7 +74,7 @@ public class ExportFullKeys {
     /*
      * This method serch name all files in directory.
      */
-    private List<File> serchFile(String urlFile) {
+    private List<File> searchFile(String urlFile) {
         File dir = new File(urlFile);
         File[] arrFiles = dir.listFiles();
         List<File> lst = Arrays.asList(arrFiles);
@@ -86,16 +86,16 @@ public class ExportFullKeys {
      */
     private void formMapFullAdres() {
         String urlFile = "../MAP/";
-        List<File> adr = serchFile(urlFile);
+        List<File> adr = searchFile(urlFile);
         for (int i = 0; i < adr.size(); i++) {
-            List<File> adrOnFile = serchFile(adr.get(i).toString());
+            List<File> adrOnFile = searchFile(adr.get(i).toString());
             for (int j = 0; j < adrOnFile.size(); j++) {
                 String[] splitKey;
                 String gAdr = adrOnFile.get(j).toString();
                 gAdr = gAdr.replace('\\', '/');
                 splitKey = gAdr.split("/");
                 splitKey = splitKey[3].split("\\.");
-                fullColectionAdres.put(splitKey[0], formCollections(gAdr));
+                fullCollectionAddress.put(splitKey[0], formCollections(gAdr));
             }
         }
     }
@@ -104,7 +104,7 @@ public class ExportFullKeys {
      * This method creates the netList at ../config/config.txt  .
      */
     public void formConfig() {
-        if (fullColectionAdres.size() == 0) {
+        if (fullCollectionAddress.size() == 0) {
             formMapFullAdres();
         }
         String adr = "";
@@ -130,7 +130,7 @@ public class ExportFullKeys {
                                 Connection ctn = ctnItr.next();
                                 System.out.println(ni.getName());
                                 String adres = getRealKeyInFile(ni, port);
-                                //System.out.println(fullColectionAdres.size());
+                                //System.out.println(fullCollectionAddress.size());
                                 if (adres == null) {
                                     System.out.println("The number of the required key was not found - " + ni.getName());
                                     break;
@@ -184,7 +184,7 @@ public class ExportFullKeys {
                 Map<String, String> list = new HashMap<>();
                 numberKey = port.split("");
                 adres = numberKey[3] + numberKey[4] + numberKey[5];
-                list = fullColectionAdres.get(param.getObject().toString());
+                list = fullCollectionAddress.get(param.getObject().toString());
                 if (list == null) {
                     System.out.println("The file or number of the key being found could not be found - " + param.getObject().toString());
                     break;

@@ -55,6 +55,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     public FilterDesignWindowUIFrame(Frame parent) {
         super(parent);
         initComponents();
+        ((JLabel) ellipticFilterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
     }
 
     private void formCmdRequestForPython() {
@@ -152,8 +153,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         setResizable(false);
 
         chooseTypeFilterGroup.add(ButterRadioButton);
-        ButterRadioButton.setSelected(true);
         ButterRadioButton.setText("Butterworth");
+        ButterRadioButton.setEnabled(false);
         ButterRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ButterRadioButtonActionPerformed(evt);
@@ -162,6 +163,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         chooseTypeFilterGroup.add(ChebyRadioButton);
         ChebyRadioButton.setText("Chebyshev");
+        ChebyRadioButton.setEnabled(false);
         ChebyRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ChebyRadioButtonActionPerformed(evt);
@@ -169,6 +171,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         });
 
         chooseTypeFilterGroup.add(EllipticRadioButton);
+        EllipticRadioButton.setSelected(true);
         EllipticRadioButton.setText("Elliptic");
         EllipticRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -178,6 +181,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         chooseTypeFilterGroup.add(BesselRadioButton);
         BesselRadioButton.setText("Bessel");
+        BesselRadioButton.setEnabled(false);
         BesselRadioButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 BesselRadioButtonActionPerformed(evt);
@@ -240,6 +244,11 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         filterTypeChoiceComboBox.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         filterTypeChoiceComboBox.setMaximumRowCount(4);
         filterTypeChoiceComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Lowpass", "Highpass", "Bandpass", "Bandstop" }));
+        filterTypeChoiceComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterTypeChoiceComboBoxActionPerformed(evt);
+            }
+        });
 
         jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -754,6 +763,10 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void ellipticFilterTypeChoiceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ellipticFilterTypeChoiceComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_ellipticFilterTypeChoiceComboBoxActionPerformed
+
+    private void filterTypeChoiceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterTypeChoiceComboBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_filterTypeChoiceComboBoxActionPerformed
 
     /**
      * Invoke frame.

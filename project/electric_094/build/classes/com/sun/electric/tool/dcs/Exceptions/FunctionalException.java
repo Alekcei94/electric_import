@@ -19,6 +19,8 @@
  */
 package com.sun.electric.tool.dcs.Exceptions;
 
+import com.sun.electric.tool.dcs.Accessory;
+
 /**
  *
  * @author Dmitrii
@@ -31,6 +33,7 @@ public class FunctionalException extends Exception {
 
     public FunctionalException(String message) {
         super(message);
+        Accessory.showMessage(message);
     }
 
     public FunctionalException(String message, Throwable cause) {

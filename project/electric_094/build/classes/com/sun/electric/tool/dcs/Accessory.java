@@ -67,6 +67,7 @@ public class Accessory {
             System.err.println("IOException: " + ioe.getMessage());
         }
     }
+    
 
     /**
      * Method to show dialog to user.

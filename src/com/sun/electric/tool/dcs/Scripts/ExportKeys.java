@@ -21,16 +21,28 @@ package com.sun.electric.tool.dcs.Scripts;
 
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.hierarchy.Export;
+import com.sun.electric.database.hierarchy.View;
 import com.sun.electric.database.topology.ArcInst;
 import com.sun.electric.database.topology.Connection;
 import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
+import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
+import com.sun.electric.tool.user.User;
+import com.sun.electric.tool.user.ui.TextWindow;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -63,8 +75,8 @@ public class ExportKeys {
             // HERE WE SHOULD AVOID OTHER BLOCKS WHICH MAYBE HAVE PARAMETERS
             configurationList.addAll(getConfigFromOneNodeInst(ni));
         }
-        
-        for(String str : configurationList) {
+
+        for (String str : configurationList) {
             System.out.println("mainResult " + str);
         }
     }
@@ -83,17 +95,15 @@ public class ExportKeys {
             isBlock = true;
         }*/
         // node basic:key{ic}['key@437']
-        for(String block : listOfBlocks) {
-            if(ni.toString().contains(block)) {
+        for (String block : listOfBlocks) {
+            if (ni.toString().contains(block)) {
                 isBlock = true;
             }
         }
         // return if this block is not block with keys
-        if(!isBlock) {
+        if (!isBlock) {
             return new ArrayList<>();
         }
-
-        
 
         ArrayList<String> partConfigList = new ArrayList<>();
 
@@ -114,7 +124,7 @@ public class ExportKeys {
     * Method to show if the key is closed or not.
     * THERE SHOULDN'T BE MORE THAN 1 
     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2.
-    * Method finds the M1 outisde export, checks it for connection and get 2nd port by connection.
+    * Method finds the M1 outside export, checks it for connection and get 2nd port by connection.
      */
     private boolean isClosedKey(NodeInst ni, NodeInst key) throws FunctionalException {
         Iterator<PortInst> itrPorts = key.getPortInsts();
@@ -146,8 +156,8 @@ public class ExportKeys {
                 PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
 
                 System.out.println("outsidePort " + outsidePort.toString());
-                
-                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"+getOnlyParamOfNodeInst(key)+"_1")) {
+
+                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_1")) {
                     throw new FunctionalException("Incorrect block map");
                 }
 
@@ -167,8 +177,8 @@ public class ExportKeys {
                     ctnNext = ctnTail;
                 }
                 PortInst secondPort = ctnNext.getPortInst();
-                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd"+getOnlyParamOfNodeInst(key)+"_2")) {
-                    System.out.println("mAd"+getOnlyParamOfNodeInst(key)+" is connected");
+                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_2")) {
+                    System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
                     return true;
                 }
             }
@@ -184,7 +194,7 @@ public class ExportKeys {
 
     /*
     * Method to get ONE parameter of nodeInst if there are no more parameters
-    */
+     */
     private String getOnlyParamOfNodeInst(NodeInst ni) throws FunctionalException {
         ArrayList<String> paramList = new ArrayList<>();
         Iterator<Variable> varItr = ni.getParameters();
@@ -201,7 +211,7 @@ public class ExportKeys {
 
     /*
     * Method to get ONE object from any iterator if there are no more objects there.
-    */
+     */
     private <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) throws FunctionalException {
         ArrayList<A> objectsList = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -211,5 +221,89 @@ public class ExportKeys {
             throw new FunctionalException("More than one object in iterator");
         }
         return objectsList.get(0);
+    }
+
+    public class DigitalConfigExport {
+
+        public DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName) {
+            NodeInst FPGAcell = getFPGACell(simLibName, simCellName, FPGAnodeInstName);
+            String pathToVerilog = LinksHolder.getProjectSimulationPath();
+            writeVerilogToFile(FPGAcell, pathToVerilog);
+            try {
+                formDigitalConfig(pathToVerilog);
+            } catch (IOException ex) {
+                Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+        private DigitalConfigExport() {
+            throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
+        }
+        
+        /**
+         * Method to get FPGA verilog/icon cell.
+         * Method finds cell with given name.
+         * @param cell
+         * @return 
+         */
+        private NodeInst getFPGACell(String simLibName, String simCellName, String FPGAnodeInstName) {
+            Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
+            Iterator<NodeInst> niItr = simCell.getNodes();
+            while(niItr.hasNext()) {
+                NodeInst ni = niItr.next();
+                if(ni.getName().contains(FPGAnodeInstName)) {
+                    return ni;
+                }
+            }
+            return null;
+            //return simCell.findNode(FPGAnodeInstName);
+        }
+        
+        private void writeVerilogToFile(NodeInst FPGAcell, String pathToVerilog) {
+            Cell verilogCell = (Cell) FPGAcell.getProto();
+            Cell verEquiv = verilogCell.getEquivalent();
+            if( (verEquiv == null) || (verEquiv.getView() != View.VERILOG) ) {
+                throw new IllegalStateException("Corrupted path to simulation folder. Best solution is to reinstall application");
+            }
+            String[] content = verEquiv.getTextViewContents();
+            String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
+            Accessory.cleanFile(verilogFilePath);
+            for(String str : content) {
+                Accessory.write(verilogFilePath, str);
+            }
+        }
+        
+        private void formDigitalConfig(String pathToVerilog) throws IOException {
+            String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
+            String xcadPath = LinksHolder.getXCADPath();
+            String shPath = xcadPath + File.separator + "xa_sh.exe";
+            String shxaPath = xcadPath + File.separator + "xa";
+            System.out.println(shPath +
+                " " +
+                shxaPath +
+                " -i " +
+                verilogFilePath +
+                " -y++");
+            
+            ProcessBuilder pb = new ProcessBuilder(shPath,
+                shxaPath,
+                "-i",
+                verilogFilePath,
+                "-y++");
+            pb.directory(new File(LinksHolder.getProjectSimulationPath()));
+            pb.inheritIO();
+            try {
+               Process p = pb.start(); 
+               int exitCode = p.waitFor();
+               System.out.println("exit code: " + exitCode);
+            } catch(IOException ioe) {
+                ioe.printStackTrace();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+        }
     }
 }
