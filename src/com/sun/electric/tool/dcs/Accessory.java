@@ -67,6 +67,7 @@ public class Accessory {
             System.err.println("IOException: " + ioe.getMessage());
         }
     }
+    
 
     /**
      * Method to show dialog to user.
@@ -104,7 +105,6 @@ public class Accessory {
 
     /**
      * Method to decompose in powers of two.
-     *
      * @param number
      * @param base
      * @return
@@ -118,8 +118,7 @@ public class Accessory {
     }
 
     /**
-     * String counter in file.
-     *
+     * Just iteratively count all strings.
      * @param file
      * @return
      */
@@ -156,7 +155,6 @@ public class Accessory {
 
     /**
      * Method to get array of INPUT-like chain (PADDR.PX1-6).
-     *
      * @return
      */
     public static NodeInst[] getStartingNodeInsts() {

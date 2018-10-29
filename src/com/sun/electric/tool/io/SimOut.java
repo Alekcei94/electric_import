@@ -59,9 +59,10 @@ public class SimOut {
                 pathOutput);
         String s = Paths.get(".").toAbsolutePath().normalize().toString();
         pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-        System.out.println(s);
+        //System.out.println(s);
         File file = new File(s);
         pb.directory(file);
+        System.out.println(pb.directory());
         pb.inheritIO();
         try {
             Process p = pb.start();
@@ -151,7 +152,7 @@ public class SimOut {
             return;
         }
 
-        filePath = User.getWorkingDirectory() + File.separator + filePath;
+        filePath = User.getWorkingDirectory() + File.separator + "simulation" + File.separator + filePath;
         System.out.println(filePath + " simulation");
         Output.exportCellCommand(cell, context, filePath, type, override);
         new SimulateWithPath(filePath);

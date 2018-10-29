@@ -103,23 +103,21 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 /**
- * A Cell is a non-primitive NodeProto.
- * Besides the information that it inherits from NodeProto, the Cell holds a
- * set of nodes, arcs, and networks.
- * The exported ports on NodeInsts inside of this cell become the Exports
- * of this Cell.
- * A Cell also has a specific view and version number.
+ * A Cell is a non-primitive NodeProto. Besides the information that it inherits
+ * from NodeProto, the Cell holds a set of nodes, arcs, and networks. The
+ * exported ports on NodeInsts inside of this cell become the Exports of this
+ * Cell. A Cell also has a specific view and version number.
  * <P>
- * It is possible to get all of the versions of the cell.
- * A Cell knows about the most recent version of itself, which may be itself.
+ * It is possible to get all of the versions of the cell. A Cell knows about the
+ * most recent version of itself, which may be itself.
  * <P>
  * Cells also belong to CellGroup objects, which gather related cells together.
  * <P>
  * <CENTER><IMG SRC="doc-files/Cell-2.gif"></CENTER>
  * <P>
- * A Cell can have different views and versions, each of which is a cell.
- * The library shown here has two cells ("gate" and "twogate"), each of which has many
- * views (layout, schematics, icon, vhdl) and versions:
+ * A Cell can have different views and versions, each of which is a cell. The
+ * library shown here has two cells ("gate" and "twogate"), each of which has
+ * many views (layout, schematics, icon, vhdl) and versions:
  * <P>
  * <CENTER><IMG SRC="doc-files/Cell-1.gif"></CENTER>
  */
@@ -130,8 +128,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     // ------------------------- private classes -----------------------------
 
     /**
-     * A CellGroup contains a list of cells that are related.
-     * This includes different Views of a cell (e.g. the schematic, layout, and icon Views),
+     * A CellGroup contains a list of cells that are related. This includes
+     * different Views of a cell (e.g. the schematic, layout, and icon Views),
      * alternative icons, all the parts of a multi-part icon.
      */
     public static class CellGroup {
@@ -166,6 +164,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to add a Cell to this CellGroup.
+         *
          * @param cell the cell to add to this CellGroup.
          */
         private void add(Cell cell) {
@@ -185,6 +184,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to remove a Cell from this CellGroup.
+         *
          * @param f the cell to remove from this CellGroup.
          */
         private void remove(Cell f) {
@@ -197,7 +197,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to return an Iterator over all the Cells that are in this CellGroup.
+         * Method to return an Iterator over all the Cells that are in this
+         * CellGroup.
+         *
          * @return an Iterator over all the Cells that are in this CellGroup.
          */
         public Iterator<Cell> getCells() {
@@ -206,6 +208,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to return the number of Cells that are in this CellGroup.
+         *
          * @return the number of Cells that are in this CellGroup.
          */
         public int getNumCells() {
@@ -214,6 +217,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to return a List of all cells in this Group, sorted by View.
+         *
          * @return a List of all cells in this Group, sorted by View.
          */
         public List<Cell> getCellsSortedByView() {
@@ -225,9 +229,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to return main schematics Cell in this CellGroup.
-         * The main schematic is the one that is shown when descending into an icon.
-         * Other schematic views may exist in the group, but they are "alternates".
+         * Method to return main schematics Cell in this CellGroup. The main
+         * schematic is the one that is shown when descending into an icon.
+         * Other schematic views may exist in the group, but they are
+         * "alternates".
+         *
          * @return main schematics Cell in this CellGroup.
          */
         public Cell getMainSchematics() {
@@ -235,12 +241,13 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to return parameter owner Cell in this CellGroup.
-         * The parameter owner Cell is icon or schematic Cell whose parameters
-         * are used as reference when reconciling parameters of other icon/schematic
-         * Cells in the group.
-         * Parameter owner Cell is either main schematic Cell or first icon in alphanumeric
-         * order in CellGroups without schematic Cells
+         * Method to return parameter owner Cell in this CellGroup. The
+         * parameter owner Cell is icon or schematic Cell whose parameters are
+         * used as reference when reconciling parameters of other icon/schematic
+         * Cells in the group. Parameter owner Cell is either main schematic
+         * Cell or first icon in alphanumeric order in CellGroups without
+         * schematic Cells
+         *
          * @return parameter owner Cell in this CellGroup.
          */
         public Cell getParameterOwner() {
@@ -256,8 +263,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to add a parameter on icons/schematics of this CellGroup.
-         * It may add repaired copy of this Variable in some cases.
+         * Method to add a parameter on icons/schematics of this CellGroup. It
+         * may add repaired copy of this Variable in some cases.
+         *
          * @param param parameter to add.
          */
         public void addParam(Variable param) {
@@ -274,6 +282,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to delete a parameter from icons/schematics this CellGroup.
+         *
          * @param key the key of the parameter to delete.
          */
         public void delParam(Variable.AttrKey key) {
@@ -286,9 +295,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Rename a parameter. Note that this creates a new variable of
-         * the new name and copies all values from the old variable, and
-         * then deletes the old variable.
+         * Rename a parameter. Note that this creates a new variable of the new
+         * name and copies all values from the old variable, and then deletes
+         * the old variable.
+         *
          * @param key the name key of the parameter to rename
          * @param newName the new name of the parameter
          */
@@ -305,8 +315,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to update a parameter on icons/schematics of this CellGroup with the specified values.
-         * If the parameter already exists, only the value is changed; the displayable attributes are preserved.
+         * Method to update a parameter on icons/schematics of this CellGroup
+         * with the specified values. If the parameter already exists, only the
+         * value is changed; the displayable attributes are preserved.
+         *
          * @param key the key of the parameter.
          * @param value the object to store in the parameter.
          * @param unit the unit of the parameter
@@ -323,9 +335,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to update a text parameter on icons/schematics of this ElectricObject with the specified values.
-         * If the Parameter already exists, only the value is changed;
-         * the displayable attributes and Code are preserved.
+         * Method to update a text parameter on icons/schematics of this
+         * ElectricObject with the specified values. If the Parameter already
+         * exists, only the value is changed; the displayable attributes and
+         * Code are preserved.
+         *
          * @param key the key of the parameter.
          * @param text the text to store in the parameter.
          */
@@ -342,6 +356,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to tell whether this CellGroup contains a specified Cell.
+         *
          * @param cell the Cell in question.
          * @return true if the Cell is in this CellGroup.
          */
@@ -351,6 +366,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Returns a printable version of this CellGroup.
+         *
          * @return a printable version of this CellGroup.
          */
         @Override
@@ -359,11 +375,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to compare two CellGroups.
-         * Because CellGroups seem to be ephemeral, and are created dynamically,
-         * it is not possible to compare them by equating the object.
-         * Therefore, this override compares the group names.
-         * Although not accurate, it is better than simple object equality.
+         * Method to compare two CellGroups. Because CellGroups seem to be
+         * ephemeral, and are created dynamically, it is not possible to compare
+         * them by equating the object. Therefore, this override compares the
+         * group names. Although not accurate, it is better than simple object
+         * equality.
          */
         @Override
         public boolean equals(Object obj) {
@@ -394,6 +410,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Method to check invariants in this CellGroup.
+         *
          * @exception AssertionError if invariants are not valid
          */
         void check() {
@@ -409,11 +426,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to set the main schematics Cell in this CellGroup.
-         * The main schematic is the one that is shown when descending into an icon.
-         * Other schematic views may exist in the group, but they are "alternates".
-         * Only one schematic view should be in cell group.
-         * If many schematic views exists then main schematics is the newest version of first in alphabetical order schematic cell.
+         * Method to set the main schematics Cell in this CellGroup. The main
+         * schematic is the one that is shown when descending into an icon.
+         * Other schematic views may exist in the group, but they are
+         * "alternates". Only one schematic view should be in cell group. If
+         * many schematic views exists then main schematics is the newest
+         * version of first in alphabetical order schematic cell.
          */
         private void setMainSchematics(boolean undo) {
             if (cells.isEmpty()) {
@@ -443,80 +461,146 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
     }
     // -------------------------- private data ---------------------------------
-    /** Variable key for characteristic spacing for a cell. */
+    /**
+     * Variable key for characteristic spacing for a cell.
+     */
     public static final Variable.Key CHARACTERISTIC_SPACING = Variable.newKey("FACET_characteristic_spacing");
-    /** Variable key for text cell contents. */
+    /**
+     * Variable key for text cell contents.
+     */
     public static final Variable.Key CELL_TEXT_KEY = Variable.newKey("FACET_message");
-    /** Variable key for number of multipage pages. */
+    /**
+     * Variable key for number of multipage pages.
+     */
     public static final Variable.Key MULTIPAGE_COUNT_KEY = Variable.newKey("CELL_page_count");
-    /** Variable key for font of text in textual cells. */
+    /**
+     * Variable key for font of text in textual cells.
+     */
     public static final Variable.Key TEXT_CELL_FONT_NAME = Variable.newKey("CELL_text_font");
-    /** Variable key for size of text in textual cells. */
+    /**
+     * Variable key for size of text in textual cells.
+     */
     public static final Variable.Key TEXT_CELL_FONT_SIZE = Variable.newKey("CELL_text_size");
     private static final int[] NULL_INT_ARRAY = {};
     private static final Export[] NULL_EXPORT_ARRAY = {};
-    /** set if instances should be expanded */
+    /**
+     * set if instances should be expanded
+     */
     public static final int WANTNEXPAND = 02;
 //  /** set if cell is modified */                                  private static final int MODIFIED      =     01000000;
-    /** set if everything in cell is locked */
+    /**
+     * set if everything in cell is locked
+     */
     public static final int NPLOCKED = 04000000;
-    /** set if instances in cell are locked */
+    /**
+     * set if instances in cell are locked
+     */
     public static final int NPILOCKED = 010000000;
-    /** set if cell is part of a "cell library" */
+    /**
+     * set if cell is part of a "cell library"
+     */
     public static final int INCELLLIBRARY = 020000000;
-    /** set if cell is from a technology-library */
+    /**
+     * set if cell is from a technology-library
+     */
     public static final int TECEDITCELL = 040000000;
-    /** set if cell is a multi-page schematic */
+    /**
+     * set if cell is a multi-page schematic
+     */
     private static final int MULTIPAGE = 017600000000;
-    /** zero rectangle */
+    /**
+     * zero rectangle
+     */
     private static final Rectangle2D CENTERRECT = new Rectangle2D.Double(0, 0, 0, 0);
-    /** Database to which this Library belongs. */
+    /**
+     * Database to which this Library belongs.
+     */
     private final EDatabase database;
-    /** Persistent data of this Cell. */
+    /**
+     * Persistent data of this Cell.
+     */
     private ImmutableCell d;
-    /** The CellGroup this Cell belongs to. */
+    /**
+     * The CellGroup this Cell belongs to.
+     */
     private CellGroup cellGroup;
-    /** The library this Cell belongs to. */
+    /**
+     * The library this Cell belongs to.
+     */
     private Library lib;
-    /** The technology of this Cell. */
+    /**
+     * The technology of this Cell.
+     */
     private Technology tech;
-    /** The newest version of this Cell. */
+    /**
+     * The newest version of this Cell.
+     */
     Cell newestVersion;
-    /** An array of Exports on the Cell by chronological index. */
+    /**
+     * An array of Exports on the Cell by chronological index.
+     */
     private Export[] chronExports = new Export[2];
-    /** A sorted array of Exports on the Cell. */
+    /**
+     * A sorted array of Exports on the Cell.
+     */
     private Export[] exports = NULL_EXPORT_ARRAY;
-    /** Cell's topology. */
+    /**
+     * Cell's topology.
+     */
     private Reference<Topology> topologyRef;
-    /** Cell's topology. */
+    /**
+     * Cell's topology.
+     */
     private Topology strongTopology;
-    /** Set containing nodeIds of expanded cells. */
+    /**
+     * Set containing nodeIds of expanded cells.
+     */
     private final BitSet expandedNodes = new BitSet();
-    /** Counts of NodeInsts for each CellUsage. */
+    /**
+     * Counts of NodeInsts for each CellUsage.
+     */
     private int[] cellUsages = NULL_INT_ARRAY;
-    /** The temporary integer value. */
+    /**
+     * The temporary integer value.
+     */
     private int tempInt;
-    /** Set if expanded status of subcell instances is modified. */
+    /**
+     * Set if expanded status of subcell instances is modified.
+     */
     private boolean expandStatusModified;
-    /** Last CellTree of this Cell */
+    /**
+     * Last CellTree of this Cell
+     */
     CellTree tree;
-    /** True if cell together with subcells matches cell tree. */
+    /**
+     * True if cell together with subcells matches cell tree.
+     */
     boolean cellTreeFresh;
-    /** Last backup of this Cell */
+    /**
+     * Last backup of this Cell
+     */
     CellBackup backup;
-    /** True if cell together with contents matches cell backup. */
+    /**
+     * True if cell together with contents matches cell backup.
+     */
     boolean cellBackupFresh;
-    /** True if cell contents matches cell backup. */
+    /**
+     * True if cell contents matches cell backup.
+     */
     private boolean cellContentsFresh;
-    /** True if cell revision date is just set by lowLevelSetRevisionDate*/
+    /**
+     * True if cell revision date is just set by lowLevelSetRevisionDate
+     */
     private boolean revisionDateFresh;
-    /** A weak reference to NetCell object with Netlists */
+    /**
+     * A weak reference to NetCell object with Netlists
+     */
     private Reference<NetCell> netCellRef;
 
     // ------------------ protected and private methods -----------------------
     /**
-     * This constructor should not be called.
-     * Use the factory "newInstance" to create a Cell.
+     * This constructor should not be called. Use the factory "newInstance" to
+     * create a Cell.
      */
     Cell(EDatabase database, ImmutableCell d) {
         this.database = database;
@@ -535,6 +619,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Don't delete. This method is necessary for serialization
+     *
      * @return object serialization.
      */
     private Object writeReplace() {
@@ -571,13 +656,14 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Factory method to create a new Cell.
-     * Also does auxiliary things to create the Cell, such as placing a cell-center if requested.
+     * Factory method to create a new Cell. Also does auxiliary things to create
+     * the Cell, such as placing a cell-center if requested.
+     *
      * @param lib the Library in which to place this cell.
-     * @param name the name of this cell.
-     * Cell names may not contain unprintable characters, spaces, tabs, a colon (:), semicolon (;) or curly braces ({}).
-     * However, the name can be fully qualified with version and view information.
-     * For example, "foo;2{sch}".
+     * @param name the name of this cell. Cell names may not contain unprintable
+     * characters, spaces, tabs, a colon (:), semicolon (;) or curly braces
+     * ({}). However, the name can be fully qualified with version and view
+     * information. For example, "foo;2{sch}".
      * @return the newly created cell (null on error).
      * @deprecated Use method with explicit EditingPreferences parameter.
      */
@@ -586,14 +672,15 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Factory method to create a new Cell.
-     * Also does auxiliary things to create the Cell, such as placing a cell-center if requested.
+     * Factory method to create a new Cell. Also does auxiliary things to create
+     * the Cell, such as placing a cell-center if requested.
+     *
      * @param ep EditingPreferences with default sizes and text descriptors.
      * @param lib the Library in which to place this cell.
-     * @param name the name of this cell.
-     * Cell names may not contain unprintable characters, spaces, tabs, a colon (:), semicolon (;) or curly braces ({}).
-     * However, the name can be fully qualified with version and view information.
-     * For example, "foo;2{sch}".
+     * @param name the name of this cell. Cell names may not contain unprintable
+     * characters, spaces, tabs, a colon (:), semicolon (;) or curly braces
+     * ({}). However, the name can be fully qualified with version and view
+     * information. For example, "foo;2{sch}".
      * @return the newly created cell (null on error).
      */
     public static Cell makeInstance(EditingPreferences ep, Library lib, String name) {
@@ -614,11 +701,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Factory method to create a new Cell.
+     *
      * @param lib the Library in which to place this cell.
-     * @param name the name of this cell.
-     * Cell names may not contain unprintable characters, spaces, tabs, a colon (:), semicolon (;) or curly braces ({}).
-     * However, the name can be fully qualified with version and view information.
-     * For example, "foo;2{sch}".
+     * @param name the name of this cell. Cell names may not contain unprintable
+     * characters, spaces, tabs, a colon (:), semicolon (;) or curly braces
+     * ({}). However, the name can be fully qualified with version and view
+     * information. For example, "foo;2{sch}".
      * @return the newly created cell (null on error).
      */
     public static Cell newInstance(Library lib, String name) {
@@ -715,16 +803,18 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to copy a Cell to any Library.
+     *
      * @param fromCell the Cell to copy.
      * @param toLib the Library to copy it to.
-     * @param toName the name of the Cell in the destination Library.
-     * If the destination library is the same as the original Cell's library and the new name is the same
-     * as the old name, a new version is made.
-     * @param useExisting true to use existing subcell instances if they exist in the destination Library.
-     * @return the new Cell in the destination Library.
-     * Note that when copying cells, it is necessary to copy the expanded status of cell instances
-     * inside of the copied cell.  This must be done during the Job's terminateOK method.
-     * See examples that call CellChangeJobs.copyExpandedStatus()
+     * @param toName the name of the Cell in the destination Library. If the
+     * destination library is the same as the original Cell's library and the
+     * new name is the same as the old name, a new version is made.
+     * @param useExisting true to use existing subcell instances if they exist
+     * in the destination Library.
+     * @return the new Cell in the destination Library. Note that when copying
+     * cells, it is necessary to copy the expanded status of cell instances
+     * inside of the copied cell. This must be done during the Job's terminateOK
+     * method. See examples that call CellChangeJobs.copyExpandedStatus()
      */
     public static Cell copyNodeProto(Cell fromCell, Library toLib, String toName, boolean useExisting) {
         return copyNodeProto(fromCell, toLib, toName, useExisting, null);
@@ -732,16 +822,21 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to copy a Cell to any Library.
+     *
      * @param fromCell the Cell to copy.
      * @param toLib the Library to copy it to.
-     * @param toName the name of the Cell in the destination Library.
-     * If the destination library is the same as the original Cell's library and the new name is the same
-     * as the old name, a new version is made.
-     * @param useExisting true to use existing subcell instances if they exist in the destination Library.
-     * @param cellNamesToUse a map that disambiguates cell names when they clash in different original libraries.
-     * The main key is an old cell name, and the value for that key is a map of library names to new cell names.
-     * So, for example, if libraries "A" and "B" both have a cell called "X", then existing.get("X").get("A") is "X" but
-     * existing.get(X").get("B") is "X_1" which disambiguates the cell names in the destination library.  The map may be null.
+     * @param toName the name of the Cell in the destination Library. If the
+     * destination library is the same as the original Cell's library and the
+     * new name is the same as the old name, a new version is made.
+     * @param useExisting true to use existing subcell instances if they exist
+     * in the destination Library.
+     * @param cellNamesToUse a map that disambiguates cell names when they clash
+     * in different original libraries. The main key is an old cell name, and
+     * the value for that key is a map of library names to new cell names. So,
+     * for example, if libraries "A" and "B" both have a cell called "X", then
+     * existing.get("X").get("A") is "X" but existing.get(X").get("B") is "X_1"
+     * which disambiguates the cell names in the destination library. The map
+     * may be null.
      * @return the new Cell in the destination Library.
      */
     public static Cell copyNodeProto(Cell fromCell, Library toLib, String toName, boolean useExisting,
@@ -852,12 +947,15 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to copy a Cell to any Library, using a preset mapping of node prototypes.
+     * Method to copy a Cell to any Library, using a preset mapping of node
+     * prototypes.
+     *
      * @param fromCell the Cell to copy.
-     * @param toLib the Library to copy it to.
-     * If the destination library is the same as the original Cell's library, a new version is made.
+     * @param toLib the Library to copy it to. If the destination library is the
+     * same as the original Cell's library, a new version is made.
      * @param toName the name of the Cell in the destination Library.
-     * @param nodePrototypes a HashMap from NodeInsts in the source Cell to proper NodeProtos to use in the new Cell.
+     * @param nodePrototypes a HashMap from NodeInsts in the source Cell to
+     * proper NodeProtos to use in the new Cell.
      * @return the new Cell in the destination Library.
      */
     public static Cell copyNodeProtoUsingMapping(Cell fromCell, Library toLib, String toName,
@@ -1025,7 +1123,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to replace subcells of a Cell by cells with similar name in Cell's  	 */
+     * Method to replace subcells of a Cell by cells with similar name in Cell's
+     */
     public void replaceSubcellsByExisting(EditingPreferences ep) {
         // scan all subcells to see if they are found in the new library
         Map<NodeInst, Cell> nodePrototypes = new HashMap<NodeInst, Cell>();
@@ -1087,8 +1186,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to rename this Cell.
+     *
      * @param newName the new name of this cell.
-     * @param newGroupName the name of cell in a group to put the rename cell to.
+     * @param newGroupName the name of cell in a group to put the rename cell
+     * to.
      */
     public IdMapper rename(String newName, String newGroupName) {
         return rename(CellName.parseName(newName + ";" + getVersion() + getView().getAbbreviationExtension()), newGroupName);
@@ -1096,6 +1197,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to rename this Cell.
+     *
      * @param cellName the new name of this cell.
      */
     private IdMapper rename(CellName cellName, String newGroupName) {
@@ -1111,7 +1213,6 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //		// remove temporarily from the library and from cell group
 //		lib.removeCell(this);
 //		cellGroup.remove(this);
-
 //      // remember the expansion state of instances of the cell
 //      Map<CellId, Map<Name, Boolean>> expansionRemap = new HashMap<CellId, Map<Name, Boolean>>();
 //      for (Iterator<NodeInst> it = getInstancesOf(); it.hasNext();) {
@@ -1125,7 +1226,6 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //          Boolean isExpanded = new Boolean(ni.isExpanded());
 //          cellExpansionRemap.put(ni.getNameKey(), isExpanded);
 //      }
-
         // do the rename
         cellName = makeUnique(lib, cellName);
 //      setD(getD().withCellName(cellName));
@@ -1151,26 +1251,23 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //              }
 //          }
 //      }
-
         return idMapper;
     }
 
-    /****************************** LOW-LEVEL IMPLEMENTATION ******************************/
+    /**
+     * **************************** LOW-LEVEL IMPLEMENTATION *****************************
+     */
     private static CellName makeUnique(Library lib, CellName cellName) {
         // ensure unique cell name
         String protoName = cellName.getName();
         String canonicProtoName = TextUtils.canonicString(protoName);
         View view = cellName.getView();
         int version = cellName.getVersion();
-        if (Snapshot.CELLNAMES_IGNORE_CASE)
-        {
-            for (Iterator<Cell> it = lib.getCells(); it.hasNext();)
-            {
+        if (Snapshot.CELLNAMES_IGNORE_CASE) {
+            for (Iterator<Cell> it = lib.getCells(); it.hasNext();) {
                 Cell c = it.next();
-                if (TextUtils.canonicString(c.getName()).equals(canonicProtoName))
-                {
-                    if (!c.getName().equals(protoName))
-                    {
+                if (TextUtils.canonicString(c.getName()).equals(canonicProtoName)) {
+                    if (!c.getName().equals(protoName)) {
                         cellName = CellName.newName(c.getName(), view, version);
                         System.out.println("Change case of cell name from " + protoName + " to " + cellName.getName());
                         protoName = cellName.getName();
@@ -1204,12 +1301,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Low-level method to get the user bits.
-     * The "user bits" are a collection of flags that are more sensibly accessed
-     * through special methods.
-     * This general access to the bits is required because the ELIB
-     * file format stores it as a full integer.
-     * This should not normally be called by any other part of the system.
+     * Low-level method to get the user bits. The "user bits" are a collection
+     * of flags that are more sensibly accessed through special methods. This
+     * general access to the bits is required because the ELIB file format
+     * stores it as a full integer. This should not normally be called by any
+     * other part of the system.
+     *
      * @return the "user bits".
      */
     public int lowLevelGetUserbits() {
@@ -1217,12 +1314,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Low-level method to set the user bits.
-     * The "user bits" are a collection of flags that are more sensibly accessed
-     * through special methods.
-     * This general access to the bits is required because the ELIB
-     * file format stores it as a full integer.
-     * This should not normally be called by any other part of the system.
+     * Low-level method to set the user bits. The "user bits" are a collection
+     * of flags that are more sensibly accessed through special methods. This
+     * general access to the bits is required because the ELIB file format
+     * stores it as a full integer. This should not normally be called by any
+     * other part of the system.
+     *
      * @param userBits the new "user bits".
      */
     public void lowLevelSetUserbits(int userBits) {
@@ -1231,8 +1328,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Low-level method to backup this Cell to CellTree.
+     *
      * @return CellTree which is the backup of this Cell.
-     * @throws IllegalStateException if recalculation of Snapshot is required in thread which is not enabled to do it.
+     * @throws IllegalStateException if recalculation of Snapshot is required in
+     * thread which is not enabled to do it.
      */
     public CellTree tree() {
         if (cellTreeFresh) {
@@ -1244,8 +1343,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Low-level method to backup this Cell to CellBackup.
+     *
      * @return CellBackup which is the backup of this Cell.
-     * @throws IllegalStateException if recalculation of Snapshot is required in thread which is not enabled to do it.
+     * @throws IllegalStateException if recalculation of Snapshot is required in
+     * thread which is not enabled to do it.
      */
     public CellBackup backup() {
         if (cellBackupFresh) {
@@ -1430,9 +1531,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         revisionDateFresh = true;
     }
 
-    /****************************** GRAPHICS ******************************/
+    /**
+     * **************************** GRAPHICS *****************************
+     */
     /**
      * Method to get the width of this Cell.
+     *
      * @return the width of this Cell.
      */
     public double getDefWidth() {
@@ -1441,6 +1545,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to get the width of this Cell.
+     *
      * @return the width of this Cell.
      */
     @Override
@@ -1450,6 +1555,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to the height of this Cell.
+     *
      * @return the height of this Cell.
      */
     public double getDefHeight() {
@@ -1458,6 +1564,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to the height of this Cell.
+     *
      * @return the height of this Cell.
      */
     @Override
@@ -1466,8 +1573,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the default size of this NodeProto relative to minamal size of this NodeProot.
-     * Cells always return zero size.
+     * Method to return the default size of this NodeProto relative to minamal
+     * size of this NodeProot. Cells always return zero size.
+     *
      * @param ep EditingPreferences with default sizes
      * @return the size to use when creating new NodeInsts of this NodeProto.
      */
@@ -1478,7 +1586,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to get the size offset of this Cell.
-     * @return the size offset of this Cell.  It is always zero for cells.
+     *
+     * @return the size offset of this Cell. It is always zero for cells.
      */
     @Override
     public SizeOffset getProtoSizeOffset() {
@@ -1486,7 +1595,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return an iterator over all RTBounds objects in a given area of this Cell.
+     * Method to return an iterator over all RTBounds objects in a given area of
+     * this Cell.
+     *
      * @param bounds the specified area to search.
      * @return an iterator over all of the RTBounds objects in that area.
      */
@@ -1495,10 +1606,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return an iterator over all RTBounds objects in a given area of this Cell that allows
-     * to ignore elements touching the area.
+     * Method to return an iterator over all RTBounds objects in a given area of
+     * this Cell that allows to ignore elements touching the area.
+     *
      * @param bounds the specified area to search.
-     * @param includeEdges true if RTBounds objects along edges are considered in.
+     * @param includeEdges true if RTBounds objects along edges are considered
+     * in.
      * @return an iterator over all of the RTBounds objects in that area.
      */
     public Iterator<Geometric> searchIterator(Rectangle2D bounds, boolean includeEdges) {
@@ -1507,6 +1620,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the bounds of this Cell.
+     *
      * @return an ERectangle with the bounds of this cell's contents
      */
     public ERectangle getBounds() {
@@ -1514,11 +1628,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to compute the "essential bounds" of this Cell.
-     * It looks for NodeInst objects in the cell that are of the type
+     * Method to compute the "essential bounds" of this Cell. It looks for
+     * NodeInst objects in the cell that are of the type
      * "generic:Essential-Bounds" and builds a rectangle from their locations.
-     * @return the bounding area of the essential bounds.
-     * Returns null if an essential bounds cannot be determined.
+     *
+     * @return the bounding area of the essential bounds. Returns null if an
+     * essential bounds cannot be determined.
      */
     public Rectangle2D findEssentialBounds() {
         return getTopology().findEssentialBounds();
@@ -1526,20 +1641,23 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether this Cell has a cell center in it.
+     *
      * @return true if this Cell has a Cell-center node in it.
      */
     public boolean alreadyCellCenter() {
         for (Iterator<NodeInst> it = getNodes(); it.hasNext();) {
             NodeInst ni = it.next();
-            if (Generic.isCellCenter(ni))
+            if (Generic.isCellCenter(ni)) {
                 return true;
+            }
         }
         return false;
     }
 
     /**
-     * Method adjust this cell when the reference point moves.
-     * This requires renumbering all coordinate values in the Cell.
+     * Method adjust this cell when the reference point moves. This requires
+     * renumbering all coordinate values in the Cell.
+     *
      * @param cX coordinate X of new center.
      * @param cY coordinate Y of new center.
      */
@@ -1553,12 +1671,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         // move reference point by (dx,dy)
 //		referencePointNode.modifyInstance(-cX, -cY, 0, 0, 0);
-
         // must adjust all nodes by (dx,dy)
         for (Iterator<NodeInst> it = getNodes(); it.hasNext();) {
             NodeInst ni = it.next();
-            if (Generic.isCellCenter(ni))
+            if (Generic.isCellCenter(ni)) {
                 continue;
+            }
 
             // move NodeInst "ni" by (dx,dy)
             ni.move(-cX, -cY);
@@ -1630,6 +1748,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         /**
          * Constructor for cell frame descriptions.
+         *
          * @param cell the Cell that is having a frame drawn.
          */
         public FrameDescription(Cell cell, int pageNo) {
@@ -1645,8 +1764,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to draw a line in a frame.
-         * This method is overridden by subclasses that know how to do the function.
+         * Method to draw a line in a frame. This method is overridden by
+         * subclasses that know how to do the function.
+         *
          * @param from the starting point of the line (in database units).
          * @param to the ending point of the line (in database units).
          */
@@ -1654,8 +1774,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to draw text in a frame.
-         * This method is overridden by subclasses that know how to do the function.
+         * Method to draw text in a frame. This method is overridden by
+         * subclasses that know how to do the function.
+         *
          * @param ctr the anchor point of the text.
          * @param size the size of the text (in database units).
          * @param maxWid the maximum width of the text (ignored if zero).
@@ -1666,8 +1787,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method called to render the frame information.
-         * It makes calls to "renderInit()", "showFrameLine()", and "showFrameText()".
+         * Method called to render the frame information. It makes calls to
+         * "renderInit()", "showFrameLine()", and "showFrameText()".
          */
         public void renderFrame() {
             double offY = 0;
@@ -1698,11 +1819,14 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
 
         /**
-         * Method to determine the size of the schematic frame in the current Cell.
-         * @param d a Dimension in which the size (database units) will be placed.
-         * @return 0: there should be a frame whose size is absolute;
-         * 1: there should be a frame but it combines with other stuff in the cell;
-         * 2: there is no frame.
+         * Method to determine the size of the schematic frame in the current
+         * Cell.
+         *
+         * @param d a Dimension in which the size (database units) will be
+         * placed.
+         * @return 0: there should be a frame whose size is absolute; 1: there
+         * should be a frame but it combines with other stuff in the cell; 2:
+         * there is no frame.
          */
         public static int getCellFrameInfo(Cell cell, Dimension d) {
             String frameInfo = cell.getVarValue(User.FRAME_SIZE, String.class);
@@ -1937,9 +2061,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
     }
 
-    /****************************** NODES ******************************/
+    /**
+     * **************************** NODES *****************************
+     */
     /**
      * Method to return an Iterator over all NodeInst objects in this Cell.
+     *
      * @return an Iterator over all NodeInst objects in this Cell.
      */
     public synchronized Iterator<NodeInst> getNodes() {
@@ -1948,6 +2075,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an Iterator over all NodeInst objects in this Cell.
+     *
      * @return an Iterator over all NodeInst objects in this Cell.
      */
     public synchronized Iterator<Nodable> getNodables() {
@@ -1956,6 +2084,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of NodeInst objects in this Cell.
+     *
      * @return the number of NodeInst objects in this Cell.
      */
     public int getNumNodes() {
@@ -1965,6 +2094,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the NodeInst at specified position.
+     *
      * @param nodeIndex specified position of NodeInst.
      * @return the NodeInst at specified position.
      */
@@ -1974,6 +2104,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the NodeInst by its chronological index.
+     *
      * @param nodeId chronological index of NodeInst.
      * @return the NodeInst with specified chronological index.
      */
@@ -1983,6 +2114,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Tells expanded status of NodeInst with specified nodeId.
+     *
      * @return true if NodeInst with specified nodeId is expanded.
      */
     public boolean isExpanded(int nodeId) {
@@ -1994,10 +2126,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set expanded status of specified NodeInst.
-     * Expanded NodeInsts are instances of Cells that show their contents.
-     * Unexpanded Cell instances are shown as boxes with the node prototype names in them.
-     * The state has no meaning for instances of primitive node prototypes.
+     * Method to set expanded status of specified NodeInst. Expanded NodeInsts
+     * are instances of Cells that show their contents. Unexpanded Cell
+     * instances are shown as boxes with the node prototype names in them. The
+     * state has no meaning for instances of primitive node prototypes.
+     *
      * @param nodeId specified nodeId
      * @param value true if NodeInst is expanded.
      */
@@ -2018,29 +2151,38 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-	 *  Adds to the argument collection this cell and any cell which
-	 *  has an instance at most "depth" levels below this one (or anywhere
-	 *  if depth==-1), and such that the path from this cell to the target
-	 *  does not pass through an instance of a cell already in the
-	 *  collection.  This runs in time proportional to the size of the database.
-	 */
-	public void getCellsToDepth(java.util.HashSet<Cell> cells, int depth) {
-		if (cells.contains(this)) return;
-		cells.add(this);
-		if (depth == 0) return;
-		for (ImmutableNodeInst n : backup().cellRevision.nodes) {
-			if (!n.isCellInstance()) continue;
+     * Adds to the argument collection this cell and any cell which has an
+     * instance at most "depth" levels below this one (or anywhere if
+     * depth==-1), and such that the path from this cell to the target does not
+     * pass through an instance of a cell already in the collection. This runs
+     * in time proportional to the size of the database.
+     */
+    public void getCellsToDepth(java.util.HashSet<Cell> cells, int depth) {
+        if (cells.contains(this)) {
+            return;
+        }
+        cells.add(this);
+        if (depth == 0) {
+            return;
+        }
+        for (ImmutableNodeInst n : backup().cellRevision.nodes) {
+            if (!n.isCellInstance()) {
+                continue;
+            }
 
-			// ignore recursive references (showing icon in contents)
-			Cell subCell = (Cell)n.protoId.inDatabase(database);
-			if (subCell.isIconOf(this)) continue;
-			subCell.getCellsToDepth(cells, depth==-1 ? -1 : depth-1);
-		}
-	}
+            // ignore recursive references (showing icon in contents)
+            Cell subCell = (Cell) n.protoId.inDatabase(database);
+            if (subCell.isIconOf(this)) {
+                continue;
+            }
+            subCell.getCellsToDepth(cells, depth == -1 ? -1 : depth - 1);
+        }
+    }
 
-	/**
-     * Method to set expand specified subcells.
-     * Expanded NodeInsts are instances of Cells that show their contents.
+    /**
+     * Method to set expand specified subcells. Expanded NodeInsts are instances
+     * of Cells that show their contents.
+     *
      * @param subCells nodeIds of subCells to expand
      */
     void expand(BitSet subCells) {
@@ -2051,6 +2193,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the PortInst by nodeId and PortProtoId.
+     *
      * @param nodeId specified NodeId.
      * @param portProtoId
      * @return the PortInst at specified position..
@@ -2061,6 +2204,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an Iterator over all CellUsage objects in this Cell.
+     *
      * @return an Iterator over all CellUsage objects in this Cell.
      */
     public synchronized Iterator<CellUsage> getUsagesIn() {
@@ -2105,6 +2249,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of NodeUsage objects in this Cell.
+     *
      * @return the number of NodeUsage objects in this Cell.
      */
     public int getNumUsagesIn() {
@@ -2119,8 +2264,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find a named NodeInst on this Cell.
+     *
      * @param name the name of the NodeInst.
-     * @return the NodeInst.  Returns null if none with that name are found.
+     * @return the NodeInst. Returns null if none with that name are found.
      */
     public NodeInst findNode(String name) {
         return getTopology().findNode(name);
@@ -2128,6 +2274,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to unlink a set of these NodeInsts from this Cell.
+     *
      * @param killedNodes a set of NodeInsts to kill.
      */
     public void killNodes(Set<NodeInst> killedNodes) {
@@ -2174,9 +2321,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     private static boolean allowCirDep = false;
 
     /**
-     * Method to allow temporarily circular library dependences
-     * (for example to read legacy libraries).
-     * It is called only from synchronized method Input.readLibrary.
+     * Method to allow temporarily circular library dependences (for example to
+     * read legacy libraries). It is called only from synchronized method
+     * Input.readLibrary.
+     *
      * @param val true allows circular dependencies.
      */
     public static void setAllowCircularLibraryDependences(boolean val) {
@@ -2286,6 +2434,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to add a new NodeInst to the Cell by ImmutableNodeInst.
+     *
      * @param n ImmutableNodeInst of new NodeInst
      * @return the newly created NodeInst, or null on error.
      */
@@ -2366,6 +2515,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to remove an NodeInst from the cell.
+     *
      * @param ni the NodeInst to be removed from the cell.
      */
     private void removeNode(NodeInst ni) {
@@ -2374,7 +2524,6 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         getTopology().removeNode(ni);
 
 //        essenBounds.remove(ni);
-
         // remove usage count
         if (ni.isCellInstance()) {
             Cell subCell = (Cell) ni.getProto();
@@ -2409,9 +2558,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //        }
 //        ni.setNodeIndex(-1);
 //    }
-    /****************************** ARCS ******************************/
+    /**
+     * **************************** ARCS *****************************
+     */
     /**
      * Method to return an Iterator over all ArcInst objects in this Cell.
+     *
      * @return an Iterator over all ArcInst objects in this Cell.
      */
     public synchronized Iterator<ArcInst> getArcs() {
@@ -2420,6 +2572,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of ArcInst objects in this Cell.
+     *
      * @return the number of ArcInst objects in this Cell.
      */
     public int getNumArcs() {
@@ -2429,6 +2582,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the ArcInst at specified position.
+     *
      * @param arcIndex specified position of ArcInst.
      * @return the ArcInst at specified position..
      */
@@ -2438,6 +2592,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the ArcInst by its chronological index.
+     *
      * @param arcId chronological index of ArcInst.
      * @return the ArcInst with specified chronological index.
      */
@@ -2447,8 +2602,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find a named ArcInst on this Cell.
+     *
      * @param name the name of the ArcInst.
-     * @return the ArcInst.  Returns null if none with that name are found.
+     * @return the ArcInst. Returns null if none with that name are found.
      */
     public ArcInst findArc(String name) {
         return getTopology().findArc(name);
@@ -2456,6 +2612,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to unlink a set of these ArcInsts from this Cell.
+     *
      * @param killedArcs a set of ArcInsts to kill.
      */
     public void killArcs(Set<ArcInst> killedArcs) {
@@ -2475,9 +2632,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         }
     }
 
-    /****************************** EXPORTS ******************************/
+    /**
+     * **************************** EXPORTS *****************************
+     */
     /**
      * Add Exports to this Cell.
+     *
      * @param exports the ImmutableExport to add to this Cell.
      */
     public void addExports(Collection<ImmutableExport> exports) {
@@ -2490,6 +2650,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Add an Export to this Cell.
+     *
      * @param e the ImmutableExport to add to this Cell.
      */
     public Export addExport(ImmutableExport e) {
@@ -2548,6 +2709,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Removes an Export from this Cell.
+     *
      * @param export the Export to remove from this Cell.
      */
     void removeExport(Export export) {
@@ -2587,6 +2749,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Move renamed Export in sorted exports array.
+     *
      * @param oldPortIndex old position of the Export in exports array.
      */
     void moveExport(int oldPortIndex, String newName) {
@@ -2641,9 +2804,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Update PortInsts of all instances of this Cell according to pattern.
-     * Pattern contains an element for each Export.
-     * If Export was just created, the element contains -1.
-     * For old Exports the element contains old index of the Export.
+     * Pattern contains an element for each Export. If Export was just created,
+     * the element contains -1. For old Exports the element contains old index
+     * of the Export.
+     *
      * @param pattern array with elements describing new PortInsts.
      */
     public void updatePortInsts(int[] pattern) {
@@ -2659,6 +2823,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to unlink a set of these Export from this Cell.
+     *
      * @param killedExports a set of Exports to kill.
      */
     public void killExports(Set<Export> killedExports) {
@@ -2739,6 +2904,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to recursively alter the state bit fields of these Exports.
+     *
      * @param changedExports changed exports of this Cell.
      */
     void recursivelyChangeAllPorts(Set<Export> changedExports) {
@@ -2774,6 +2940,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find the PortProto that has a particular name.
+     *
      * @return the PortProto, or null if there is no PortProto with that name.
      */
     @Override
@@ -2786,6 +2953,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find the PortProto that has a particular Name.
+     *
      * @return the PortProto, or null if there is no PortProto with that name.
      */
     @Override
@@ -2802,6 +2970,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an iterator over all PortProtos of this NodeProto.
+     *
      * @return an iterator over all PortProtos of this NodeProto.
      */
     @Override
@@ -2811,6 +2980,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an iterator over all Exports of this NodeProto.
+     *
      * @return an iterator over all Exports of this NodeProto.
      */
     public Iterator<Export> getExports() {
@@ -2819,6 +2989,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of PortProtos on this NodeProto.
+     *
      * @return the number of PortProtos on this NodeProto.
      */
     @Override
@@ -2828,6 +2999,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the PortProto at specified position.
+     *
      * @param portIndex specified position of PortProto.
      * @return the PortProto at specified position..
      */
@@ -2838,6 +3010,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the PortProto by thread-independent PortProtoId.
+     *
      * @param portProtoId thread-independent PortProtoId.
      * @return the PortProto.
      */
@@ -2851,6 +3024,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the Export at specified chronological index.
+     *
      * @param chronIndex specified chronological index of Export.
      * @return the Export at specified chronological index or null.
      */
@@ -2860,8 +3034,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find a named Export on this Cell.
+     *
      * @param name the name of the export.
-     * @return the export.  Returns null if that name was not found.
+     * @return the export. Returns null if that name was not found.
      */
     public Export findExport(String name) {
         return (Export) findPortProto(name);
@@ -2869,25 +3044,26 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find a named Export on this Cell.
+     *
      * @param name the Name of the export.
-     * @return the export.  Returns null if that name was not found.
+     * @return the export. Returns null if that name was not found.
      */
     public Export findExport(Name name) {
         return (Export) findPortProto(name);
     }
 
     /**
-     * Searches the exports for the specified name using the binary
-     * search algorithm.
+     * Searches the exports for the specified name using the binary search
+     * algorithm.
+     *
      * @param name the name to be searched.
      * @return index of the search name, if it is contained in the exports;
-     *	       otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>.  The
-     *	       <i>insertion point</i> is defined as the point at which the
-     *	       Export would be inserted into the list: the index of the first
-     *	       element greater than the name, or <tt>exports.length()</tt>, if all
-     *	       elements in the list are less than the specified name.  Note
-     *	       that this guarantees that the return value will be &gt;= 0 if
-     *	       and only if the Export is found.
+     * otherwise, <tt>(-(<i>insertion point</i>) - 1)</tt>. The
+     * <i>insertion point</i> is defined as the point at which the Export would
+     * be inserted into the list: the index of the first element greater than
+     * the name, or <tt>exports.length()</tt>, if all elements in the list are
+     * less than the specified name. Note that this guarantees that the return
+     * value will be &gt;= 0 if and only if the Export is found.
      */
     private int searchExport(String name) {
         int low = 0;
@@ -2909,9 +3085,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         return -(low + 1);  // Export not found.
     }
 
-    /****************************** TEXT ******************************/
+    /**
+     * **************************** TEXT *****************************
+     */
     /**
      * Method to return the CellName object describing this Cell.
+     *
      * @return the CellName object describing this Cell.
      */
     public CellName getCellName() {
@@ -2919,8 +3098,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the pure name of this Cell, without
-     * any view or version information.
+     * Method to return the pure name of this Cell, without any view or version
+     * information.
+     *
      * @return the pure name of this Cell.
      */
     @Override
@@ -2929,9 +3109,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to describe this cell.
-     * The description has the form: cell;version{view}
-     * If the cell is not from the current library, prepend the library name.
+     * Method to describe this cell. The description has the form:
+     * cell;version{view} If the cell is not from the current library, prepend
+     * the library name.
+     *
      * @param withQuotes to wrap description between quotes
      * @return a String that describes this cell.
      */
@@ -2946,8 +3127,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to describe this cell.
-     * The description has the form: Library:cell;version{view}
+     * Method to describe this cell. The description has the form:
+     * Library:cell;version{view}
+     *
      * @return a String that describes this cell.
      */
     @Override
@@ -2956,9 +3138,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to describe this cell.
-     * The description has the form: cell;version{view}
-     * Unlike "describe()", this method never prepends the library name.
+     * Method to describe this cell. The description has the form:
+     * cell;version{view} Unlike "describe()", this method never prepends the
+     * library name.
+     *
      * @return a String that describes this cell.
      */
     @Override
@@ -2972,9 +3155,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to find the NodeProto with the given name.
-     * This can be a PrimitiveNode (and can be prefixed by a Technology name),
-     * or it can be a Cell (and be prefixed by a Library name).
+     * Method to find the NodeProto with the given name. This can be a
+     * PrimitiveNode (and can be prefixed by a Technology name), or it can be a
+     * Cell (and be prefixed by a Library name).
+     *
      * @param line the name of the NodeProto.
      * @return the specified NodeProto, or null if none can be found.
      */
@@ -3020,10 +3204,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to get the strings in this Cell.
-     * It is only valid for cells with "text" views (documentation, vhdl, netlist, etc.)
-     * @return the strings in this Cell.
-     * Returns null if there are no strings.
+     * Method to get the strings in this Cell. It is only valid for cells with
+     * "text" views (documentation, vhdl, netlist, etc.)
+     *
+     * @return the strings in this Cell. Returns null if there are no strings.
      */
     public String[] getTextViewContents() {
         // look on the cell for its text
@@ -3039,9 +3223,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set the strings in this Cell.
-     * It is only valid for cells with "text" views (documentation, vhdl, netlist, etc.)
-     * The call needs to be wrapped inside of a Job.
+     * Method to set the strings in this Cell. It is only valid for cells with
+     * "text" views (documentation, vhdl, netlist, etc.) The call needs to be
+     * wrapped inside of a Job.
+     *
      * @param strings an array of Strings that define this Cell.
      * @param ep EditingPreferences with default TextDescriptors
      */
@@ -3051,17 +3236,21 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the Variable on this Cell with the given key
-     * that is a parameter. Returns null if not found.
+     * Method to return the Variable on this Cell with the given key that is a
+     * parameter. Returns null if not found.
+     *
      * @param key the key of the variable
-     * @return the Variable with that key, that is parameter. Returns null if none found.
+     * @return the Variable with that key, that is parameter. Returns null if
+     * none found.
      */
     public Variable getParameter(Variable.Key key) {
         return key instanceof Variable.AttrKey ? getD().getParameter((Variable.AttrKey) key) : null;
     }
 
     /**
-     * Method to return an Iterator over all Variables marked as parameters on this Cell.
+     * Method to return an Iterator over all Variables marked as parameters on
+     * this Cell.
+     *
      * @return an Iterator over all Variables on this Cell.
      */
     public Iterator<Variable> getParameters() {
@@ -3070,6 +3259,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Tells if this Cell has parameters.
+     *
      * @return true if this Cell has parameters.
      */
     public boolean hasParameters() {
@@ -3078,6 +3268,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of Parameters on this Cell.
+     *
      * @return the number of Parameters on this ImmutableCell.
      */
     public int getNumParameters() {
@@ -3086,6 +3277,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the Parameter by its paramIndex.
+     *
      * @param paramIndex index of Parameter.
      * @return the Parameter with given paramIndex.
      * @throws ArrayIndexOutOfBoundesException if paramIndex out of bounds.
@@ -3095,10 +3287,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return true if the Variable on this ElectricObject with given key is a parameter.
-     * Parameters are those Variables that have values on instances which are
-     * passed down the hierarchy into the contents.
+     * Method to return true if the Variable on this ElectricObject with given
+     * key is a parameter. Parameters are those Variables that have values on
+     * instances which are passed down the hierarchy into the contents.
      * Parameters can only exist on NodeInst objects.
+     *
      * @param varKey key to test
      * @return true if the Variable with given key is a parameter.
      */
@@ -3175,6 +3368,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return a list of Polys that describes all text on this Cell.
+     *
      * @param hardToSelect is true if considering hard-to-select text.
      * @param wnd the window in which the text will be drawn.
      * @return an array of Polys that describes the text.
@@ -3184,11 +3378,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the bounds of all relative text in this Cell.
-     * This is used when displaying "full screen" because the text may grow to
-     * be larger than the actual cell contents.
-     * Only relative (scalable) text is considered, since it is not possible
-     * to change the size of absolute text.
+     * Method to return the bounds of all relative text in this Cell. This is
+     * used when displaying "full screen" because the text may grow to be larger
+     * than the actual cell contents. Only relative (scalable) text is
+     * considered, since it is not possible to change the size of absolute text.
+     *
      * @param wnd the EditWindow0 in which this Cell is being displayed.
      * @return the bounds of the relative (scalable) text.
      */
@@ -3228,6 +3422,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the basename for autonaming instances of this Cell.
+     *
      * @return the basename for autonaming instances of this Cell.
      */
     public Name getBasename() {
@@ -3235,13 +3430,15 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to determine the index value which, when appended to a given string,
-     * will generate a unique name in this Cell.
+     * Method to determine the index value which, when appended to a given
+     * string, will generate a unique name in this Cell.
+     *
      * @param prefix the start of the string.
      * @param suffix the end of the string.
      * @param cls the type of object being examined.
      * @param startingIndex the starting value to append to the string.
-     * @return a value that, when appended to the prefix, forms a unique name in the cell.
+     * @return a value that, when appended to the prefix, forms a unique name in
+     * the cell.
      */
     public int getUniqueNameIndex(String prefix, String suffix, Class<?> cls, int startingIndex) {
         int prefixLen = prefix.length();
@@ -3298,11 +3495,14 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether a name is unique in this Cell.
+     *
      * @param name the Name being tested to see if it is unique.
-     * @param cls the type of object being examined.
-     * The only classes that can be examined are PortProto, NodeInst, and ArcInst.
-     * @param exclude an object that should not be considered in this test (null to ignore the exclusion).
-     * @return true if the name is unique in the Cell.  False if it already exists.
+     * @param cls the type of object being examined. The only classes that can
+     * be examined are PortProto, NodeInst, and ArcInst.
+     * @param exclude an object that should not be considered in this test (null
+     * to ignore the exclusion).
+     * @return true if the name is unique in the Cell. False if it already
+     * exists.
      */
     public boolean isUniqueName(String name, Class<?> cls, ElectricObject exclude) {
         return isUniqueName(Name.findName(name), cls, exclude);
@@ -3310,11 +3510,14 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether a name is unique in this Cell.
+     *
      * @param name the Name being tested to see if it is unique.
-     * @param cls the type of object being examined.
-     * The only classes that can be examined are PortProto, NodeInst, and ArcInst.
-     * @param exclude an object that should not be considered in this test (null to ignore the exclusion).
-     * @return true if the name is unique in the Cell.  False if it already exists.
+     * @param cls the type of object being examined. The only classes that can
+     * be examined are PortProto, NodeInst, and ArcInst.
+     * @param exclude an object that should not be considered in this test (null
+     * to ignore the exclusion).
+     * @return true if the name is unique in the Cell. False if it already
+     * exists.
      */
     public boolean isUniqueName(Name name, Class<?> cls, ElectricObject exclude) {
         if (cls == Export.class) {
@@ -3334,8 +3537,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether a variable key on Cell is deprecated.
-     * Deprecated variable keys are those that were used in old versions of Electric,
-     * but are no longer valid.
+     * Deprecated variable keys are those that were used in old versions of
+     * Electric, but are no longer valid.
+     *
      * @param key the key of the variable.
      * @return true if the variable key is deprecated.
      */
@@ -3353,6 +3557,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to compute the location of a new Variable on this Cell.
+     *
      * @return the offset of the new Variable.
      */
     public Point2D newVarOffset() {
@@ -3386,6 +3591,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Returns a printable version of this Cell.
+     *
      * @return a printable version of this Cell.
      */
     @Override
@@ -3393,9 +3599,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         return "cell " + describe(true);
     }
 
-    /****************************** HIERARCHY ******************************/
+    /**
+     * **************************** HIERARCHY *****************************
+     */
     /**
      * Returns persistent data of this Cell.
+     *
      * @return persistent data of this Cell.
      */
     @Override
@@ -3405,6 +3614,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Modifies persistent data of this Cell.
+     *
      * @param newD new persistent data.
      */
     private void setD(ImmutableCell newD) {
@@ -3420,8 +3630,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to add a Variable on this Cell.
-     * It may add repaired copy of this Variable in some cases.
+     * Method to add a Variable on this Cell. It may add repaired copy of this
+     * Variable in some cases.
+     *
      * @param var Variable to add.
      */
     @Override
@@ -3434,6 +3645,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to delete a Variable from this Cell.
+     *
      * @param key the key of the Variable to delete.
      */
     @Override
@@ -3446,8 +3658,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the Parameter or Variable on this Cell with a given key.
+     *
      * @param key the key of the Parameter or Variable.
-     * @return the Parameter or Variable with that key, or null if there is no such Parameter or Variable Variable.
+     * @return the Parameter or Variable with that key, or null if there is no
+     * such Parameter or Variable Variable.
      * @throws NullPointerException if key is null
      */
     @Override
@@ -3463,7 +3677,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return an Iterator over all Parameters and Variables on this Cell.
+     * Method to return an Iterator over all Parameters and Variables on this
+     * Cell.
+     *
      * @return an Iterator over all Parameters and Variables on this Cell.
      */
     @Override
@@ -3482,10 +3698,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Updates the TextDescriptor on this Cell selected by varKey.
-     * The varKey may be a key of parameter or variable on this Cell.
-     * If varKey doesn't select any text descriptor, no action is performed.
-     * The TextDescriptor gives information for displaying the Variable.
+     * Updates the TextDescriptor on this Cell selected by varKey. The varKey
+     * may be a key of parameter or variable on this Cell. If varKey doesn't
+     * select any text descriptor, no action is performed. The TextDescriptor
+     * gives information for displaying the Variable.
+     *
      * @param varKey key of variable or special key.
      * @param td new value TextDescriptor
      */
@@ -3504,8 +3721,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return NodeProtoId of this NodeProto.
-     * NodeProtoId identifies NodeProto independently of threads.
+     * Method to return NodeProtoId of this NodeProto. NodeProtoId identifies
+     * NodeProto independently of threads.
+     *
      * @return NodeProtoId of this NodeProto.
      */
     @Override
@@ -3514,8 +3732,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Returns a Cell by CellId.
-     * Returns null if the Cell is not linked to the database.
+     * Returns a Cell by CellId. Returns null if the Cell is not linked to the
+     * database.
+     *
      * @param cellId CellId to find.
      * @return Cell or null.
      */
@@ -3525,6 +3744,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an iterator over all usages of this NodeProto.
+     *
      * @return an iterator over all usages of this NodeProto.
      */
     public Iterator<CellUsage> getUsagesOf() {
@@ -3577,6 +3797,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an iterator over all instances of this NodeProto.
+     *
      * @return an iterator over all instances of this NodeProto.
      */
     public Iterator<NodeInst> getInstancesOf() {
@@ -3643,6 +3864,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     /**
      * Determines whether an instantiation of cell <code>toInstantiate</code>
      * into <code>parent</code> would be a recursive operation.
+     *
      * @param toInstantiate the cell to instantiate
      * @param parent the cell in which to create the instance
      * @return true if the operation would be recursive, false otherwise
@@ -3675,12 +3897,15 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether this Cell is a child of a given parent Cell.
-     * DO NOT use this method to determine whether an instantiation should be allowed
-     * (i.e. it is not a recursive instantiation).  Use <code>isInstantiationRecursive</code>
-     * instead.  This method *only* does what is it says it does: it checks if this cell
-     * is currently instantiated as a child of 'parent' cell.
+     * DO NOT use this method to determine whether an instantiation should be
+     * allowed (i.e. it is not a recursive instantiation). Use
+     * <code>isInstantiationRecursive</code> instead. This method *only* does
+     * what is it says it does: it checks if this cell is currently instantiated
+     * as a child of 'parent' cell.
+     *
      * @param parent the parent cell being examined.
-     * @return true if, somewhere above the hierarchy of this Cell is the parent Cell.
+     * @return true if, somewhere above the hierarchy of this Cell is the parent
+     * Cell.
      */
     public boolean isAChildOf(Cell parent) {
         return getIsAChildOf(parent, new HashMap<Cell, Cell>());
@@ -3705,7 +3930,6 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         checkedParents.put(parent, parent);
 
         //System.out.println("Checking if this "+describe()+" is a child of "+parent.describe());
-
         // see if any instances of this have parent 'parent'
         // check both icon and content views
         // Note that contentView and iconView are the same for every recursion
@@ -3785,8 +4009,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //		return false;
 //	}
     /**
-     * Method to determine whether this Cell is in use anywhere.
-     * If it is, an error dialog is displayed.
+     * Method to determine whether this Cell is in use anywhere. If it is, an
+     * error dialog is displayed.
+     *
      * @param action a description of the intended action (i.e. "delete").
      * @param quiet true not to warn the user of the cell being used.
      * @param sameCellGroupAlso
@@ -3820,9 +4045,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to determine whether this Cell is in use anywhere.
-     * If it is, a string with super-cell names is returned.
-     * @param sameCellGroupAlso true to check parents in the CellGroup of this Cell also.
+     * Method to determine whether this Cell is in use anywhere. If it is, a
+     * string with super-cell names is returned.
+     *
+     * @param sameCellGroupAlso true to check parents in the CellGroup of this
+     * Cell also.
      * @return string with super-cell names, or null if cell is not used.
      */
     private String isInUse(boolean sameCellGroupAlso) {
@@ -3842,9 +4069,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         return parents;
     }
 
-    /****************************** VERSIONS ******************************/
+    /**
+     * **************************** VERSIONS *****************************
+     */
     /**
      * Method to create a new version of this Cell.
+     *
      * @return a new Cell that is a new version of this Cell.
      */
     public Cell makeNewVersion() {
@@ -3854,6 +4084,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the version number of this Cell.
+     *
      * @return the version number of this Cell.
      */
     public int getVersion() {
@@ -3862,6 +4093,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of different versions of this Cell.
+     *
      * @return the number of different versions of this Cell.
      */
     public int getNumVersions() {
@@ -3882,6 +4114,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return an Iterator over the different versions of this Cell.
+     *
      * @return an Iterator over the different versions of this Cell.
      */
     public Iterator<Cell> getVersions() {
@@ -3902,6 +4135,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the most recent version of this Cell.
+     *
      * @return he most recent version of this Cell.
      */
     public Cell getNewestVersion() {
@@ -3929,10 +4163,13 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         return lib.getCellsTail(cn);
     }
 
-    /****************************** GROUPS ******************************/
+    /**
+     * **************************** GROUPS *****************************
+     */
     /**
      * Method to get the CellGroup that this Cell is part of.
-     * @return the CellGroup that this Cell is part of 
+     *
+     * @return the CellGroup that this Cell is part of
      * @throws IllegalStateException if Cell is not linked
      */
     public CellGroup getCellGroup() {
@@ -3944,8 +4181,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return a List of Cells in the group with this one.
-     * If this Cell is not in a group, the list contains just this Cell.
+     * Method to return a List of Cells in the group with this one. If this Cell
+     * is not in a group, the list contains just this Cell.
+     *
      * @return a List of Cells in the group with this one.
      * @throws IllegalStateException if Cell is not linked
      */
@@ -3965,6 +4203,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     /**
      * Method to return the main schematic Cell associated with this Cell.
      * Examines the group for the main schematic.
+     *
      * @return the main schematic Cell associated with this Cell.
      * @throws IllegalStateException if Cell is not linked
      */
@@ -3979,8 +4218,23 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to move this Cell together with all its versions and views
-     * to the group of another Cell.
+     * Method to return the main schematic Cell associated with this Cell.
+     * Examines the group for the main schematic.
+     *
+     * @return the main schematic Cell associated with this Cell.
+     * @throws IllegalStateException if Cell is not linked
+     */
+    public Cell getMainSchematicOrVerilogInGroup() {
+        if (!isLinked()) {
+            throw new IllegalStateException();
+        }
+        return contentsView();
+    }
+
+    /**
+     * Method to move this Cell together with all its versions and views to the
+     * group of another Cell.
+     *
      * @param otherCell the other cell whose group this Cell should join.
      */
     public void joinGroup(Cell otherCell) {
@@ -3996,8 +4250,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //		setCellGroup(null);
 //	}
     /**
-     * Method to put this Cell together with all its versions and views into the given CellGroup.
-     * @param cellGroup the CellGroup that this cell belongs to or null to put into own cell group
+     * Method to put this Cell together with all its versions and views into the
+     * given CellGroup.
+     *
+     * @param cellGroup the CellGroup that this cell belongs to or null to put
+     * into own cell group
      */
     public void setCellGroup(CellGroup cellGroup) {
         if (!isLinked()) {
@@ -4026,10 +4283,13 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //		Undo.modifyCellGroup(this, oldCellGroup);
     }
 
-    /****************************** VIEWS ******************************/
     /**
-     * Method to get this Cell's View.
-     * Views include "layout", "schematics", "icon", "netlist", etc.
+     * **************************** VIEWS *****************************
+     */
+    /**
+     * Method to get this Cell's View. Views include "layout", "schematics",
+     * "icon", "netlist", etc.
+     *
      * @return to get this Cell's View.
      */
     public View getView() {
@@ -4038,6 +4298,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to change the view of this Cell.
+     *
      * @param newView the new View.
      */
     public IdMapper setView(View newView) {
@@ -4046,7 +4307,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether this Cell is an icon Cell.
-     * @return true if this Cell is an icon  Cell.
+     *
+     * @return true if this Cell is an icon Cell.
      */
     public boolean isIcon() {
         return getId().isIcon();
@@ -4054,6 +4316,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to determine whether this Cell is an icon of another Cell.
+     *
      * @param cell the other cell which this may be an icon of.
      * @return true if this Cell is an icon of that other Cell.
      */
@@ -4063,6 +4326,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return true if this Cell is a schematic Cell.
+     *
      * @return true if this Cell is a schematic Cell.
      */
     public boolean isSchematic() {
@@ -4071,6 +4335,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return true if bus names are allowed in this Cell
+     *
      * @return true if bus names are allowed in this Cell
      */
     public boolean busNamesAllowed() {
@@ -4079,6 +4344,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return true if this Cell is a layout Cell.
+     *
      * @return true if this Cell is a layout Cell
      */
     public boolean isLayout() {
@@ -4088,6 +4354,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the number of pages in this multi-page Cell.
+     *
      * @return the number of different pages.
      */
     public int getNumMultiPages() {
@@ -4106,10 +4373,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to find the contents Cell associated with this Cell.
-     * This only makes sense if the current Cell is an icon or skeleton Cell.
-     * @return the contents Cell associated with this Cell.
-     * Returns null if no such Cell can be found.
+     * Method to find the contents Cell associated with this Cell. This only
+     * makes sense if the current Cell is an icon or skeleton Cell.
+     *
+     * @return the contents Cell associated with this Cell. Returns null if no
+     * such Cell can be found.
      */
     public Cell contentsView() {
         // can only consider contents if this cell is an icon
@@ -4138,6 +4406,13 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
                 return cellInGroup;
             }
         }
+        
+        // finally check to see if there is any "unknown" link
+        for (Cell cellInGroup : cellsInGroup) {
+            if (cellInGroup.getView() == View.VERILOG) {
+                return cellInGroup;
+            }
+        }
 
         // no contents found
         return null;
@@ -4145,8 +4420,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to find the icon Cell associated with this Cell.
-     * @return the icon Cell associated with this Cell.
-     * Returns null if no such Cell can be found.
+     *
+     * @return the icon Cell associated with this Cell. Returns null if no such
+     * Cell can be found.
      */
     public Cell iconView() {
         // can only get icon view if this is a schematic
@@ -4165,11 +4441,13 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to find the Cell of a given View that is in the same group as this Cell.
-     * If there is more than one cell matching the View, it will do a name match.
+     * Method to find the Cell of a given View that is in the same group as this
+     * Cell. If there is more than one cell matching the View, it will do a name
+     * match.
+     *
      * @param view the View of the other Cell.
-     * @return the Cell from this group with the specified View.
-     * Returns null if no such Cell can be found.
+     * @return the Cell from this group with the specified View. Returns null if
+     * no such Cell can be found.
      */
     public Cell otherView(View view) {
         Cell otherViewCell = null;
@@ -4188,19 +4466,28 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         return otherViewCell;
     }
 
-    /****************************** NETWORKS ******************************/
-    /** Recompute the Netlist structure for this Cell without shortening resistors.
+    /**
+     * **************************** NETWORKS *****************************
+     */
+    /**
+     * Recompute the Netlist structure for this Cell without shortening
+     * resistors.
+     *
      * @return the Netlist structure for this cell.
-     * @throws NetworkTool.NetlistNotReady if called from GUI thread and change Job hasn't prepared Netlist yet
+     * @throws NetworkTool.NetlistNotReady if called from GUI thread and change
+     * Job hasn't prepared Netlist yet
      */
     public Netlist getNetlist() {
         return getNetlist(Netlist.ShortResistors.NO);
     }
 
-    /** Recompute the Netlist structure for this Cell.
+    /**
+     * Recompute the Netlist structure for this Cell.
+     *
      * @param shortResistors short resistors mode of Netlist.
      * @return the Netlist structure for this cell.
-     * @throws NetworkTool.NetlistNotReady if called from GUI thread and change Job hasn't prepared Netlist yet
+     * @throws NetworkTool.NetlistNotReady if called from GUI thread and change
+     * Job hasn't prepared Netlist yet
      */
     public Netlist getNetlist(Netlist.ShortResistors shortResistors) {
         NetCell netCell = netCellRef.get();
@@ -4230,9 +4517,12 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 //    public Netlist acquireUserNetlist() {
 //        return getNetlist();
 //    }
-    /****************************** DATES ******************************/
+    /**
+     * **************************** DATES *****************************
+     */
     /**
      * Method to get the creation date of this Cell.
+     *
      * @return the creation date of this Cell.
      */
     public Date getCreationDate() {
@@ -4240,8 +4530,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell's creation date.
-     * This is a low-level method and should not be called unless you know what you are doing.
+     * Method to set this Cell's creation date. This is a low-level method and
+     * should not be called unless you know what you are doing.
+     *
      * @param creationDate the date of this Cell's creation.
      */
     public void lowLevelSetCreationDate(Date creationDate) {
@@ -4250,6 +4541,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to return the revision date of this Cell.
+     *
      * @return the revision date of this Cell.
      */
     public Date getRevisionDate() {
@@ -4257,8 +4549,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell's last revision date.
-     * This is a low-level method and should not be called unless you know what you are doing.
+     * Method to set this Cell's last revision date. This is a low-level method
+     * and should not be called unless you know what you are doing.
+     *
      * @param revisionDate the date of this Cell's last revision.
      */
     public void lowLevelSetRevisionDate(Date revisionDate) {
@@ -4266,9 +4559,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell's revision date and user name.
-     * Change system is not informed about this.
-     * This is a low-level method and should not be called unless you know what you are doing.
+     * Method to set this Cell's revision date and user name. Change system is
+     * not informed about this. This is a low-level method and should not be
+     * called unless you know what you are doing.
      */
     public void lowLevelMadeRevision(long revisionDate, String userName, CellRevision oldRevision) {
         backup();
@@ -4287,9 +4580,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to check the current cell to be sure that no subcells have a more recent date.
-     * This is invoked when the "Check cell dates" feature is enabled in the New Nodes tab of
-     * the Edit Options dialog.
+     * Method to check the current cell to be sure that no subcells have a more
+     * recent date. This is invoked when the "Check cell dates" feature is
+     * enabled in the New Nodes tab of the Edit Options dialog.
      */
     public void checkCellDates() {
         Set<Cell> cellsChecked = new HashSet<Cell>();
@@ -4298,8 +4591,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Recursive method to check sub-cell revision times.
-     * @param rev_time the revision date of the top-level cell.
-     * Nothing below it can be newer.
+     *
+     * @param rev_time the revision date of the top-level cell. Nothing below it
+     * can be newer.
      */
     private void checkCellDate(Date rev_time, Set<Cell> cellsChecked) {
         for (Iterator<NodeInst> it = getNodes(); it.hasNext();) {
@@ -4336,7 +4630,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
                 + " has been edited since the last revision to the current cell");
     }
 
-    /****************************** MISCELLANEOUS ******************************/
+    /**
+     * **************************** MISCELLANEOUS *****************************
+     */
     private int getFlags() {
         return d.flags;
     }
@@ -4350,16 +4646,18 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell so that instances of it are "expanded" by when created.
-     * Expanded NodeInsts are instances of Cells that show their contents.
+     * Method to set this Cell so that instances of it are "expanded" by when
+     * created. Expanded NodeInsts are instances of Cells that show their
+     * contents.
      */
     public void setWantExpanded() {
         setFlag(WANTNEXPAND, true);
     }
 
     /**
-     * Method to set this Cell so that instances of it are "not expanded" by when created.
-     * Expanded NodeInsts are instances of Cells that show their contents.
+     * Method to set this Cell so that instances of it are "not expanded" by
+     * when created. Expanded NodeInsts are instances of Cells that show their
+     * contents.
      */
     public void clearWantExpanded() {
         setFlag(WANTNEXPAND, false);
@@ -4368,6 +4666,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     /**
      * Method to tell if instances of it are "expanded" by when created.
      * Expanded NodeInsts are instances of Cells that show their contents.
+     *
      * @return true if instances of it are "expanded" by when created.
      */
     public boolean isWantExpanded() {
@@ -4375,8 +4674,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the function of this Cell.
-     * The Function of CELL is always UNKNOWN.
+     * Method to return the function of this Cell. The Function of CELL is
+     * always UNKNOWN.
+     *
      * @return the function of this Cell.
      */
     @Override
@@ -4385,8 +4685,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell so that everything inside of it is locked.
-     * Locked instances cannot be moved or deleted.
+     * Method to set this Cell so that everything inside of it is locked. Locked
+     * instances cannot be moved or deleted.
      */
     public void setAllLocked() {
         setFlag(NPLOCKED, true);
@@ -4401,8 +4701,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to tell if the contents of this Cell are locked.
-     * Locked instances cannot be moved or deleted.
+     * Method to tell if the contents of this Cell are locked. Locked instances
+     * cannot be moved or deleted.
+     *
      * @return true if the contents of this Cell are locked.
      */
     public boolean isAllLocked() {
@@ -4418,16 +4719,17 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell so that all instances inside of it are not locked.
-     * Locked instances cannot be moved or deleted.
+     * Method to set this Cell so that all instances inside of it are not
+     * locked. Locked instances cannot be moved or deleted.
      */
     public void clearInstancesLocked() {
         setFlag(NPILOCKED, false);
     }
 
     /**
-     * Method to tell if the sub-instances in this Cell are locked.
-     * Locked instances cannot be moved or deleted.
+     * Method to tell if the sub-instances in this Cell are locked. Locked
+     * instances cannot be moved or deleted.
+     *
      * @return true if the sub-instances in this Cell are locked.
      */
     public boolean isInstancesLocked() {
@@ -4435,10 +4737,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set this Cell so that it is part of a cell library.
-     * Cell libraries are simply libraries that contain standard cells but no hierarchy
-     * (as opposed to libraries that define a complete circuit).
-     * Certain commands exclude facets from cell libraries, so that the actual circuit hierarchy can be more clearly seen.
+     * Method to set this Cell so that it is part of a cell library. Cell
+     * libraries are simply libraries that contain standard cells but no
+     * hierarchy (as opposed to libraries that define a complete circuit).
+     * Certain commands exclude facets from cell libraries, so that the actual
+     * circuit hierarchy can be more clearly seen.
      */
     public void setInCellLibrary() {
         setFlag(INCELLLIBRARY, true);
@@ -4479,9 +4782,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to tell if this Cell is part of a Technology Library.
-     * Technology libraries are those libraries that contain Cells with
-     * graphical descriptions of the nodes, arcs, and layers of a technology.
+     * Method to tell if this Cell is part of a Technology Library. Technology
+     * libraries are those libraries that contain Cells with graphical
+     * descriptions of the nodes, arcs, and layers of a technology.
+     *
      * @return true if this Cell is part of a Technology Library.
      */
     public boolean isInTechnologyLibrary() {
@@ -4489,8 +4793,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to clear this Cell modified bit since last save to disk. No need to call checkChanging().
-     * This is done when the library contained this cell is saved to disk.
+     * Method to clear this Cell modified bit since last save to disk. No need
+     * to call checkChanging(). This is done when the library contained this
+     * cell is saved to disk.
      */
     void clearModified() {
         if (isModified()) {
@@ -4504,6 +4809,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to tell if this Cell has been modified since last save to disk.
+     *
      * @return true if cell has been modified.
      */
     public boolean isModified() {
@@ -4605,11 +4911,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         String cellName = noLibDescribe().replace('/', ':');
         String cellKey = "E" + cellName;
         if (cellKey.length() > Preferences.MAX_KEY_LENGTH) {
-	        if (Job.getDebug()) {
-	            System.err.println("WARNING: Cannot save expanded status of cell " + this +
-	            	" because key exceeds " + Preferences.MAX_KEY_LENGTH + " characters in length.");
-	        }
-	        return;
+            if (Job.getDebug()) {
+                System.err.println("WARNING: Cannot save expanded status of cell " + this
+                        + " because key exceeds " + Preferences.MAX_KEY_LENGTH + " characters in length.");
+            }
+            return;
         }
         if (Job.getDebug()) {
             System.err.println("Save expanded status of " + this);
@@ -4660,10 +4966,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
                 boolean isExpanded = isExpanded(ni.getNodeId());
                 if (isExpanded != defaultExpanded) {
                     String nodeName = "E" + ni.getName();
-                    if (nodeName.length() <  Preferences.MAX_KEY_LENGTH)
-                    	cellPrefs.putBoolean(nodeName, isExpanded);
-                    else
-                    	System.out.println("Key string too long to store as Preference '" + nodeName + "'");
+                    if (nodeName.length() < Preferences.MAX_KEY_LENGTH) {
+                        cellPrefs.putBoolean(nodeName, isExpanded);
+                    } else {
+                        System.out.println("Key string too long to store as Preference '" + nodeName + "'");
+                    }
                 }
             }
         }
@@ -4671,9 +4978,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set the multi-page capability of this Cell.
-     * Multipage cells (usually schematics) must have cell frames to isolate the different
-     * areas of the cell that are different pages.
+     * Method to set the multi-page capability of this Cell. Multipage cells
+     * (usually schematics) must have cell frames to isolate the different areas
+     * of the cell that are different pages.
+     *
      * @param multi true to make this cell multi-page.
      */
     public void setMultiPage(boolean multi) {
@@ -4681,9 +4989,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to tell if this Cell is a multi-page drawing.
-     * Multipage cells (usually schematics) must have cell frames to isolate the different
-     * areas of the cell that are different pages.
+     * Method to tell if this Cell is a multi-page drawing. Multipage cells
+     * (usually schematics) must have cell frames to isolate the different areas
+     * of the cell that are different pages.
+     *
      * @return true if this Cell is a multi-page drawing.
      */
     public boolean isMultiPage() {
@@ -4692,6 +5001,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Returns true if this Cell is linked into database.
+     *
      * @return true if this Cell is linked into database.
      */
     @Override
@@ -4702,6 +5012,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Returns database to which this Cell belongs.
+     *
      * @return database to which this ElectricObject belongs.
      */
     @Override
@@ -4729,7 +5040,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         for (Iterator<Export> it = getExports(); it.hasNext();) {
             Export e = it.next();
             checkName(e, errorLogger);
-        } 
+        }
         if (repair && list.size() > 0) {
             CircuitChangeJobs.eraseObjectsInList(this, list, false, null, ep);
         }
@@ -4767,11 +5078,11 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
         return errorCount;
     }
-    
+
     private void checkName(Name name, Geometric geom, ErrorLogger errorLogger) {
         if (name.isTempname()) {
             return;
-        } 
+        }
         String s = name.toString();
         if (s.indexOf('<') >= 0 && s.indexOf('>') >= 0) {
             String msg = "Name " + s + " contains angle brackets. They are not considered as array chars";
@@ -4795,6 +5106,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to check invariants in this Cell.
+     *
      * @exception AssertionError if invariants are not valid
      */
     @Override
@@ -4888,9 +5200,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to tell whether an ElectricObject exists in this Cell.
-     * Used when saving and restoring highlighting to ensure that the object still
-     * exists.
+     * Method to tell whether an ElectricObject exists in this Cell. Used when
+     * saving and restoring highlighting to ensure that the object still exists.
+     *
      * @param eObj the ElectricObject in question
      * @return true if that ElectricObject is in this Cell.
      */
@@ -4920,6 +5232,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to get the 0-based index of this Cell.
+     *
      * @return the index of this Cell.
      */
     public final int getCellIndex() {
@@ -4928,6 +5241,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to set an arbitrary integer in a temporary location on this Cell.
+     *
      * @param tempInt the integer to be set on this Cell.
      */
     public void setTempInt(int tempInt) {
@@ -4937,6 +5251,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to get the temporary integer on this Cell.
+     *
      * @return the temporary integer on this Cell.
      */
     public int getTempInt() {
@@ -4944,7 +5259,9 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to determine the appropriate Cell associated with this ElectricObject.
+     * Method to determine the appropriate Cell associated with this
+     * ElectricObject.
+     *
      * @return the appropriate Cell associated with this ElectricObject..
      * Returns null if no Cell can be found.
      */
@@ -4955,6 +5272,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Method to get the library to which this Cell belongs.
+     *
      * @return to get the library to which this Cell belongs.
      */
     public Library getLibrary() {
@@ -4962,10 +5280,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the Technology of this Cell.
-     * It can be quite complex to determine which Technology a Cell belongs to.
-     * The system examines all of the nodes and arcs in it, and also considers
-     * the Cell's view.
+     * Method to return the Technology of this Cell. It can be quite complex to
+     * determine which Technology a Cell belongs to. The system examines all of
+     * the nodes and arcs in it, and also considers the Cell's view.
+     *
      * @return return the Technology of this Cell.
      */
     @Override
@@ -4983,8 +5301,10 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to set the Technology to which this NodeProto belongs
-     * It can only be called for Cells because PrimitiveNodes have fixed Technology membership.
+     * Method to set the Technology to which this NodeProto belongs It can only
+     * be called for Cells because PrimitiveNodes have fixed Technology
+     * membership.
+     *
      * @param tech the new technology for this NodeProto (Cell).
      */
     public void setTechnology(Technology tech) {
@@ -5000,19 +5320,20 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Finds the Schematic Cell associated with this Icon Cell.
-     * If this Cell is an Icon View then find the schematic Cell in its
-     * CellGroup.
-     * @return the Schematic Cell.  Returns null if there is no equivalent.
-     * If there are multiple versions of the Schematic View then
-     * return the latest version.
+     * Finds the Schematic Cell associated with this Icon Cell. If this Cell is
+     * an Icon View then find the schematic Cell in its CellGroup.
+     *
+     * @return the Schematic Cell. Returns null if there is no equivalent. If
+     * there are multiple versions of the Schematic View then return the latest
+     * version.
      */
     public Cell getEquivalent() {
-        return isIcon() ? getMainSchematicInGroup() : this;
+        return isIcon() ? getMainSchematicOrVerilogInGroup() : this;
     }
 
     /**
      * Use to compare cells in Cross Library Check
+     *
      * @param obj Object to compare to
      * @param buffer To store comparison messages in case of failure
      * @return True if objects represent same NodeInst
@@ -5196,6 +5517,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
 
     /**
      * Compares Cells by their Libraries and CellNames.
+     *
      * @param that the other Cell.
      * @return a comparison between the Cells.
      */
@@ -5211,38 +5533,44 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to get MinZ and MaxZ of the cell calculated based on nodes.
-     * You must guarantee minZ = Double.MaxValue() and maxZ = Double.MinValue()
-     * for initial call.
+     * Method to get MinZ and MaxZ of the cell calculated based on nodes. You
+     * must guarantee minZ = Double.MaxValue() and maxZ = Double.MinValue() for
+     * initial call.
+     *
      * @param array array[0] is minZ and array[1] is max
      * @return true if at least one valid layer was found with data.
      */
     public boolean getZValues(double[] array) {
-    	boolean foundValue = false;
-    	
+        boolean foundValue = false;
+
         for (Iterator<NodeInst> it = getNodes(); it.hasNext();) {
             NodeInst ni = it.next();
             if (ni.isCellInstance()) {
                 Cell nCell = (Cell) ni.getProto();
-                if (nCell.getZValues(array))
-                	foundValue = true;
+                if (nCell.getZValues(array)) {
+                    foundValue = true;
+                }
             } else {
                 PrimitiveNode np = (PrimitiveNode) ni.getProto();
-                if (np.getZValues(array))
-                	foundValue = true;
+                if (np.getZValues(array)) {
+                    foundValue = true;
+                }
             }
         }
         for (Iterator<ArcInst> it = getArcs(); it.hasNext();) {
             ArcInst ai = it.next();
             ArcProto ap = ai.getProto();
-            if (ap.getZValues(array))
-            	foundValue = true;
+            if (ap.getZValues(array)) {
+                foundValue = true;
+            }
         }
         return foundValue;
     }
 
     /**
-     * Method to fill a set with any nodes in this Cell that refer to an external library.
+     * Method to fill a set with any nodes in this Cell that refer to an
+     * external library.
+     *
      * @param elib the external library being considered.
      * @param set the set being filled.
      * @return true if anything was added to the set.
