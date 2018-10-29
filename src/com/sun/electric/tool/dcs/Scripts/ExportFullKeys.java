@@ -25,7 +25,10 @@ import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
+import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
+import com.sun.electric.tool.dcs.Data.Constants;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -44,7 +47,7 @@ import java.util.Map;
 public class ExportFullKeys {
 
     private static ExportFullKeys exportFullKeys;
-    private Map<String, Map<String, String>> fullColectionAdres = new HashMap<String, Map<String, String>>();
+    private final Map<String, Map<String, String>> fullColectionAdres = new HashMap<>();
 
     public static ExportFullKeys getInstance() {
         if (exportFullKeys == null) {
@@ -56,8 +59,8 @@ public class ExportFullKeys {
     /*
      * This method forms Map adress from a given file. Map<real adress, adress in electric>
      */
-    private Map<String, String> formCollections(String urlFile) {
-        Map<String, String> list = new HashMap<String, String>();
+    private Map<String, String> formCollection(String urlFile) {
+        Map<String, String> list = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
             String line;
             String[] key;
@@ -74,7 +77,7 @@ public class ExportFullKeys {
     /*
      * This method serch name all files in directory.
      */
-    private List<File> serchFile(String urlFile) {
+    private List<File> searchFile(String urlFile) {
         File dir = new File(urlFile);
         File[] arrFiles = dir.listFiles();
         List<File> lst = Arrays.asList(arrFiles);
@@ -84,18 +87,18 @@ public class ExportFullKeys {
     /*
      * This method forms Map all addresses and names block. Map<Name block, Map<adress electric, real adress>>
      */
-    private void formMapFullAdres() {
+    private void formMapFullAddress() {
         String urlFile = "../MAP/";
-        List<File> adr = serchFile(urlFile);
+        List<File> adr = searchFile(urlFile);
         for (int i = 0; i < adr.size(); i++) {
-            List<File> adrOnFile = serchFile(adr.get(i).toString());
+            List<File> adrOnFile = searchFile(adr.get(i).toString());
             for (int j = 0; j < adrOnFile.size(); j++) {
                 String[] splitKey;
                 String gAdr = adrOnFile.get(j).toString();
                 gAdr = gAdr.replace('\\', '/');
                 splitKey = gAdr.split("/");
                 splitKey = splitKey[3].split("\\.");
-                fullColectionAdres.put(splitKey[0], formCollections(gAdr));
+                fullColectionAdres.put(splitKey[0], formCollection(gAdr));
             }
         }
     }
@@ -103,12 +106,12 @@ public class ExportFullKeys {
     /*
      * This method creates the netList at ../config/config.txt  .
      */
-    public void formConfig() {
-        if (fullColectionAdres.size() == 0) {
-            formMapFullAdres();
+    public void formConfig() throws FunctionalException {
+        if (fullColectionAdres.isEmpty()) {
+            formMapFullAddress();
         }
         String adr = "";
-        try (FileWriter writer = new FileWriter("../config/config.txt", false)) {
+        try (FileWriter writer = new FileWriter(Constants.getPathTo("config"), false)) {
             String urlFile = "adres";
             //write config FPGA;
             /*writer.write("-- FPGA configuration --" + "\n");//Made to validate the formation netList.
@@ -132,8 +135,8 @@ public class ExportFullKeys {
                                 String adres = getRealKeyInFile(ni, port);
                                 //System.out.println(fullColectionAdres.size());
                                 if (adres == null) {
-                                    System.out.println("The number of the required key was not found - " + ni.getName());
-                                    break;
+                                    Accessory.showMessage("The number of the required key was not found - " + ni.getName());
+                                    throw new FunctionalException("The number of the required key was not found ");
                                 }
                                 writer.write(adres);
                             }
@@ -162,7 +165,7 @@ public class ExportFullKeys {
                 informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
             }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            Accessory.showMessage("At this address " + urlFile + " missing file.");
         }
         return informKeyInFileOfFilters;
     }
@@ -177,22 +180,24 @@ public class ExportFullKeys {
             String adres = "";
             String[] numberKey;
             if (param.toString().contains("gAdr")) {
-                numberKey = port.split("");
-                adres = param.getObject().toString() + numberKey[3] + numberKey[4] + numberKey[5] + "\n";
+                numberKey = port.split("mAd");
+                numberKey = numberKey[1].split("_");
+                adres = param.getObject().toString() + numberKey[0] + "\n";
                 return adres;
             } else if (param.toString().contains("uniq")) {
                 Map<String, String> list = new HashMap<>();
-                numberKey = port.split("");
-                adres = numberKey[3] + numberKey[4] + numberKey[5];
+                numberKey = port.split("mAd");
+                numberKey = numberKey[1].split("_");
+                adres = numberKey[0];
                 list = fullColectionAdres.get(param.getObject().toString());
                 if (list == null) {
-                    System.out.println("The file or number of the key being found could not be found - " + param.getObject().toString());
+                    Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
                     break;
                 }
                 adres = list.get(adres);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
                 //adres = readFileMap(param, adres);//method to perform config formation with reading from file.     (2)
                 if (adres == null) {
-                    System.out.println("The file or number of the key being found could not be found.");
+                    Accessory.printLog("The file or number of the key being found could not be found.");
                     return null;
                 } else {
                     adres = adres + "\n";

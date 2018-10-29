@@ -42,6 +42,10 @@ public class Constants {
      * Path to global graph, typically in /electric/autotracing/global.trc
      */
     private static String GLOBAL_PATH = "./autotracing/global.trc";
+    /**
+     * The way on which the cards lie  MAP/
+     */
+    private static String MAP_PATH = "./MAP/";
 
     /**
      * Path to electric folder (.../electric/).
@@ -68,6 +72,8 @@ public class Constants {
                 return CONFIG_PATH;
             case "global graph":
                 return GLOBAL_PATH;
+            case "MAP":
+                return MAP_PATH;
             default:
                 return null;
         }

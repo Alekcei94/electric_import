@@ -167,6 +167,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -1164,7 +1166,11 @@ public class ToolMenu {
                 },
                         new EMenuItem("345") {
                     public void run() {
-                        new ExportFullKeys().formConfig();
+                        try {
+                            new ExportKeys().formConfig();
+                        } catch (FunctionalException ex) {
+                            Logger.getLogger(ToolMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 },
                         new EMenuItem("567") {
