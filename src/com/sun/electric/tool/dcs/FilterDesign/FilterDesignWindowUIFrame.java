@@ -55,9 +55,20 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     public FilterDesignWindowUIFrame(Frame parent) {
         super(parent);
         initComponents();
-        ((JLabel) ellipticFilterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
+        initMyComponents();
     }
-
+    /**
+     * Allignment of comboBox doesn't work in netbeans' GI,
+     * We have only one filter so let's start with elliptic.
+     */
+    private void initMyComponents() {
+        ((JLabel) ellipticFilterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
+        EllipticRadioButton.doClick();
+    }
+    /**
+     * Start building filter with python script,
+     * joins to build button.
+     */
     private void formCmdRequestForPython() {
         if (EllipticRadioButton.isSelected()) {
             System.out.println("Filter design process started.");
@@ -78,8 +89,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             pb.inheritIO();
             try {
                 Accessory.showMessage("started");
-                Process p = pb.start();
-                p.waitFor(120, TimeUnit.SECONDS);
+                pb.start().waitFor(120, TimeUnit.SECONDS); // not sure about 120secs
                 Accessory.showMessage("done");
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
@@ -107,6 +117,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         EllipticRadioButton = new javax.swing.JRadioButton();
         BesselRadioButton = new javax.swing.JRadioButton();
         StartButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jPanelAfc = new ResizableImagePane();
         jPanelForCardLayout = new javax.swing.JPanel();
         jPanelButter = new javax.swing.JPanel();
@@ -130,15 +141,15 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jPanelElliptic = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        ellipticMaximumRippleTextField = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
-        ellipticFilterTypeChoiceComboBox = new javax.swing.JComboBox<>();
         jLabel14 = new javax.swing.JLabel();
-        ellipticOrderTextField = new javax.swing.JTextField();
-        ellipticCutoffFrequencyTextField = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        ellipticOrderTextField = new javax.swing.JTextField();
+        ellipticMaximumRippleTextField = new javax.swing.JTextField();
         ellipticMinimumAttenuationTextField = new javax.swing.JTextField();
+        ellipticCutoffFrequencyTextField = new javax.swing.JTextField();
+        ellipticFilterTypeChoiceComboBox = new javax.swing.JComboBox<>();
         jPanelBessel = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jLabel19 = new javax.swing.JLabel();
@@ -149,10 +160,12 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jLabel21 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1300, 800));
+        setPreferredSize(new java.awt.Dimension(1300, 700));
         setResizable(false);
 
         chooseTypeFilterGroup.add(ButterRadioButton);
+        ButterRadioButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        ButterRadioButton.setForeground(new java.awt.Color(75, 75, 75));
         ButterRadioButton.setText("Butterworth");
         ButterRadioButton.setEnabled(false);
         ButterRadioButton.addActionListener(new java.awt.event.ActionListener() {
@@ -162,6 +175,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         });
 
         chooseTypeFilterGroup.add(ChebyRadioButton);
+        ChebyRadioButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        ChebyRadioButton.setForeground(new java.awt.Color(75, 75, 75));
         ChebyRadioButton.setText("Chebyshev");
         ChebyRadioButton.setEnabled(false);
         ChebyRadioButton.addActionListener(new java.awt.event.ActionListener() {
@@ -171,6 +186,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         });
 
         chooseTypeFilterGroup.add(EllipticRadioButton);
+        EllipticRadioButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        EllipticRadioButton.setForeground(new java.awt.Color(75, 75, 75));
         EllipticRadioButton.setSelected(true);
         EllipticRadioButton.setText("Elliptic");
         EllipticRadioButton.addActionListener(new java.awt.event.ActionListener() {
@@ -180,6 +197,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         });
 
         chooseTypeFilterGroup.add(BesselRadioButton);
+        BesselRadioButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        BesselRadioButton.setForeground(new java.awt.Color(75, 75, 75));
         BesselRadioButton.setText("Bessel");
         BesselRadioButton.setEnabled(false);
         BesselRadioButton.addActionListener(new java.awt.event.ActionListener() {
@@ -188,12 +207,18 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             }
         });
 
-        StartButton.setText("Build Fiilter");
+        StartButton.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        StartButton.setForeground(new java.awt.Color(75, 75, 75));
+        StartButton.setText("Build Filter");
         StartButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 StartButtonActionPerformed(evt);
             }
         });
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(75, 75, 75));
+        jLabel1.setText("CHOOSE TYPE");
 
         jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -201,11 +226,11 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jPanelAfc.setLayout(jPanelAfcLayout);
         jPanelAfcLayout.setHorizontalGroup(
             jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 713, Short.MAX_VALUE)
+            .addGap(0, 610, Short.MAX_VALUE)
         );
         jPanelAfcLayout.setVerticalGroup(
             jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 534, Short.MAX_VALUE)
+            .addGap(0, 490, Short.MAX_VALUE)
         );
 
         jPanelForCardLayout.setLayout(new java.awt.CardLayout());
@@ -290,7 +315,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
         jPanelButterLayout.setVerticalGroup(
             jPanelButterLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -312,7 +337,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                     .addGroup(jPanelButterLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(214, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         ((JLabel) filterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
@@ -408,22 +433,62 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         jPanelForCardLayout.add(jPanelCheby, "card2");
 
-        jPanelElliptic.setPreferredSize(new java.awt.Dimension(495, 636));
+        jPanelElliptic.setPreferredSize(new java.awt.Dimension(495, 500));
 
         jLabel11.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel11.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel11.setText("Maximum ripple");
         jLabel11.setFocusable(false);
         jLabel11.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(75, 75, 75));
         jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("Elliptic Filter");
         jLabel12.setFocusable(false);
         jLabel12.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
-        ellipticMaximumRippleTextField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel13.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel13.setText("Order");
+        jLabel13.setFocusable(false);
+        jLabel13.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jLabel14.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel14.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel14.setText("Filter type");
+        jLabel14.setFocusable(false);
+        jLabel14.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jLabel15.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel15.setText("Cutoff frequency");
+        jLabel15.setFocusable(false);
+        jLabel15.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        jLabel16.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel16.setText("Minimum attenuation");
+        jLabel16.setFocusable(false);
+        jLabel16.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        ellipticOrderTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        ellipticOrderTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        ellipticOrderTextField.setText("6");
+        ellipticOrderTextField.setMinimumSize(new java.awt.Dimension(25, 46));
+        ellipticOrderTextField.setPreferredSize(new java.awt.Dimension(25, 46));
+        ellipticOrderTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ellipticOrderTextFieldActionPerformed(evt);
+            }
+        });
+
+        ellipticMaximumRippleTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         ellipticMaximumRippleTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         ellipticMaximumRippleTextField.setText("0.1");
         ellipticMaximumRippleTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -432,62 +497,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             }
         });
 
-        jLabel13.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel13.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel13.setText("Order");
-        jLabel13.setFocusable(false);
-        jLabel13.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        ellipticFilterTypeChoiceComboBox.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        ellipticFilterTypeChoiceComboBox.setMaximumRowCount(4);
-        ellipticFilterTypeChoiceComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "low", "high", "pass", "stop" }));
-        ellipticFilterTypeChoiceComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ellipticFilterTypeChoiceComboBoxActionPerformed(evt);
-            }
-        });
-
-        jLabel14.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel14.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel14.setText("Filter type");
-        jLabel14.setFocusable(false);
-        jLabel14.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        ellipticOrderTextField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        ellipticOrderTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        ellipticOrderTextField.setText("6");
-        ellipticOrderTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ellipticOrderTextFieldActionPerformed(evt);
-            }
-        });
-
-        ellipticCutoffFrequencyTextField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        ellipticCutoffFrequencyTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        ellipticCutoffFrequencyTextField.setText("0.05");
-        ellipticCutoffFrequencyTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ellipticCutoffFrequencyTextFieldActionPerformed(evt);
-            }
-        });
-
-        jLabel15.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel15.setText(" Cutoff frequency");
-        jLabel15.setFocusable(false);
-        jLabel15.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        jLabel16.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel16.setText("Minimum attenuation");
-        jLabel16.setFocusable(false);
-        jLabel16.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-
-        ellipticMinimumAttenuationTextField.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        ellipticMinimumAttenuationTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         ellipticMinimumAttenuationTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         ellipticMinimumAttenuationTextField.setText("60");
         ellipticMinimumAttenuationTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -496,74 +506,73 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             }
         });
 
+        ellipticCutoffFrequencyTextField.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        ellipticCutoffFrequencyTextField.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        ellipticCutoffFrequencyTextField.setText("0.05");
+        ellipticCutoffFrequencyTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ellipticCutoffFrequencyTextFieldActionPerformed(evt);
+            }
+        });
+
+        ellipticFilterTypeChoiceComboBox.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        ellipticFilterTypeChoiceComboBox.setMaximumRowCount(4);
+        ellipticFilterTypeChoiceComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "low", "high", "pass", "stop" }));
+        ellipticFilterTypeChoiceComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ellipticFilterTypeChoiceComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelEllipticLayout = new javax.swing.GroupLayout(jPanelElliptic);
         jPanelElliptic.setLayout(jPanelEllipticLayout);
         jPanelEllipticLayout.setHorizontalGroup(
             jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(19, 19, 19)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, 0)
-                        .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(54, Short.MAX_VALUE))
+                        .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(19, 19, 19))
         );
         jPanelEllipticLayout.setVerticalGroup(
             jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(30, 30, 30)
-                        .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(10, 10, 10)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanelEllipticLayout.createSequentialGroup()
-                        .addGap(20, 20, 20)
-                        .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addComponent(jLabel12)
+                .addGap(18, 18, 18)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel14)
+                    .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel16)
+                    .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         ((JLabel) filterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
@@ -643,43 +652,46 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(22, 22, 22)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(EllipticRadioButton)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(16, 16, 16)
+                        .addComponent(jLabel1))
+                    .addComponent(ButterRadioButton)
                     .addComponent(ChebyRadioButton)
-                    .addComponent(BesselRadioButton)
-                    .addComponent(ButterRadioButton))
-                .addGap(18, 18, 18)
+                    .addComponent(EllipticRadioButton)
+                    .addComponent(BesselRadioButton))
+                .addGap(29, 29, 29)
                 .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(251, 251, 251))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(337, 337, 337))
+                .addGap(40, 40, 40)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(70, 70, 70)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(101, 101, 101)
+                        .addComponent(jLabel1)
+                        .addGap(10, 10, 10)
                         .addComponent(ButterRadioButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(3, 3, 3)
                         .addComponent(ChebyRadioButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(3, 3, 3)
                         .addComponent(EllipticRadioButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(3, 3, 3)
                         .addComponent(BesselRadioButton))
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(205, Short.MAX_VALUE))
+                        .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
         pack();
@@ -757,7 +769,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             e.printStackTrace();
             Accessory.showMessage("Image is not forming properly");
         }
-
     }//GEN-LAST:event_StartButtonActionPerformed
 
     private void ellipticFilterTypeChoiceComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ellipticFilterTypeChoiceComboBoxActionPerformed
@@ -832,7 +843,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             return true;
         }
     }
-    
+
     public class ResizableImagePane extends JPanel {
 
         private Image img;
@@ -855,9 +866,9 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                 img.flush();
                 ImageIcon ii = new ImageIcon("filterDesignResult.png");
                 this.setImage(ii.getImage());
-                
+
                 Graphics2D g2d = (Graphics2D) g.create();
-                g2d.drawImage(img, 0, 0, this);
+                g2d.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
                 g2d.dispose();
             }
         }
@@ -878,6 +889,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox;
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox1;
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox3;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
