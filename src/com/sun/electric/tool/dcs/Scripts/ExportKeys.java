@@ -162,7 +162,7 @@ public class ExportKeys {
                 Connection outsideCtn = getOnlyIteratorObject(outsidePort.getConnections());
 
                 ArcInst outsideArc = outsideCtn.getArc();
-                System.out.println("outsideArc " + outsideArc.toString());
+                //System.out.println("outsideArc " + outsideArc.toString());
 
                 ctnTail = outsideArc.getConnection(0);
                 ctnHead = outsideArc.getConnection(1);
@@ -173,7 +173,7 @@ public class ExportKeys {
                 }
                 PortInst secondPort = ctnNext.getPortInst();
                 if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_2")) {
-                    System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
+                    //System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
                     return true;
                 }
             }
@@ -242,7 +242,8 @@ public class ExportKeys {
          * @param cell
          * @return 
          */
-        private NodeInst getFPGACell(String simLibName, String simCellName, String FPGAnodeInstName) {
+        private NodeInst getFPGACell(String simLibName, String simCellName,
+                String FPGAnodeInstName) {
             Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
             Iterator<NodeInst> niItr = simCell.getNodes();
             while(niItr.hasNext()) {
