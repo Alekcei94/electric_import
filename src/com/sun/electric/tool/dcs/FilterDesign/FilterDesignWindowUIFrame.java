@@ -27,19 +27,20 @@ import com.sun.electric.tool.user.dialogs.EModelessDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.awt.CardLayout;
 import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 /**
  *
@@ -57,17 +58,18 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         initComponents();
         initMyComponents();
     }
+
     /**
-     * Allignment of comboBox doesn't work in netbeans' GI,
-     * We have only one filter so let's start with elliptic.
+     * Allignment of comboBox doesn't work in netbeans' GI, We have only one
+     * filter so let's start with elliptic.
      */
     private void initMyComponents() {
         ((JLabel) ellipticFilterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
         EllipticRadioButton.doClick();
     }
+
     /**
-     * Start building filter with python script,
-     * joins to build button.
+     * Start building filter with python script, joins to build button.
      */
     private void formCmdRequestForPython() {
         if (EllipticRadioButton.isSelected()) {
@@ -98,8 +100,59 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     }
 
+    /**
+     * Method to reload image after every filter-building action.
+     *
+     * @throws IOException
+     */
     private void reloadImage() throws IOException {
+        /*SerializableImageWithTextObject sii = new SerializableImageWithTextObject("filterDesignResult.png", new HashMap<String,String>(), new ArrayList<>());
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("image.dat"));
+            out.writeObject(sii);
+            ObjectInputStream in =  new ObjectInputStream (new FileInputStream("image.dat"));
+            try {
+            SerializableImageWithTextObject sii2 = (SerializableImageWithTextObject) in.readObject();
+            //System.out.println(sii2.getText());
+            jPanelAfc.setImage(sii2.getImage());
+            } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         */
+ /*try {
+            SerializableImageWithTextObject sii2 = deserializeFilterObject("image.dat");
+            jPanelAfc.setImage(sii2.getImage());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+
         this.repaint();
+    }
+
+    /**
+     * Method to serialize image and some text data into one file.
+     */
+    private void serializeFilterObject(String pathWhereSerialize, String pathToImage,
+            Map<String, String> infoMap, List<String> configList) throws IOException {
+        SerializableImageWithTextObject sii = new SerializableImageWithTextObject(
+                pathToImage, infoMap, configList);
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(pathWhereSerialize));
+        out.writeObject(sii);
+    }
+
+    /**
+     * Method to deserialize filter object, Map<String, String> is holding
+     * information of filter parameters: filterType -> Elliptic, order -> 6 ...,
+     * List<String> configList consists of configuration Strings.
+     *
+     * @param pathWhereDeserialize
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private SerializableImageWithTextObject deserializeFilterObject(String pathFromDeserialize) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(pathFromDeserialize));
+        return (SerializableImageWithTextObject) in.readObject();
+
     }
 
     /**
@@ -118,7 +171,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         BesselRadioButton = new javax.swing.JRadioButton();
         StartButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jPanelAfc = new ResizableImagePane();
         jPanelForCardLayout = new javax.swing.JPanel();
         jPanelButter = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -158,6 +210,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jTextField11 = new javax.swing.JTextField();
         jTextField12 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
+        jPanelAfc = new com.sun.electric.tool.dcs.FilterDesign.ResizableImagePane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1300, 700));
@@ -219,19 +272,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(75, 75, 75));
         jLabel1.setText("CHOOSE TYPE");
-
-        jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
-
-        javax.swing.GroupLayout jPanelAfcLayout = new javax.swing.GroupLayout(jPanelAfc);
-        jPanelAfc.setLayout(jPanelAfcLayout);
-        jPanelAfcLayout.setHorizontalGroup(
-            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 610, Short.MAX_VALUE)
-        );
-        jPanelAfcLayout.setVerticalGroup(
-            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 490, Short.MAX_VALUE)
-        );
 
         jPanelForCardLayout.setLayout(new java.awt.CardLayout());
 
@@ -648,6 +688,19 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         jPanelForCardLayout.add(jPanelBessel, "card4");
 
+        jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanelAfcLayout = new javax.swing.GroupLayout(jPanelAfc);
+        jPanelAfc.setLayout(jPanelAfcLayout);
+        jPanelAfcLayout.setHorizontalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 604, Short.MAX_VALUE)
+        );
+        jPanelAfcLayout.setVerticalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 465, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -655,16 +708,16 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(EllipticRadioButton)
+                    .addComponent(BesselRadioButton)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(jLabel1))
                     .addComponent(ButterRadioButton)
-                    .addComponent(ChebyRadioButton)
-                    .addComponent(EllipticRadioButton)
-                    .addComponent(BesselRadioButton))
-                .addGap(29, 29, 29)
+                    .addComponent(ChebyRadioButton))
+                .addGap(69, 69, 69)
                 .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
@@ -691,7 +744,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(10, 10, 10)
                         .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(165, Short.MAX_VALUE))
         );
 
         pack();
@@ -760,7 +813,11 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void jTextField12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField12ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField12ActionPerformed
-
+    /**
+     * After pressing start button, filter will be designed.
+     *
+     * @param evt
+     */
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         formCmdRequestForPython();
         try {
@@ -844,35 +901,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         }
     }
 
-    public class ResizableImagePane extends JPanel {
-
-        private Image img;
-
-        public ResizableImagePane() {
-            ImageIcon ii = new ImageIcon("filterDesignResult.png");
-            this.setImage(ii.getImage());
-        }
-
-        private void setImage(Image value) {
-            if (img != value) {
-                this.img = value;
-            }
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (img != null) {
-                img.flush();
-                ImageIcon ii = new ImageIcon("filterDesignResult.png");
-                this.setImage(ii.getImage());
-
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
-                g2d.dispose();
-            }
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton BesselRadioButton;
@@ -909,7 +937,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanelAfc;
+    private com.sun.electric.tool.dcs.FilterDesign.ResizableImagePane jPanelAfc;
     private javax.swing.JPanel jPanelBessel;
     private javax.swing.JPanel jPanelButter;
     private javax.swing.JPanel jPanelCheby;

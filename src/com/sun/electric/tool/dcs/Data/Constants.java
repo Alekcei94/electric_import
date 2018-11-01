@@ -26,6 +26,4 @@ package com.sun.electric.tool.dcs.Data;
 public class Constants {
 
     
-
-    
 }

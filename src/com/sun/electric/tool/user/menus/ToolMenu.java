@@ -73,8 +73,6 @@ import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
-import com.sun.electric.tool.dcs.Scripts.ExportFullKeys;
-import com.sun.electric.tool.dcs.Scripts.ExportKeys.DigitalConfigExport;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;
@@ -168,6 +166,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -1171,7 +1171,11 @@ public class ToolMenu {
                 },
                         new EMenuItem("345") {
                     public void run() {
-                        new ExportFullKeys().formConfig();
+                        try {
+                            new ExportKeys().formConfig();
+                        } catch (FunctionalException ex) {
+                            Logger.getLogger(ToolMenu.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 },
                         new EMenuItem("567") {

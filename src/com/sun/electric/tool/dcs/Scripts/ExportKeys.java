@@ -30,12 +30,19 @@ import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
-import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import com.sun.electric.tool.dcs.Data.LinksHolder;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,9 +53,11 @@ import java.util.logging.Logger;
 public class ExportKeys {
 
     private static ExportKeys exportKeys;
+    private final Map<String, Map<String, String>> fullCollectionAddress = new HashMap<>();
 
-    /*
-    * Instantination of exportKeys singleton.
+    /**
+     * Instantination of exportKeys singleton.
+     * @return instance.
      */
     public static ExportKeys getInstance() {
         if (exportKeys == null) {
@@ -58,7 +67,163 @@ public class ExportKeys {
     }
 
     /*
-    * Method to create configuration file (software -> programming -> FPAA)
+     * This method forms Map address from a given file. Map<real address, address in electric>
+     */
+    private Map<String, String> formCollection(String urlFile) {
+        Map<String, String> list = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
+            String line;
+            String[] key;
+            while ((line = br.readLine()) != null) {
+                key = line.split(" ");
+                list.put(key[1], key[0]);
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return list;
+    }
+
+    /*
+     * This method search name all files in directory.
+     */
+    private List<File> searchFile(String urlFile) {
+        File dir = new File(urlFile);
+        File[] arrFiles = dir.listFiles();
+        List<File> lst = Arrays.asList(arrFiles);
+        return lst;
+    }
+
+    /*
+     * This method forms Map all addresses and names block. Map<Name block, Map<adress electric, real adress>>
+     */
+    private void formMapFullAddress() {
+        String urlFile = LinksHolder.getPathTo("MAP");
+        //String urlFile = "../MAP";
+        List<File> adr = searchFile(urlFile);
+        for (int i = 0; i < adr.size(); i++) {
+            List<File> adrOnFile = searchFile(adr.get(i).toString());
+            for (int j = 0; j < adrOnFile.size(); j++) {
+                String[] splitKey;
+                String gAdr = adrOnFile.get(j).toString();
+                gAdr = gAdr.replace('\\', '/');
+                splitKey = gAdr.split("/");
+                splitKey = splitKey[3].split("\\.");
+                fullCollectionAddress.put(splitKey[0], formCollection(gAdr));
+            }
+        }
+    }
+
+    /*
+     * This method reads file at a given address and displays all information without processing.
+     */
+    private String getConfigurationFilters(String urlFile) {
+        String informKeyInFileOfFilters = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
+            String line;
+            informKeyInFileOfFilters = "";
+            while ((line = br.readLine()) != null) {
+                informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
+            }
+        } catch (IOException ex) {
+            Accessory.showMessage("At this address " + urlFile + " missing file.");
+        }
+        return informKeyInFileOfFilters;
+    }
+
+    /*
+     * This method reads the parameters NodeInst and determines the number of the closed key in Electric.
+     */
+    private String getRealKeyInFile(NodeInst ni, NodeInst key) {
+        Iterator<Variable> paramItr = ni.getParameters();
+        while (paramItr.hasNext()) {
+            Variable param = paramItr.next();
+            String address = "";
+            if (param.toString().contains("gAdr")) {
+                try {
+                    address = getConfigForKey(key, ni) + "\n";
+                } catch (FunctionalException ex) {
+                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return address;
+            } else if (param.toString().contains("uniq")) {
+                Map<String, String> list = new HashMap<>();
+                try {
+                    address = getOnlyParamOfNodeInst(key);
+                } catch (FunctionalException ex) {
+                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                list = fullCollectionAddress.get(param.getObject().toString());
+                if (list == null) {
+                    Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
+                    break;
+                }
+                address = list.get(address);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
+                //adres = readFileMap(param, address);//method to perform config formation with reading from file.     (2)
+                if (address == null) {
+                    Accessory.printLog("The file or number of the key being found could not be found.");
+                    return null;
+                } else {
+                    address = address + "\n";
+                }
+                return address;
+            }
+        }
+        return null;
+    }
+
+    /*
+     * This method creates config file at ../config/config.txt  .
+     */
+    public void formConfig() throws FunctionalException {
+        if (fullCollectionAddress.isEmpty()) {
+            formMapFullAddress();
+        }
+        String adr = "";
+        try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
+            String urlFile = "adres";
+            //write config FPGA;
+            /*writer.write("-- FPGA configuration --" + "\n");//Made to validate the formation netList.
+            adr = getConfigurationFilters(urlFile);
+            writer.write(adr);*/
+            // writer.write("-- Scheme configuration --" + "\n");//Made to validate the formation netList.
+            Cell curcell = Job.getUserInterface().getCurrentCell();
+            Iterator<NodeInst> niItr = curcell.getNodes();
+            String[] listNameBloc = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP", "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
+            while (niItr.hasNext()) {
+                NodeInst ni = niItr.next();
+                boolean flag = false;
+                for (String list : listNameBloc) {
+                    if (ni.getName().contains(list)) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    Cell equiv = ni.getProtoEquivalent();
+                    Iterator<NodeInst> keyItr = equiv.getNodes();
+                    while (keyItr.hasNext()) {
+                        NodeInst key = keyItr.next();
+                        if (key.getProto().getName().equals("key")) {
+                            if (isClosedKey(ni, key)) {
+                                String adres = "";
+                                adres = getRealKeyInFile(ni, key);
+                                writer.write(adres);
+                            }
+                        }
+                    }
+                }
+            }
+            urlFile = "filterDesign.txt";
+            writer.write("-- filter configuration --" + "\n");//Made to validate the formation netList.
+            adr = getConfigurationFilters(urlFile);
+            writer.write(adr);
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    /**
+     * Method to create configuration file (software -> programming -> FPAA)
      */
     public void formConfigFromScheme() throws FunctionalException {
         Cell curcell = Job.getUserInterface().getCurrentCell();
@@ -76,15 +241,24 @@ public class ExportKeys {
         }
     }
 
+    /*
+    * This method delete a "h" simbol in the param to write to the file. It was gAdr = 0eh; It became gAdr = 0e
+    * else return param
+    */
+    private String deleteACharacterInTheParam(String param) {
+        if (param.charAt(param.length()-1)=='h'){
+            param = param.substring​(0,param.length()-1);
+            return param;
+        }
+        return param;
+    }
+
     private ArrayList<String> getConfigFromOneNodeInst(NodeInst ni) throws FunctionalException {
         // There are some unintersting blocks like "node generic:Facet-Center['art@0']" 
         ArrayList<String> listOfBlocks = new ArrayList<>();
         listOfBlocks.add("CB");
-        listOfBlocks.add("SPM");
-        listOfBlocks.add("CAPA");
-        listOfBlocks.add("RESA");
         listOfBlocks.add("PPC");
-        listOfBlocks.add("PAM");
+
         boolean isBlock = false;
         /*if(listOfBlocks.contains(ni.toString())) {
             isBlock = true;
@@ -115,7 +289,8 @@ public class ExportKeys {
         return partConfigList;
     }
 
-    /*
+
+    /**
     * Method to show if the key is closed or not.
     * THERE SHOULDN'T BE MORE THAN 1 
     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2.
@@ -126,13 +301,13 @@ public class ExportKeys {
         while (itrPorts.hasNext()) {
             PortInst pi = itrPorts.next();
             String port = CommonMethods.parsePortToPort(pi.toString());
-            System.out.println("port " + port);
+            //System.out.println("port " + port);
             if (port.equals("M1")) {
-                System.out.println(pi.getNodeInst().toString());
+                //System.out.println(pi.getNodeInst().toString());
                 Iterator<Connection> ctnItr = pi.getConnections();
                 Connection ctn = getOnlyIteratorObject(ctnItr);
                 ArcInst ai = ctn.getArc();
-                System.out.println("port " + ai.toString());
+                //System.out.println("port " + ai.toString());
 
                 Connection ctnTail = ai.getConnection(0);
                 Connection ctnHead = ai.getConnection(1);
@@ -145,12 +320,11 @@ public class ExportKeys {
 
                 PortInst outPort = ctnNext.getPortInst();
 
-                System.out.println("outPort " + outPort.toString());
-
+                //System.out.println("outPort " + outPort.toString());
                 Export outExport = getOnlyIteratorObject(outPort.getExports());
                 PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
 
-                System.out.println("outsidePort " + outsidePort.toString());
+                //System.out.println("outsidePort " + outsidePort.toString());
 
                 if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_1")) {
                     throw new FunctionalException("Incorrect block map");
@@ -183,12 +357,14 @@ public class ExportKeys {
 
     private String getConfigForKey(NodeInst key, NodeInst ni) throws FunctionalException {
         String parameterOfBlock = getOnlyParamOfNodeInst(ni);
+        parameterOfBlock = deleteACharacterInTheParam(parameterOfBlock);
         String parameterOfKey = getOnlyParamOfNodeInst(key);
         return parameterOfBlock + parameterOfKey;
     }
 
-    /*
-    * Method to get ONE parameter of nodeInst if there are no more parameters
+
+    /**
+     * Method to get ONE parameter of nodeInst if there are no more parameters
      */
     private String getOnlyParamOfNodeInst(NodeInst ni) throws FunctionalException {
         ArrayList<String> paramList = new ArrayList<>();
@@ -196,7 +372,7 @@ public class ExportKeys {
         while (varItr.hasNext()) {
             Variable var = varItr.next();
             paramList.add(var.getObject().toString());
-            System.out.println("var " + var.getObject().toString());
+            //System.out.println("var " + var.getObject().toString());
         }
         if (paramList.size() != 1) {
             throw new FunctionalException("There shouldn't be more than one parameters for global blocks");
@@ -204,8 +380,10 @@ public class ExportKeys {
         return paramList.get(0);
     }
 
-    /*
-    * Method to get ONE object from any iterator if there are no more objects there.
+
+    /**
+     * Method to get ONE object from any iterator if there are no more objects
+     * there.
      */
     private <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) throws FunctionalException {
         ArrayList<A> objectsList = new ArrayList<>();

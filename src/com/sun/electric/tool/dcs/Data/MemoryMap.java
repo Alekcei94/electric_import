@@ -74,6 +74,12 @@ public class MemoryMap {
         }
     }
 
+    /**
+     * Method to get all files and transfer them into MemoryFile objects,
+     * add dependency as map(key=internalAddress, value=trueAddress).
+     * @param path
+     * @throws IOException 
+     */
     private void buildMemoryFile(Path path) throws IOException {
         MemoryFile mf = new MemoryFile(path.getFileName().toString());
         System.out.println(mf.getName());
