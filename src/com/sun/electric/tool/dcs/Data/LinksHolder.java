@@ -64,6 +64,11 @@ public class LinksHolder {
     private static String GLOBAL_PATH = "./autotracing/global.trc";
 
     /**
+     * Path to global graph, typically in /electric/autotracing/global.trc
+     */
+    private static String MAP = "./MAP";
+    
+    /**
      * Path to electric folder (.../electric/).
      */
     private static final String PATH = new File("").getAbsoluteFile().getAbsolutePath();
@@ -82,6 +87,8 @@ public class LinksHolder {
                 return CONFIG_PATH;
             case "global graph":
                 return GLOBAL_PATH;
+            case "MAP":
+                return MAP;
             default:
                 return null;
         }
@@ -142,7 +149,7 @@ public class LinksHolder {
     
     /////////////////////////////////////////////////////////////////////////
     
-    private static final String pathToXCAD = "C:\\dcsEle\\XCAD\\bin";
+    private static final String pathToXCAD = "c:/electric2_2/XCAD/bin";
     
     /**
      * Method to get path to xcad.
