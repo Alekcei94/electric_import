@@ -32,9 +32,13 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -43,6 +47,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -66,15 +72,16 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         initMyComponents();
     }
 
+    /**
+     * This method read config Filters in file in address ./filterDesing.txt .
+     */
     private List<String> readFileConfigFilters() {
         List<String> configFilterInFile = new ArrayList<>();
-        configFilterInFile.add("Seting Filters");
         try (BufferedReader br = new BufferedReader(new FileReader("./filterDesign.txt"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 configFilterInFile.add(line);
             }
-            configFilterInFile.add("End seting Filters");
             return configFilterInFile;
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -82,17 +89,33 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         return configFilterInFile;
     }
 
+    /**
+     * This method read config Filters in file in address ./filterDesing.txt .
+     */
+    private void writeFileConfigFilters(List<String> configFilterInFile) {
+        try (FileWriter writer = new FileWriter("./filterDesign.txt", false)) {
+            for (String config : configFilterInFile){
+                writer.write(config);
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    /**
+     * This method creates a form for entering an address and a name for Import
+     * the configuration.
+     */
     private String useImportFile() {
         JFileChooser chooser = new JFileChooser();
-        File Dir = new File("./Filters/");
+        File Dir = new File("../config/Filters/");
         String pathToFile;
         chooser.setCurrentDirectory(Dir);
         chooser.setDialogTitle("Import config");
         chooser.setAcceptAllFileFilterUsed(false);
-        //int ret = chooser.showDialog(null, "Сохранить");
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             pathToFile = chooser.getSelectedFile().getAbsolutePath();
-            if (!pathToFile.contains(".shs")) {
+            if (!pathToFile.contains(".fnt")) {
                 System.out.println("Wrong File ");
                 System.out.println(pathToFile);
                 return null;
@@ -104,51 +127,27 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         return pathToFile;
     }
 
-    private void readFileSaveConfigFiltersAndSetParametrs(String address) {
+    /*
+    * This method 
+     */
+    private void readFileSaveConfigFiltersAndSetParametrs(String address, Map<String, String> infoMap, List<String> configList) {
         ArrayList<String> collectionLineInFile = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(address))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                collectionLineInFile.add(line);
-            }
-            ellipticOrderTextField.setText(collectionLineInFile.get(0));
-            ellipticMaximumRippleTextField.setText(collectionLineInFile.get(1));
-            ellipticMinimumAttenuationTextField.setText(collectionLineInFile.get(2));
-            ellipticCutoffFrequencyTextField.setText(collectionLineInFile.get(3));
-            /*ellipticFilterTypeChoiceComboBox.setSelectedIndex(collectionLineInFile.get(4));
+        String line;
+        ellipticOrderTextField.setText(collectionLineInFile.get(0));
+        ellipticMaximumRippleTextField.setText(collectionLineInFile.get(1));
+        ellipticMinimumAttenuationTextField.setText(collectionLineInFile.get(2));
+        ellipticCutoffFrequencyTextField.setText(collectionLineInFile.get(3));
+        /*ellipticFilterTypeChoiceComboBox.setSelectedIndex(collectionLineInFile.get(4));
             BesselRadioButton.setSelected(collectionLineInFile.get(5));
             ButterRadioButton.isSelected(collectionLineInFile.get(6));
            ChebyRadioButton.isSelected(collectionLineInFile.get(7));
             EllipticRadioButton.isSelected(collectionLineInFile.get(8));*/
-            int start = 0;
-            int end = 0;
-            for (int i = 9; i < collectionLineInFile.size(); i++) {
-                if (collectionLineInFile.get(i).equals("Seting Filters")) {
-                    start = i;
-                }
-                if (collectionLineInFile.get(i).equals("End seting Filters")) {
-                    end = i;
-                    break;
-                }
-            }
-            if ((start == 0) || (end == 0)) {
-                System.out.println("Error! Add a comment!");
-                return;
-            }
-            line = "";
-            for (int i = start + 1; i < end; i++) {
-                line = line + collectionLineInFile.get(i) + '\n';
-            }
-            try (FileWriter writer = new FileWriter("./filterDesign.txt", false)) {
-                writer.write(line);
-            } catch (IOException ex) {
-                System.out.println(ex.getMessage());
-            }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 
+    /**
+     * This method creates a form for entering an address and a name for Export
+     * the configuration.
+     */
     private String useExportFile() {
         JFileChooser chooser = new JFileChooser();
         File Dir = new File("../config/Filters/");
@@ -166,10 +165,13 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         return pathToFile;
     }
 
+    /*
+     * This method form Map <Name block, parametre>.
+     */
     private Map<String, String> exportConfigFiltersInFile() {
         Map<String, String> paramFiltres = new HashMap<>();
         if (ButterRadioButton.isSelected()) {
-            paramFiltres.put(ButterRadioButton.getName(), String.valueOf(ButterRadioButton.isSelected())); 
+            paramFiltres.put(ButterRadioButton.getName(), String.valueOf(ButterRadioButton.isSelected()));
             paramFiltres.put(jLabel5.getText(), jTextField5.getText());
             paramFiltres.put(jLabel2.getText(), jTextField1.getText());
             paramFiltres.put(jLabel6.getText(), String.valueOf(filterTypeChoiceComboBox.getSelectedIndex()));
@@ -238,6 +240,33 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     private void reloadImage() throws IOException {
         this.repaint();
+    }
+
+    /**
+     * Method to serialize image and some text data into one file.
+     */
+    private void serializeFilterObject(String pathWhereSerialize, String pathToImage,
+            Map<String, String> infoMap, List<String> configList) throws IOException {
+        SerializableImageWithTextObject sii = new SerializableImageWithTextObject(
+                pathToImage, infoMap, configList);
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(pathWhereSerialize));
+        out.writeObject(sii);
+    }
+
+    /**
+     * Method to deserialize filter object, Map<String, String> is holding
+     * information of filter parameters: filterType -> Elliptic, order -> 6 ...,
+     * List<String> configList consists of configuration Strings.
+     *
+     * @param pathWhereDeserialize
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    private SerializableImageWithTextObject deserializeFilterObject(String pathFromDeserialize) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(pathFromDeserialize));
+        return (SerializableImageWithTextObject) in.readObject();
+
     }
 
     /**
@@ -835,14 +864,11 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGap(70, 70, 70)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)
-                                .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(10, 10, 10)
@@ -852,8 +878,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addGap(3, 3, 3)
                         .addComponent(EllipticRadioButton)
                         .addGap(3, 3, 3)
-                        .addComponent(BesselRadioButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(BesselRadioButton)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2))
@@ -947,15 +973,24 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String addressImportFile = useImportFile();
-        readFileSaveConfigFiltersAndSetParametrs(addressImportFile);
+        SerializableImageWithTextObject readFileSaveConfigFilters;
+        try {
+            readFileSaveConfigFilters = deserializeFilterObject(addressImportFile);
+            writeFileConfigFilters(readFileSaveConfigFilters.getConfig());
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        String adresSave = useExportFile() + ".shs";
+        String adresSave = useExportFile() + ".fnt";
         List<String> config = readFileConfigFilters();
         Map<String, String> exportConfigFilters = exportConfigFiltersInFile();
-        SerializableImageWithTextObject SerializableImageWithTextObject = new SerializableImageWithTextObject(adresSave, exportConfigFilters, config);
-       // SerializableImageWithTextObject SerializableImageWithTextObject = new SerializableImageWithTextObject(adresSave);
+        try {
+            serializeFilterObject(adresSave, "./filterDesignResult.png", exportConfigFilters, config);
+        } catch (IOException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
