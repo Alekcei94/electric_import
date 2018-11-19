@@ -20,58 +20,65 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 /**
- *
+ * Class holds vertex logic for autotracing system.
  * @author diivanov
  */
 public class Vertex {
 
     private final String LABEL;
-    private boolean isVisited;
-    private int pathCount;
-
+    
     private final int MAXPATHCOUNT = 1000;
-    private int cost = 1;
+    private int pathCount = MAXPATHCOUNT;
+      
+    private final boolean isExternal;
+    private boolean isVisited;
+    
 
     /**
-     *
      * @param label
      */
     public Vertex(String label) {
         this.LABEL = label;
-        this.pathCount = MAXPATHCOUNT;
+        isExternal = LABEL.contains("#");
+    }
+    
+    /**
+     * Copy constructor.
+     * @param vert 
+     */
+    public Vertex(Vertex vert) {
+        this(vert.getName());
+        this.setVisited(vert.isVisited());
+        this.setPathCount(vert.getPathCount());
     }
 
     /**
-     * Uniq label
-     *
-     * @return
+     * Uniq label.
+     * @return label.
      */
-    public String getLabel() {
+    public String getName() {
         return LABEL;
     }
 
     /**
      * Get variable for deikstra method.
-     *
-     * @return
+     * @return true if vert was visited
      */
-    public boolean getVisited() {
+    public boolean isVisited() {
         return isVisited;
     }
 
     /**
      * Set variable for deikstra method.
-     *
      * @param isVisited
      */
-    public void setVisited(boolean isVisited) {
+    public final void setVisited(boolean isVisited) {
         this.isVisited = isVisited;
     }
 
     /**
      * Get variable for deikstra method.
-     *
-     * @return
+     * @return current path value for vertice
      */
     public int getPathCount() {
         return pathCount;
@@ -79,10 +86,9 @@ public class Vertex {
 
     /**
      * Set variable for deikstra method.
-     *
      * @param count
      */
-    public void setPathCount(int count) {
+    public final void setPathCount(int count) {
         this.pathCount = count;
     }
 
@@ -95,8 +101,22 @@ public class Vertex {
 
     /**
      * Get pathcount of untouched vertex.
+     * @return 
      */
     public int getMaxPathCount() {
         return MAXPATHCOUNT;
+    }
+    
+    @Override
+    public String toString() {
+        String answer = "Vertex: " + this.getName();
+        return answer;
+    }
+
+    /**
+     * @return the isExternal
+     */
+    public boolean isExternal() {
+        return isExternal;
     }
 }

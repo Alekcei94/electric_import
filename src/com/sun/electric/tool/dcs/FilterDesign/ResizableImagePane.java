@@ -14,13 +14,13 @@ import javax.swing.ImageIcon;
  *
  * @author diivanov
  */
-public class ResizableImagePane extends javax.swing.JPanel {
+public final class ResizableImagePane extends javax.swing.JPanel {
 
     private Image img;
 
         public ResizableImagePane() {
             initComponents();
-            ImageIcon ii = new ImageIcon("filterDesignResult.png"); // hardconding,
+            ImageIcon ii = new ImageIcon("filterDesignResult.png"); // hardcoding,
             // should be changed later
             this.setImage(ii.getImage());
         }

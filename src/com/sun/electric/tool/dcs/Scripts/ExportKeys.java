@@ -57,6 +57,7 @@ public class ExportKeys {
 
     /**
      * Instantination of exportKeys singleton.
+     *
      * @return instance.
      */
     public static ExportKeys getInstance() {
@@ -241,13 +242,13 @@ public class ExportKeys {
         }
     }
 
-    /*
-    * This method delete a "h" simbol in the param to write to the file. It was gAdr = 0eh; It became gAdr = 0e
-    * else return param
-    */
+    /**
+     * This method delete a "h" simbol in the param to write to the file. It was
+     * gAdr = 0eh; It became gAdr = 0e else return param
+     */
     private String deleteACharacterInTheParam(String param) {
-        if (param.charAt(param.length()-1)=='h'){
-            param = param.substring​(0,param.length()-1);
+        if (param.charAt(param.length() - 1) == 'h') {
+            param = param.substring​(0, param.length() - 1);
             return param;
         }
         return param;
@@ -289,12 +290,13 @@ public class ExportKeys {
         return partConfigList;
     }
 
-
     /**
-    * Method to show if the key is closed or not.
-    * THERE SHOULDN'T BE MORE THAN 1 
-    * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2.
-    * Method finds the M1 outside export, checks it for connection and get 2nd port by connection.
+     * Method to show if the key is closed or not. THERE SHOULDN'T BE MORE THAN
+     * 1
+     *
+     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2. Method finds
+     * the M1 outside export, checks it for connection and get 2nd port by
+     * connection.
      */
     private boolean isClosedKey(NodeInst ni, NodeInst key) throws FunctionalException {
         Iterator<PortInst> itrPorts = key.getPortInsts();
@@ -325,7 +327,6 @@ public class ExportKeys {
                 PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
 
                 //System.out.println("outsidePort " + outsidePort.toString());
-
                 if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_1")) {
                     throw new FunctionalException("Incorrect block map");
                 }
@@ -362,7 +363,6 @@ public class ExportKeys {
         return parameterOfBlock + parameterOfKey;
     }
 
-
     /**
      * Method to get ONE parameter of nodeInst if there are no more parameters
      */
@@ -379,7 +379,6 @@ public class ExportKeys {
         }
         return paramList.get(0);
     }
-
 
     /**
      * Method to get ONE object from any iterator if there are no more objects
@@ -407,77 +406,77 @@ public class ExportKeys {
             } catch (IOException ex) {
                 Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
         }
-        
+
         private DigitalConfigExport() {
             throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
         }
-        
+
         /**
-         * Method to get FPGA verilog/icon cell.
-         * Method finds cell with given name.
+         * Method to get FPGA verilog/icon cell. Method finds cell with given
+         * name.
+         *
          * @param cell
-         * @return 
+         * @return
          */
         private NodeInst getFPGACell(String simLibName, String simCellName,
                 String FPGAnodeInstName) {
             Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
             Iterator<NodeInst> niItr = simCell.getNodes();
-            while(niItr.hasNext()) {
+            while (niItr.hasNext()) {
                 NodeInst ni = niItr.next();
-                if(ni.getName().contains(FPGAnodeInstName)) {
+                if (ni.getName().contains(FPGAnodeInstName)) {
                     return ni;
                 }
             }
             return null;
             //return simCell.findNode(FPGAnodeInstName);
         }
-        
+
         private void writeVerilogToFile(NodeInst FPGAcell, String pathToVerilog) {
             Cell verilogCell = (Cell) FPGAcell.getProto();
             Cell verEquiv = verilogCell.getEquivalent();
-            if( (verEquiv == null) || (verEquiv.getView() != View.VERILOG) ) {
+            if ((verEquiv == null) || (verEquiv.getView() != View.VERILOG)) {
                 throw new IllegalStateException("Corrupted path to simulation folder. Best solution is to reinstall application");
             }
             String[] content = verEquiv.getTextViewContents();
             String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
             Accessory.cleanFile(verilogFilePath);
-            for(String str : content) {
+            for (String str : content) {
                 Accessory.write(verilogFilePath, str);
             }
         }
-        
+
         private void formDigitalConfig(String pathToVerilog) throws IOException {
             String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
             String xcadPath = LinksHolder.getXCADPath();
             String shPath = xcadPath + File.separator + "xa_sh.exe";
             String shxaPath = xcadPath + File.separator + "xa";
-            System.out.println(shPath +
-                " " +
-                shxaPath +
-                " -i " +
-                verilogFilePath +
-                " -y++");
-            
+            System.out.println(shPath
+                    + " "
+                    + shxaPath
+                    + " -i "
+                    + verilogFilePath
+                    + " -y++");
+
             ProcessBuilder pb = new ProcessBuilder(shPath,
-                shxaPath,
-                "-i",
-                verilogFilePath,
-                "-y++");
+                    shxaPath,
+                    "-i",
+                    verilogFilePath,
+                    "-y++");
             pb.directory(new File(LinksHolder.getProjectSimulationPath()));
             pb.inheritIO();
             try {
-               Process p = pb.start(); 
-               int exitCode = p.waitFor();
-               System.out.println("exit code: " + exitCode);
-            } catch(IOException ioe) {
+                Process p = pb.start();
+                int exitCode = p.waitFor();
+                System.out.println("exit code: " + exitCode);
+            } catch (IOException ioe) {
                 ioe.printStackTrace();
             } catch (InterruptedException ex) {
                 Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            
+
         }
     }
 }

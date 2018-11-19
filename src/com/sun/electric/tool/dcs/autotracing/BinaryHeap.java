@@ -27,9 +27,9 @@ import java.util.ArrayList;
  * Value sorting was added as extension to basic functionality.
  * 0 11 2222 3333333 tree.
  */
-public class BinaryHeap implements GraphHeapInterface {
+public class BinaryHeap {
 
-    private ArrayList<Pair<Integer, Integer>> pairList;
+    private ArrayList<Pair<Vertex, Integer>> pairList;
 
     /**
      * Constructor of heap.
@@ -51,14 +51,14 @@ public class BinaryHeap implements GraphHeapInterface {
      * @param value
      * @param key
      */
-    @Override
-    public void add(int value, int key) {
+    public void add(Vertex key, int value) {
         boolean exist = false;
-        Pair<Integer, Integer> existingPair = null;
-        for (Pair<Integer, Integer> pair : pairList) {
+        Pair<Vertex, Integer> existingPair = null;
+        for (Pair<Vertex, Integer> pair : pairList) {
             if (pair.getFirstObject().equals(key)) {
                 exist = true;
                 existingPair = pair;
+                break;
             }
         }
         if (exist) {
@@ -68,7 +68,7 @@ public class BinaryHeap implements GraphHeapInterface {
                 heapifyUp(pairList.indexOf(existingPair));
             }
         } else {
-            Pair<Integer, Integer> pair = new Pair<>(key, value);
+            Pair<Vertex, Integer> pair = new Pair<>(key, value);
             pairList.add(pair);
             heapifyUp(getKeyHeapSize() - 1);
         }
@@ -84,7 +84,7 @@ public class BinaryHeap implements GraphHeapInterface {
         int parent = (i - 1) / 2;
 
         while (i > 0 && pairList.get(parent).getSecondObject() > pairList.get(i).getSecondObject()) {
-            Pair<Integer, Integer> tempPair = pairList.get(i);
+            Pair<Vertex, Integer> tempPair = pairList.get(i);
             pairList.set(i, pairList.get(parent));
             pairList.set(parent, tempPair);
 
@@ -119,7 +119,7 @@ public class BinaryHeap implements GraphHeapInterface {
                 break;
             }
             
-            Pair<Integer, Integer> tempPair = pairList.get(i);
+            Pair<Vertex, Integer> tempPair = pairList.get(i);
             pairList.set(i, pairList.get(largestChild));
             pairList.set(largestChild, tempPair);
 
@@ -128,17 +128,16 @@ public class BinaryHeap implements GraphHeapInterface {
     }
 
     /**
-     * Method to pop value of element with minimum key.
+     * Method to pop value of element with minimum value.
      * 
      * @return
      */
-    @Override
-    public int getValueOfMinKeyElement() {
+    public Vertex getKeyOfMinValueElement() {
         if (getKeyHeapSize() == 0) {
-            return -1;
+            return null;
         }
         
-        int result = pairList.get(0).getFirstObject();
+        Vertex result = pairList.get(0).getFirstObject();
         pairList.set(0, pairList.get(getKeyHeapSize() - 1));
         pairList.remove(getKeyHeapSize() - 1);
         
@@ -146,8 +145,7 @@ public class BinaryHeap implements GraphHeapInterface {
         return result;
     }
     
-    public static class BinaryHeapFactory implements GraphHeapFactory {
-        @Override
+    public static class BinaryHeapFactory {
         public BinaryHeap createBinaryHeap() {
             return new BinaryHeap();
         }

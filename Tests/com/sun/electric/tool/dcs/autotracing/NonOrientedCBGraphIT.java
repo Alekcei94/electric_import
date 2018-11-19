@@ -57,7 +57,7 @@ public class NonOrientedCBGraphIT {
             NoSuchMethodException, InvocationTargetException {
 
         System.out.println("testCreateAndGetResult");
-        ConnectionGraphInterface nocbg = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
+        IConnectable nocbg = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
         String elemFrom = "X5";
         String elemTo = "Y7";
         ArrayList<String> listOfPathes = getConfig(nocbg, elemFrom, elemTo);
@@ -69,7 +69,7 @@ public class NonOrientedCBGraphIT {
 
     }
 
-    private ArrayList<String> getConfig(ConnectionGraphInterface nocbg, String elemFrom, String elemTo) throws ClassNotFoundException, IllegalArgumentException,
+    private ArrayList<String> getConfig(IConnectable nocbg, String elemFrom, String elemTo) throws ClassNotFoundException, IllegalArgumentException,
             NoSuchFieldException, IllegalAccessException, FileNotFoundException, IOException {
         nocbg.getConfigurationPath(elemFrom, elemTo);
 
@@ -94,8 +94,8 @@ public class NonOrientedCBGraphIT {
                         if (i > j) {
                             if (keyMatrix[i][j].equals("")) {
                             } else if (Integer.valueOf(keyMatrix[i][j]) == num) {
-                                System.out.println(vertArray[i].getLabel() + " " + vertArray[j].getLabel());
-                                listOfPathes.add(vertArray[i].getLabel() + " " + vertArray[j].getLabel());
+                                System.out.println(vertArray[i].getName() + " " + vertArray[j].getName());
+                                listOfPathes.add(vertArray[i].getName() + " " + vertArray[j].getName());
                                 break;
                             }
                         }
@@ -115,7 +115,7 @@ public class NonOrientedCBGraphIT {
      * @param elemTo path to this element
      * @return return the number of elements in path from one to another
      */
-    public int testGetWeight(ConnectionGraphInterface nocbg, String elemFrom, String elemTo) {
+    public int testGetWeight(IConnectable nocbg, String elemFrom, String elemTo) {
         int i = nocbg.getWeight(elemFrom, elemTo);
         return i;
     }

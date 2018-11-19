@@ -57,11 +57,11 @@ public class LinksHolder {
     /**
      * Path to configuration String (list of keys), typically in /config/config.txt
      */
-    private static String CONFIG_PATH = "../config/config.txt";
+    private static final String CONFIG_PATH = "../config/config.txt";
     /**
      * Path to global graph, typically in /electric/autotracing/global.trc
      */
-    private static String GLOBAL_PATH = "./autotracing/global.trc";
+    private static final String GLOBAL_PATH = "./autotracing/global.trc";
 
     /**
      * Path to electric folder (.../electric/).
@@ -76,7 +76,7 @@ public class LinksHolder {
 
     public static String getPathTo(String pathTo) {
         switch (pathTo) {
-            case "connection box":
+            case "connection graph":
                 return CB_PATH;
             case "config":
                 return CONFIG_PATH;
