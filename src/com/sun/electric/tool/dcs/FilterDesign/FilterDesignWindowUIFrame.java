@@ -27,10 +27,6 @@ import com.sun.electric.tool.user.dialogs.EModelessDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.awt.CardLayout;
 import java.awt.Frame;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -47,9 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +53,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  *
@@ -244,31 +238,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     }
 
-    /**
-     * Method to reload image after every filter-building action.
-     *
-     * @throws IOException
-     */
     private void reloadImage() throws IOException {
-        /*SerializableImageWithTextObject sii = new SerializableImageWithTextObject("filterDesignResult.png", new HashMap<String,String>(), new ArrayList<>());
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("image.dat"));
-            out.writeObject(sii);
-            ObjectInputStream in =  new ObjectInputStream (new FileInputStream("image.dat"));
-            try {
-            SerializableImageWithTextObject sii2 = (SerializableImageWithTextObject) in.readObject();
-            //System.out.println(sii2.getText());
-            jPanelAfc.setImage(sii2.getImage());
-            } catch (ClassNotFoundException ex) {
-            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-         */
- /*try {
-            SerializableImageWithTextObject sii2 = deserializeFilterObject("image.dat");
-            jPanelAfc.setImage(sii2.getImage());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }*/
-
         this.repaint();
     }
 
@@ -315,6 +285,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         BesselRadioButton = new javax.swing.JRadioButton();
         StartButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        jPanelAfc = new ResizableImagePane();
         jPanelForCardLayout = new javax.swing.JPanel();
         jPanelButter = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -354,8 +325,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jTextField11 = new javax.swing.JTextField();
         jTextField12 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
-
-        jPanelAfc = new com.sun.electric.tool.dcs.FilterDesign.ResizableImagePane();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
@@ -419,6 +388,19 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(75, 75, 75));
         jLabel1.setText("CHOOSE TYPE");
+
+        jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanelAfcLayout = new javax.swing.GroupLayout(jPanelAfc);
+        jPanelAfc.setLayout(jPanelAfcLayout);
+        jPanelAfcLayout.setHorizontalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 610, Short.MAX_VALUE)
+        );
+        jPanelAfcLayout.setVerticalGroup(
+            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 490, Short.MAX_VALUE)
+        );
 
         jPanelForCardLayout.setLayout(new java.awt.CardLayout());
 
@@ -835,7 +817,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         jPanelForCardLayout.add(jPanelBessel, "card4");
 
-
         jButton1.setText("Import");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -857,16 +838,16 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(EllipticRadioButton)
-                    .addComponent(BesselRadioButton)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(jLabel1))
                     .addComponent(ButterRadioButton)
-                    .addComponent(ChebyRadioButton))
-                .addGap(69, 69, 69)
+                    .addComponent(ChebyRadioButton)
+                    .addComponent(EllipticRadioButton)
+                    .addComponent(BesselRadioButton))
+                .addGap(29, 29, 29)
                 .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(40, 40, 40)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 416, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
@@ -897,7 +878,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addGap(3, 3, 3)
                         .addComponent(EllipticRadioButton)
                         .addGap(3, 3, 3)
-
                         .addComponent(BesselRadioButton)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -972,11 +952,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void jTextField12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField12ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField12ActionPerformed
-    /**
-     * After pressing start button, filter will be designed.
-     *
-     * @param evt
-     */
+
     private void StartButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartButtonActionPerformed
         formCmdRequestForPython();
         try {
@@ -1083,6 +1059,35 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         }
     }
 
+    public class ResizableImagePane extends JPanel {
+
+        private Image img;
+
+        public ResizableImagePane() {
+            ImageIcon ii = new ImageIcon("filterDesignResult.png");
+            this.setImage(ii.getImage());
+        }
+
+        private void setImage(Image value) {
+            if (img != value) {
+                this.img = value;
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (img != null) {
+                img.flush();
+                ImageIcon ii = new ImageIcon("filterDesignResult.png");
+                this.setImage(ii.getImage());
+
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.drawImage(img, 0, 0, this.getWidth(), this.getHeight(), this);
+                g2d.dispose();
+            }
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton BesselRadioButton;
@@ -1121,7 +1126,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private com.sun.electric.tool.dcs.FilterDesign.ResizableImagePane jPanelAfc;
+    private javax.swing.JPanel jPanelAfc;
     private javax.swing.JPanel jPanelBessel;
     private javax.swing.JPanel jPanelButter;
     private javax.swing.JPanel jPanelCheby;
