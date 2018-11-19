@@ -74,6 +74,7 @@ import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.dcs.autotracing.testLocalGraph;
+import com.sun.electric.tool.dcs.Scripts.ExportKeys.DigitalConfigExport;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;

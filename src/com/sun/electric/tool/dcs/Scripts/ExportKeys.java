@@ -180,44 +180,22 @@ public class ExportKeys {
         if (fullCollectionAddress.isEmpty()) {
             formMapFullAddress();
         }
-        String adr = "";
+        //Accessory.showMessage("Please wait.");
+        SchemeConfigExport SchemeConfigExport = new SchemeConfigExport();
+        FilterConfigExport FilterConfigExport = new FilterConfigExport();
+       
+        String simLibName = "5400TP094";
+        String simCellName = "5400TP094";
+        String FPGAnodeInstName = "FPGA";
+        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
+        //ExportKeys ek = ExportKeys.getInstance();
+        //ek.new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
         try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
-            String urlFile = "adres";
-            //write config FPGA;
-            /*writer.write("-- FPGA configuration --" + "\n");//Made to validate the formation netList.
-            adr = getConfigurationFilters(urlFile);
-            writer.write(adr);*/
-            // writer.write("-- Scheme configuration --" + "\n");//Made to validate the formation netList.
-            Cell curcell = Job.getUserInterface().getCurrentCell();
-            Iterator<NodeInst> niItr = curcell.getNodes();
-            String[] listNameBloc = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP", "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
-            while (niItr.hasNext()) {
-                NodeInst ni = niItr.next();
-                boolean flag = false;
-                for (String list : listNameBloc) {
-                    if (ni.getName().contains(list)) {
-                        flag = true;
-                    }
-                }
-                if (flag) {
-                    Cell equiv = ni.getProtoEquivalent();
-                    Iterator<NodeInst> keyItr = equiv.getNodes();
-                    while (keyItr.hasNext()) {
-                        NodeInst key = keyItr.next();
-                        if (key.getProto().getName().equals("key")) {
-                            if (isClosedKey(ni, key)) {
-                                String adres = "";
-                                adres = getRealKeyInFile(ni, key);
-                                writer.write(adres);
-                            }
-                        }
-                    }
-                }
-            }
-            urlFile = "filterDesign.txt";
-            writer.write("-- filter configuration --" + "\n");//Made to validate the formation netList.
-            adr = getConfigurationFilters(urlFile);
-            writer.write(adr);
+            String config = DigitalConfigExport.getConfigurationFPGA();
+            config = config + SchemeConfigExport.schemeConfigExport();
+            config = config + FilterConfigExport.formConfigFiltersExportFile();
+            writer.write(config);
+            //Accessory.showMessage("Finish.");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
@@ -242,9 +220,10 @@ public class ExportKeys {
         }
     }
 
-    /**
-     * This method delete a "h" simbol in the param to write to the file. It was
-     * gAdr = 0eh; It became gAdr = 0e else return param
+
+    /*
+    * This method delete a "h" simbol in the param to write to the file. It was gAdr = 0eh; It became gAdr = 0e
+    * else return param
      */
     private String deleteACharacterInTheParam(String param) {
         if (param.charAt(param.length() - 1) == 'h') {
@@ -395,6 +374,115 @@ public class ExportKeys {
         return objectsList.get(0);
     }
 
+    /*
+     * In this class the config is formed. Reading the keys of the general scheme
+     */
+    public class SchemeConfigExport {
+
+        public String schemeConfigExport() throws FunctionalException {
+            String configSchemeExportFile;
+            Cell curcell = Job.getUserInterface().getCurrentCell();
+            configSchemeExportFile = "-- Scheme configuration --" + "\n";//Made to validate the formation netList.
+            Iterator<NodeInst> niItr = curcell.getNodes();
+            String[] listNameBloc = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP", "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
+            while (niItr.hasNext()) {
+                NodeInst ni = niItr.next();
+                boolean flag = false;
+                for (String list : listNameBloc) {
+                    if (ni.getName().contains(list)) {
+                        flag = true;
+                    }
+                }
+                if (flag) {
+                    Cell equiv = ni.getProtoEquivalent();
+                    Iterator<NodeInst> keyItr = equiv.getNodes();
+                    while (keyItr.hasNext()) {
+                        NodeInst key = keyItr.next();
+                        if (key.getProto().getName().equals("key")) {
+                            if (isClosedKey(ni, key)) {
+                                configSchemeExportFile = configSchemeExportFile + getRealKeyInFile(ni, key);
+                            }
+                        }
+                    }
+                }
+            }
+            return configSchemeExportFile;
+        }
+
+        /*
+         * This method reads the parameters NodeInst and determines the number of the closed key in Electric.
+         */
+        private String getRealKeyInFile(NodeInst ni, NodeInst key) {
+            Iterator<Variable> paramItr = ni.getParameters();
+            while (paramItr.hasNext()) {
+                Variable param = paramItr.next();
+                String adres = "";
+                if (param.toString().contains("gAdr")) {
+                    try {
+                        adres = getConfigForKey(key, ni) + "\n";
+                    } catch (FunctionalException ex) {
+                        Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    return adres;
+                } else if (param.toString().contains("uniq")) {
+                    Map<String, String> list = new HashMap<>();
+                    try {
+                        adres = getOnlyParamOfNodeInst(key);
+                    } catch (FunctionalException ex) {
+                        Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    list = fullCollectionAddress.get(param.getObject().toString());
+                    if (list == null) {
+                        Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
+                        break;
+                    }
+                    adres = list.get(adres);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
+                    //adres = readFileMap(param, adres);//method to perform config formation with reading from file.     (2)
+                    if (adres == null) {
+                        Accessory.printLog("The file or number of the key being found could not be found.");
+                        return null;
+                    } else {
+                        adres = adres + "\n";
+                    }
+                    return adres;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
+     * In this class the config is formed. Reading the keys of the filter
+     */
+    public class FilterConfigExport {
+
+        public String formConfigFiltersExportFile() {
+            String configFiltersExportFile;
+            String urlFile = "filterDesign.txt";
+            configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
+            configFiltersExportFile = configFiltersExportFile + getConfigurationFilters(urlFile);
+            return configFiltersExportFile;
+        }
+
+        /**
+         * This method reads file at a given address and displays all
+         * information without processing.
+         */
+        private String getConfigurationFilters(String urlFile) {
+            String informKeyInFileOfFilters = null;
+            try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
+                String line;
+                informKeyInFileOfFilters = "";
+                while ((line = br.readLine()) != null) {
+                    informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
+                }
+            } catch (IOException ex) {
+                Accessory.showMessage("At this address " + urlFile + " missing file.");
+            }
+            return informKeyInFileOfFilters;
+        }
+    }
+
     public class DigitalConfigExport {
 
         public DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName) {
@@ -413,6 +501,23 @@ public class ExportKeys {
             throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
         }
 
+         /**
+         * This method reads file at a given address and displays all
+         * information without processing.
+         */
+        private String getConfigurationFPGA() {
+            String informKeyInFileOfFPGA = null;
+            try (BufferedReader br = new BufferedReader(new FileReader("../Projects/5400TP094/simulation/SPI.bitnum"))) {
+                String line;
+                informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
+                while ((line = br.readLine()) != null) {
+                    informKeyInFileOfFPGA = informKeyInFileOfFPGA + line + '\n';
+                }
+            } catch (IOException ex) {
+                Accessory.showMessage("Missing file.");
+            }
+            return informKeyInFileOfFPGA;
+        }
         /**
          * Method to get FPGA verilog/icon cell. Method finds cell with given
          * name.

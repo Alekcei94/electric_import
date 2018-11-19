@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
  *
  * @author diivanov
  */
+
 public final class ResizableImagePane extends javax.swing.JPanel {
 
     private Image img;
@@ -21,6 +22,7 @@ public final class ResizableImagePane extends javax.swing.JPanel {
         public ResizableImagePane() {
             initComponents();
             ImageIcon ii = new ImageIcon("filterDesignResult.png"); // hardcoding,
+
             // should be changed later
             this.setImage(ii.getImage());
         }

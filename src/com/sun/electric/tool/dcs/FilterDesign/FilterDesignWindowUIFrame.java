@@ -30,15 +30,34 @@ import java.awt.Frame;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
@@ -57,6 +76,131 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         super(parent);
         initComponents();
         initMyComponents();
+    }
+
+    /**
+     * This method read config Filters in file in address ./filterDesing.txt .
+     */
+    private List<String> readFileConfigFilters() {
+        List<String> configFilterInFile = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("./filterDesign.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                configFilterInFile.add(line);
+            }
+            return configFilterInFile;
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return configFilterInFile;
+    }
+
+    /**
+     * This method read config Filters in file in address ./filterDesing.txt .
+     */
+    private void writeFileConfigFilters(List<String> configFilterInFile) {
+        try (FileWriter writer = new FileWriter("./filterDesign.txt", false)) {
+            for (String config : configFilterInFile){
+                writer.write(config);
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    /**
+     * This method creates a form for entering an address and a name for Import
+     * the configuration.
+     */
+    private String useImportFile() {
+        JFileChooser chooser = new JFileChooser();
+        File Dir = new File("../config/Filters/");
+        String pathToFile;
+        chooser.setCurrentDirectory(Dir);
+        chooser.setDialogTitle("Import config");
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            pathToFile = chooser.getSelectedFile().getAbsolutePath();
+            if (!pathToFile.contains(".fnt")) {
+                System.out.println("Wrong File ");
+                System.out.println(pathToFile);
+                return null;
+            }
+        } else {
+            System.out.println("No Selection ");
+            return null;
+        }
+        return pathToFile;
+    }
+
+    /*
+    * This method 
+     */
+    private void readFileSaveConfigFiltersAndSetParametrs(String address, Map<String, String> infoMap, List<String> configList) {
+        ArrayList<String> collectionLineInFile = new ArrayList<>();
+        String line;
+        ellipticOrderTextField.setText(collectionLineInFile.get(0));
+        ellipticMaximumRippleTextField.setText(collectionLineInFile.get(1));
+        ellipticMinimumAttenuationTextField.setText(collectionLineInFile.get(2));
+        ellipticCutoffFrequencyTextField.setText(collectionLineInFile.get(3));
+        /*ellipticFilterTypeChoiceComboBox.setSelectedIndex(collectionLineInFile.get(4));
+            BesselRadioButton.setSelected(collectionLineInFile.get(5));
+            ButterRadioButton.isSelected(collectionLineInFile.get(6));
+           ChebyRadioButton.isSelected(collectionLineInFile.get(7));
+            EllipticRadioButton.isSelected(collectionLineInFile.get(8));*/
+    }
+
+    /**
+     * This method creates a form for entering an address and a name for Export
+     * the configuration.
+     */
+    private String useExportFile() {
+        JFileChooser chooser = new JFileChooser();
+        File Dir = new File("../config/Filters/");
+        String pathToFile;
+        chooser.setCurrentDirectory(Dir);
+        chooser.setDialogTitle("Export config");
+        chooser.setAcceptAllFileFilterUsed(false);
+
+        if (chooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            pathToFile = chooser.getSelectedFile().getAbsolutePath();
+        } else {
+            System.out.println("No Selection.");
+            return null;
+        }
+        return pathToFile;
+    }
+
+    /*
+     * This method form Map <Name block, parametre>.
+     */
+    private Map<String, String> exportConfigFiltersInFile() {
+        Map<String, String> paramFiltres = new HashMap<>();
+        if (ButterRadioButton.isSelected()) {
+            paramFiltres.put(ButterRadioButton.getName(), String.valueOf(ButterRadioButton.isSelected()));
+            paramFiltres.put(jLabel5.getText(), jTextField5.getText());
+            paramFiltres.put(jLabel2.getText(), jTextField1.getText());
+            paramFiltres.put(jLabel6.getText(), String.valueOf(filterTypeChoiceComboBox.getSelectedIndex()));
+        } else if (ChebyRadioButton.isSelected()) {
+            paramFiltres.put(ChebyRadioButton.getName(), String.valueOf(ChebyRadioButton.isSelected()));
+            paramFiltres.put(jLabel8.getText(), jTextField6.getText());
+            paramFiltres.put(jLabel4.getText(), jTextField2.getText());
+            paramFiltres.put(jLabel10.getText(), jTextField3.getText());
+            paramFiltres.put(jLabel9.getText(), String.valueOf(filterTypeChoiceComboBox1.getSelectedIndex()));
+        } else if (EllipticRadioButton.isSelected()) {
+            paramFiltres.put(EllipticRadioButton.getName(), String.valueOf(EllipticRadioButton.isSelected()));
+            paramFiltres.put(jLabel13.getText(), ellipticOrderTextField.getText());
+            paramFiltres.put(jLabel11.getText(), ellipticMaximumRippleTextField.getText());
+            paramFiltres.put(jLabel16.getText(), ellipticMinimumAttenuationTextField.getText());
+            paramFiltres.put(jLabel15.getText(), ellipticCutoffFrequencyTextField.getText());
+            paramFiltres.put(jLabel14.getText(), String.valueOf(ellipticFilterTypeChoiceComboBox.getSelectedIndex()));
+        } else if (BesselRadioButton.isSelected()) {
+            paramFiltres.put(BesselRadioButton.getName(), String.valueOf(BesselRadioButton.isSelected()));
+            paramFiltres.put(jLabel19.getText(), jTextField11.getText());
+            paramFiltres.put(jLabel21.getText(), jTextField12.getText());
+            paramFiltres.put(jLabel20.getText(), String.valueOf(filterTypeChoiceComboBox3.getSelectedIndex()));
+        }
+        return paramFiltres;
     }
 
     /**
@@ -210,7 +354,10 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jTextField11 = new javax.swing.JTextField();
         jTextField12 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
+
         jPanelAfc = new com.sun.electric.tool.dcs.FilterDesign.ResizableImagePane();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(1300, 700));
@@ -688,18 +835,20 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
         jPanelForCardLayout.add(jPanelBessel, "card4");
 
-        jPanelAfc.setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.GroupLayout jPanelAfcLayout = new javax.swing.GroupLayout(jPanelAfc);
-        jPanelAfc.setLayout(jPanelAfcLayout);
-        jPanelAfcLayout.setHorizontalGroup(
-            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 604, Short.MAX_VALUE)
-        );
-        jPanelAfcLayout.setVerticalGroup(
-            jPanelAfcLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 465, Short.MAX_VALUE)
-        );
+        jButton1.setText("Import");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("Export");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -723,6 +872,11 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 380, javax.swing.GroupLayout.PREFERRED_SIZE))))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -730,6 +884,10 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                 .addGap(70, 70, 70)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(10, 10, 10)
@@ -739,12 +897,13 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addGap(3, 3, 3)
                         .addComponent(EllipticRadioButton)
                         .addGap(3, 3, 3)
-                        .addComponent(BesselRadioButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(10, 10, 10)
-                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(165, Short.MAX_VALUE))
+
+                        .addComponent(BesselRadioButton)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jButton2))
+                .addContainerGap())
         );
 
         pack();
@@ -836,6 +995,28 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         // TODO add your handling code here:
     }//GEN-LAST:event_filterTypeChoiceComboBoxActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String addressImportFile = useImportFile();
+        SerializableImageWithTextObject readFileSaveConfigFilters;
+        try {
+            readFileSaveConfigFilters = deserializeFilterObject(addressImportFile);
+            writeFileConfigFilters(readFileSaveConfigFilters.getConfig());
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String adresSave = useExportFile() + ".fnt";
+        List<String> config = readFileConfigFilters();
+        Map<String, String> exportConfigFilters = exportConfigFiltersInFile();
+        try {
+            serializeFilterObject(adresSave, "./filterDesignResult.png", exportConfigFilters, config);
+        } catch (IOException ex) {
+            Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * Invoke frame.
      */
@@ -877,6 +1058,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         theDialog.setVisible(true);
         //}
         //});
+
     }
 
     /**
@@ -917,6 +1099,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox;
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox1;
     private javax.swing.JComboBox<String> filterTypeChoiceComboBox3;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
