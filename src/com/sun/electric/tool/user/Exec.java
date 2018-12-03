@@ -29,34 +29,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Runtime.exec() has many pitfalls to it's proper use.  This class
- * wraps external executes to make it easier to use.
+ * Runtime.exec() has many pitfalls to it's proper use. This class wraps
+ * external executes to make it easier to use.
  * <P>
  * Usage:
  * <pre>
  * Exec exec = new Exec("ls", null, User.getWorkingDirectory(), System.out, System.out);
  * exec.start(); // run in a new Thread
- * </pre>
- * You can also use exec.run() to run in the current thread.
+ * </pre> You can also use exec.run() to run in the current thread.
  */
 public class Exec extends Thread {
 
     /**
-     * This class is used to read data from an external process.
-     * If something does not consume the data, it will fill up the default
-     * buffer and deadlock.  This class also redirects data read
-     * from the process (the process' output) to another stream,
-     * if specified.
+     * This class is used to read data from an external process. If something
+     * does not consume the data, it will fill up the default buffer and
+     * deadlock. This class also redirects data read from the process (the
+     * process' output) to another stream, if specified.
      */
     public static class ExecProcessReader extends Thread {
 
         private InputStream in;
         private OutputStream redirect;
-        private char [] buf;
+        private char[] buf;
         private final UserInterfaceExec userInterface = new UserInterfaceExec();
 
         /**
          * Create a stream reader that will read from the stream
+         *
          * @param in the input stream
          */
         public ExecProcessReader(InputStream in) {
@@ -64,8 +63,9 @@ public class Exec extends Thread {
         }
 
         /**
-         * Create a stream reader that will read from the stream, and
-         * store the read text into buffer.
+         * Create a stream reader that will read from the stream, and store the
+         * read text into buffer.
+         *
          * @param in the input stream
          * @param redirect read text is redirected to this
          */
@@ -76,14 +76,17 @@ public class Exec extends Thread {
             setName("ExecProcessReader");
         }
 
+        @Override
         public void run() {
-                if (Thread.currentThread() == this) {
+            if (Thread.currentThread() == this) {
 //                    Environment.setThreadEnvironment(launcherEnvironment);
-                    Job.setUserInterface(userInterface);
-                }
-                    try {
+                Job.setUserInterface(userInterface);
+            }
+            try {
                 PrintWriter pw = null;
-                if (redirect != null) pw = new PrintWriter(redirect);
+                if (redirect != null) {
+                    pw = new PrintWriter(redirect);
+                }
 
                 // read from stream
                 InputStreamReader input = new InputStreamReader(in);
@@ -111,6 +114,7 @@ public class Exec extends Thread {
      * process.
      */
     public interface FinishedListener {
+
         public void processFinished(FinishedEvent e);
     }
 
@@ -118,6 +122,7 @@ public class Exec extends Thread {
      * The event passed to listeners when the process finishes
      */
     public static class FinishedEvent {
+
         private Object source;
         private String exec;
         private int exitValue;
@@ -130,15 +135,26 @@ public class Exec extends Thread {
             this.dir = dir;
         }
 
-        public Object getSource() { return source; }
-        public String getExec() { return exec; }
-        public int getExitValue() { return exitValue; }
-        public File getWorkingDir() { return dir; }
+        public Object getSource() {
+            return source;
+        }
+
+        public String getExec() {
+            return exec;
+        }
+
+        public int getExitValue() {
+            return exitValue;
+        }
+
+        public File getWorkingDir() {
+            return dir;
+        }
     }
 
     private final String command;
-    private final String [] exec;
-    private final String [] envVars;
+    private final String[] exec;
+    private final String[] envVars;
     private final File dir;                       // working directory
     private final Environment launcherEnvironment;
     private final UserInterfaceExec userInterface;
@@ -152,19 +168,24 @@ public class Exec extends Thread {
     private final ArrayList<FinishedListener> finishedListeners;    // list of listeners waiting for process to finish
 
     /**
-     * Execute an external process.
-     * Note: command is not a shell command line command, it is a single program and arguments.
-     * Therefore, <code>/bin/sh -c /bin/ls > file.txt</code> will NOT work.
+     * Execute an external process. Note: command is not a shell command line
+     * command, it is a single program and arguments. Therefore,
+     * <code>/bin/sh -c /bin/ls > file.txt</code> will NOT work.
      * <p>
-     * Instead, use String[] exec = {"/bin/sh", "-c", "/bin/ls > file.txt"};
-     * and use the other constructor.
+     * Instead, use String[] exec = {"/bin/sh", "-c", "/bin/ls > file.txt"}; and
+     * use the other constructor.
+     *
      * @param command the command to run.
-     * @param envVars environment variables of the form name=value. If null, inherits vars from current process.
-     * @param dir the working directory. If null, uses the working dir from the current process
-     * @param outStreamRedir stdout of the process will be redirected to this stream if not null
-     * @param errStreamRedir stderr of the process will be redirected to this stream if not null
+     * @param envVars environment variables of the form name=value. If null,
+     * inherits vars from current process.
+     * @param dir the working directory. If null, uses the working dir from the
+     * current process
+     * @param outStreamRedir stdout of the process will be redirected to this
+     * stream if not null
+     * @param errStreamRedir stderr of the process will be redirected to this
+     * stream if not null
      */
-    public Exec(String command, String [] envVars, File dir, OutputStream outStreamRedir, OutputStream errStreamRedir) {
+    public Exec(String command, String[] envVars, File dir, OutputStream outStreamRedir, OutputStream errStreamRedir) {
         this.command = command;
         this.exec = null;
         this.envVars = envVars;
@@ -180,15 +201,20 @@ public class Exec extends Thread {
     }
 
     /**
-     * Execute an external process.
-     * Note: this is not a command-line command, it is a single program and arguments.
+     * Execute an external process. Note: this is not a command-line command, it
+     * is a single program and arguments.
+     *
      * @param exec the executable and arguments of the process
-     * @param envVars environment variables of the form name=value. If null, inherits vars from current process.
-     * @param dir the working directory. If null, uses the working dir from the current process
-     * @param outStreamRedir stdout of the process will be redirected to this stream if not null
-     * @param errStreamRedir stderr of the process will be redirected to this stream if not null
+     * @param envVars environment variables of the form name=value. If null,
+     * inherits vars from current process.
+     * @param dir the working directory. If null, uses the working dir from the
+     * current process
+     * @param outStreamRedir stdout of the process will be redirected to this
+     * stream if not null
+     * @param errStreamRedir stderr of the process will be redirected to this
+     * stream if not null
      */
-    public Exec(String [] exec, String [] envVars, File dir, OutputStream outStreamRedir, OutputStream errStreamRedir) {
+    public Exec(String[] exec, String[] envVars, File dir, OutputStream outStreamRedir, OutputStream errStreamRedir) {
         this.command = null;
         this.exec = exec;
         this.envVars = envVars;
@@ -203,16 +229,17 @@ public class Exec extends Thread {
         setName(exec[0]);
     }
 
+    @Override
     public void run() {
         if (Thread.currentThread() == this) {
             Environment.setThreadEnvironment(launcherEnvironment);
             Job.setUserInterface(userInterface);
         }
         if (outStreamRedir instanceof OutputStreamChecker) {
-            ((OutputStreamChecker)outStreamRedir).setExec(this);
+            ((OutputStreamChecker) outStreamRedir).setExec(this);
         }
         if (errStreamRedir instanceof OutputStreamChecker) {
-            ((OutputStreamChecker)errStreamRedir).setExec(this);
+            ((OutputStreamChecker) errStreamRedir).setExec(this);
         }
 
         try {
@@ -220,16 +247,17 @@ public class Exec extends Thread {
 
             ExecProcessReader outReader = null;
             ExecProcessReader errReader = null;
-            
+
             // run program
-            synchronized(this) {
+            synchronized (this) {
                 try {
-                    if (command != null)
+                    if (command != null) {
                         p = rt.exec(command, envVars, dir);
-                    else
+                    } else {
                         p = rt.exec(exec, envVars, dir);
+                    }
                 } catch (IOException e) {
-                    System.out.println("Error running "+command+": "+e.getMessage());
+                    System.out.println("Error running " + command + ": " + e.getMessage());
                     return;
                 }
 
@@ -247,19 +275,24 @@ public class Exec extends Thread {
             exitVal = p.waitFor();
 
             // also wait for redir threads to die, if doing redir
-            if (outStreamRedir != null) outReader.join();
-            if (errStreamRedir != null) errReader.join();
+            if (outStreamRedir != null) {
+                outReader.join();
+            }
+            if (errStreamRedir != null) {
+                errReader.join();
+            }
 
             StringBuffer com = new StringBuffer();
-            if (command != null)
+            if (command != null) {
                 com.append(command);
-            else {
-                for (int i=0; i<exec.length; i++)
-                    com.append(exec[i]+" ");
+            } else {
+                for (int i = 0; i < exec.length; i++) {
+                    com.append(exec[i] + " ");
+                }
             }
 
             //System.out.println("Process finished [exit: "+exitVal+"]: "+com.toString());
-            synchronized(finishedListeners) {
+            synchronized (finishedListeners) {
                 FinishedEvent e = new FinishedEvent(this, com.toString(), dir, exitVal);
                 ArrayList<FinishedListener> copy = new ArrayList<FinishedListener>();
                 // make copy cause listeners may want to remove themselves if process finished
@@ -271,7 +304,7 @@ public class Exec extends Thread {
                 }
             }
 
-            synchronized(this) {
+            synchronized (this) {
                 if (processWriter != null) {
                     processWriter.close();
                     processWriter = null;
@@ -284,12 +317,13 @@ public class Exec extends Thread {
     }
 
     /**
-     * Send a line of text to the process. This is not useful
-     * if the process is not expecting any input.
+     * Send a line of text to the process. This is not useful if the process is
+     * not expecting any input.
+     *
      * @param line a line of text to send to the process
      */
     public void writeln(String line) {
-        synchronized(this) {
+        synchronized (this) {
             if (processWriter == null) {
                 System.out.println("Can't write to process: No valid process running.");
                 return;
@@ -301,20 +335,22 @@ public class Exec extends Thread {
 
     /**
      * Add a Exec.FinishedListener
+     *
      * @param a the listener
      */
     public void addFinishedListener(FinishedListener a) {
-        synchronized(finishedListeners) {
+        synchronized (finishedListeners) {
             finishedListeners.add(a);
         }
     }
 
     /**
      * Remove a Exec.FinishedListener
+     *
      * @param a the listener
      */
     public void removeFinishedListener(FinishedListener a) {
-        synchronized(finishedListeners) {
+        synchronized (finishedListeners) {
             finishedListeners.remove(a);
         }
     }
@@ -328,19 +364,22 @@ public class Exec extends Thread {
         }
     }
 
-    public int getExitVal() { return exitVal; }
+    public int getExitVal() {
+        return exitVal;
+    }
 
     /**
-     * Check for a string passed to the OutputStream. All chars passed to
-     * this class are also transparently passed to System.out.
-     * This only checks for strings within a single line of text.
-     * The strings are simple strings, not regular expressions.
+     * Check for a string passed to the OutputStream. All chars passed to this
+     * class are also transparently passed to System.out. This only checks for
+     * strings within a single line of text. The strings are simple strings, not
+     * regular expressions.
      */
     public static class OutputStreamChecker extends OutputStream implements Serializable {
+
         private OutputStream ostream;
         private String checkFor;
         private StringBuffer lastLine;
-        private char [] buf;
+        private char[] buf;
         private int bufOffset;
         private boolean found;
         private boolean regexp;             // if checkFor string is a regular expression
@@ -351,19 +390,24 @@ public class Exec extends Thread {
         private Exec exec = null;
 
         /**
-         * Checks for string in output stream.  The string may span multiple lines, or may be contained
-         * within a non-terminated line (such as an input query).
-         * @param ostream send read data to this output stream (usually System.out)
+         * Checks for string in output stream. The string may span multiple
+         * lines, or may be contained within a non-terminated line (such as an
+         * input query).
+         *
+         * @param ostream send read data to this output stream (usually
+         * System.out)
          * @param checkFor the string to check for
          */
         public OutputStreamChecker(OutputStream ostream, String checkFor) {
             this(ostream, checkFor, false, null);
         }
 
-
         /**
-         * Checks for string in output stream. String must be contained within one line.
-         * @param ostream send read data to this output stream (usually System.out)
+         * Checks for string in output stream. String must be contained within
+         * one line.
+         *
+         * @param ostream send read data to this output stream (usually
+         * System.out)
          * @param checkFor the string to check for
          * @param regexp if true, the string is considered a regular expression
          * @param copyToFile if non-null, the output is copied to this file
@@ -376,8 +420,9 @@ public class Exec extends Thread {
             buf = null;
             bufOffset = 0;
             lastLine = new StringBuffer();
-            if (!regexp)
+            if (!regexp) {
                 buf = new char[checkFor.length()];
+            }
 
             found = false;
             foundLine = null;
@@ -396,8 +441,10 @@ public class Exec extends Thread {
 
         public void write(int b) throws IOException {
             ostream.write(b);
-            if (out != null) out.write(b);
-            lastLine.append((char)b);
+            if (out != null) {
+                out.write(b);
+            }
+            lastLine.append((char) b);
             if (regexp) {
                 // match against regular expression on end-of-line
                 if (b == '\n') {
@@ -409,16 +456,19 @@ public class Exec extends Thread {
                 }
             } else {
                 // store data in buffer of same length as string trying to match
-                buf[bufOffset] = (char)b;
+                buf[bufOffset] = (char) b;
                 bufOffset++;
-                if (bufOffset >= buf.length) bufOffset = 0;
+                if (bufOffset >= buf.length) {
+                    bufOffset = 0;
+                }
                 // check against string. Since same length, when string is found bufOffset
                 // will be at start of string.
                 boolean matched = true;
-                for (int i=0; i<buf.length; i++) {
-                    int y = (i+bufOffset) % buf.length;
+                for (int i = 0; i < buf.length; i++) {
+                    int y = (i + bufOffset) % buf.length;
                     if (checkFor.charAt(i) != buf[y]) {
-                        matched = false; break;
+                        matched = false;
+                        break;
                     }
                 }
                 if (matched) {
@@ -435,21 +485,38 @@ public class Exec extends Thread {
         public void addOutputStreamCheckerListener(OutputStreamCheckerListener l) {
             listeners.add(l);
         }
+
         public void removeOutputStreamCheckerListener(OutputStreamCheckerListener l) {
             listeners.remove(l);
         }
+
         private void alertListeners(String matched) {
             for (OutputStreamCheckerListener l : listeners) {
                 l.matchFound(exec, matched);
             }
         }
 
-        public boolean getFound() { return found; }
-        public String getFoundLine() { return foundLine; }
-        public void close() { if (out != null) out.close(); }
-        public File getCopyToFile() { return copyToFile; }
+        public boolean getFound() {
+            return found;
+        }
 
-        private void setExec(Exec e) { this.exec = e; }
+        public String getFoundLine() {
+            return foundLine;
+        }
+
+        public void close() {
+            if (out != null) {
+                out.close();
+            }
+        }
+
+        public File getCopyToFile() {
+            return copyToFile;
+        }
+
+        private void setExec(Exec e) {
+            this.exec = e;
+        }
     }
 
     /**
@@ -457,6 +524,7 @@ public class Exec extends Thread {
      * matches when it is looking for.
      */
     public interface OutputStreamCheckerListener {
+
         public void matchFound(Exec exec, String matched);
     }
 }

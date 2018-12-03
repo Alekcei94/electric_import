@@ -22,7 +22,7 @@ package com.sun.electric.tool.dcs.autotracing;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
-import com.sun.electric.tool.dcs.Pair;
+import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.File;

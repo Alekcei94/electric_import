@@ -149,7 +149,7 @@ public class LinksHolder {
     
     /////////////////////////////////////////////////////////////////////////
     
-    private static final String pathToXCAD = "c:/electric2_2/XCAD/bin";
+    private static final String pathToXCAD = PARENT_PATH + "\\XCAD\\bin";
     
     /**
      * Method to get path to xcad.

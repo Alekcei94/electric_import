@@ -23,7 +23,7 @@ import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
-import com.sun.electric.tool.dcs.Pair;
+import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import java.util.ArrayList;
 import java.util.List;
 

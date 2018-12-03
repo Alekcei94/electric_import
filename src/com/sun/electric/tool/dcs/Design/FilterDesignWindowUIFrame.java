@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.FilterDesign;
+package com.sun.electric.tool.dcs.Design;
 
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
@@ -94,7 +94,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      */
     private void writeFileConfigFilters(List<String> configFilterInFile) {
         try (FileWriter writer = new FileWriter("./filterDesign.txt", false)) {
-            for (String config : configFilterInFile){
+            for (String config : configFilterInFile) {
                 writer.write(config);
             }
         } catch (IOException ex) {
@@ -130,7 +130,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     /*
     * This method 
      */
-    private void readFileSaveConfigFiltersAndSetParametrs(String address, Map<String, String> infoMap, List<String> configList) {
+    private void readFileSaveConfigFiltersAndSetParameters(String address, Map<String, String> infoMap, List<String> configList) {
         ArrayList<String> collectionLineInFile = new ArrayList<>();
         String line;
         ellipticOrderTextField.setText(collectionLineInFile.get(0));
@@ -212,7 +212,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void formCmdRequestForPython() {
         if (EllipticRadioButton.isSelected()) {
             System.out.println("Filter design process started.");
-            String path = "FilterDesign.py";
+            String path = "FilterScripts/FilterDesign.py";
             String order = ellipticOrderTextField.getText();
             String rp = ellipticMaximumRippleTextField.getText();
             String rs = ellipticMinimumAttenuationTextField.getText();
@@ -329,7 +329,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1300, 700));
         setResizable(false);
 
         chooseTypeFilterGroup.add(ButterRadioButton);
@@ -1002,7 +1001,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
- /*try {
+        try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
@@ -1017,12 +1016,9 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }*/
+        }
         //</editor-fold>
 
-        /* Create and display the form */
-        // SwingUtilities.invokeAndWait(new Runnable() {
-        //    public void run() {
         if (theDialog == null) {
             JFrame jf = null;
             if (TopLevel.isMDIMode()) {
@@ -1032,8 +1028,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         }
 
         theDialog.setVisible(true);
-        //}
-        //});
 
     }
 

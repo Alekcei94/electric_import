@@ -36,6 +36,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
+import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
+import com.sun.electric.tool.user.dialogs.ExecDialog;
+import com.sun.electric.tool.user.ui.TopLevel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -183,7 +186,7 @@ public class ExportKeys {
         //Accessory.showMessage("Please wait.");
         SchemeConfigExport SchemeConfigExport = new SchemeConfigExport();
         FilterConfigExport FilterConfigExport = new FilterConfigExport();
-       
+
         String simLibName = "5400TP094";
         String simCellName = "5400TP094";
         String FPGAnodeInstName = "FPGA";
@@ -486,6 +489,10 @@ public class ExportKeys {
     public class DigitalConfigExport {
 
         public DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName) {
+            if(!FpgaArgumentsUI.checkForTopArgument()) {
+                Accessory.showMessage("Top argument wasn't set");
+                return;
+            }
             NodeInst FPGAcell = getFPGACell(simLibName, simCellName, FPGAnodeInstName);
             String pathToVerilog = LinksHolder.getProjectSimulationPath();
             writeVerilogToFile(FPGAcell, pathToVerilog);
@@ -494,30 +501,31 @@ public class ExportKeys {
             } catch (IOException ex) {
                 Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
 
         private DigitalConfigExport() {
             throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
         }
 
-         /**
+        /**
          * This method reads file at a given address and displays all
          * information without processing.
          */
         private String getConfigurationFPGA() {
             String informKeyInFileOfFPGA = null;
-            try (BufferedReader br = new BufferedReader(new FileReader("../Projects/5400TP094/simulation/SPI.bitnum"))) {
+            try (BufferedReader br = new BufferedReader(new FileReader("../Projects/5400TP094/simulation/Verilog.bitnum"))) {
                 String line;
                 informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
                 while ((line = br.readLine()) != null) {
                     informKeyInFileOfFPGA = informKeyInFileOfFPGA + line + '\n';
                 }
             } catch (IOException ex) {
-                Accessory.showMessage("Missing file.");
+                //Accessory.showMessage("Missing file.");
+                throw new AssertionError("Missing file");
             }
             return informKeyInFileOfFPGA;
         }
+
         /**
          * Method to get FPGA verilog/icon cell. Method finds cell with given
          * name.
@@ -528,6 +536,9 @@ public class ExportKeys {
         private NodeInst getFPGACell(String simLibName, String simCellName,
                 String FPGAnodeInstName) {
             Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
+            if(simCell == null) {
+                throw new AssertionError("FPGA cell was not found");
+            }
             Iterator<NodeInst> niItr = simCell.getNodes();
             while (niItr.hasNext()) {
                 NodeInst ni = niItr.next();
@@ -541,12 +552,13 @@ public class ExportKeys {
 
         private void writeVerilogToFile(NodeInst FPGAcell, String pathToVerilog) {
             Cell verilogCell = (Cell) FPGAcell.getProto();
-            Cell verEquiv = verilogCell.getEquivalent();
+            Cell verEquiv = verilogCell.getVerilogEquivalent();
             if ((verEquiv == null) || (verEquiv.getView() != View.VERILOG)) {
-                throw new IllegalStateException("Corrupted path to simulation folder. Best solution is to reinstall application");
+                throw new IllegalStateException("Corrupted path to simulation folder."
+                        + " You should use main scheme with FPGA Cell. Otherwuse reinstall may help.");
             }
             String[] content = verEquiv.getTextViewContents();
-            String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
+            String verilogFilePath = pathToVerilog + File.separator + "Verilog.v";
             Accessory.cleanFile(verilogFilePath);
             for (String str : content) {
                 Accessory.write(verilogFilePath, str);
@@ -554,34 +566,35 @@ public class ExportKeys {
         }
 
         private void formDigitalConfig(String pathToVerilog) throws IOException {
-            String verilogFilePath = pathToVerilog + File.separator + "SPI.v";
+            String verilogFilePath = pathToVerilog + File.separator + "Verilog.v";
             String xcadPath = LinksHolder.getXCADPath();
             String shPath = xcadPath + File.separator + "xa_sh.exe";
             String shxaPath = xcadPath + File.separator + "xa";
-            System.out.println(shPath
-                    + " "
+            String command = shPath + " "
                     + shxaPath
-                    + " -i "
-                    + verilogFilePath
-                    + " -y++");
+                    + " -i ";
 
-            ProcessBuilder pb = new ProcessBuilder(shPath,
-                    shxaPath,
-                    "-i",
-                    verilogFilePath,
-                    "-y++");
-            pb.directory(new File(LinksHolder.getProjectSimulationPath()));
-            pb.inheritIO();
-            try {
-                Process p = pb.start();
-                int exitCode = p.waitFor();
-                System.out.println("exit code: " + exitCode);
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+            command += verilogFilePath + " -y++";
+            File dir = new File(pathToVerilog);
+            ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
+            //dialog.startProcess(command, null, dir);
+            //test 22.11.2018
+            List<String> argumentsList = FpgaArgumentsUI.getArgumentList();
+            for(String argument : argumentsList) {
+                command = addParameterToCommand(command, argument);
             }
-
+            command = addTopArgument(command);
+            System.out.println(command);
+            dialog.startProcess(command, null, dir);
+        }
+        
+        private String addParameterToCommand(String before, String parameter) {
+            String after = before + " " + parameter;
+            return after;
+        }
+        
+        private String addTopArgument(String arguments) {
+            return arguments + " " + FpgaArgumentsUI.getTopArgument();
         }
     }
 }

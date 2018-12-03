@@ -70,7 +70,8 @@ import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
 import com.sun.electric.tool.dcs.Data.MemoryMap;
-import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
+import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
+import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.dcs.autotracing.testLocalGraph;
@@ -1110,35 +1111,7 @@ public class ToolMenu {
                     }
                 }),
                 new EMenu("Autotracing",
-                        new EMenuItem("Make Trace") {
-                    public void run() {
-                        //DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName)
-                        String simLibName = "5400TP094";
-                        String simCellName = "5400TP094";
-                        String FPGAnodeInstName = "FPGA";
-                        ExportKeys ek = ExportKeys.getInstance();
-                        ek.new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
-                    }
-                },
                         new EMenuItem("Simulate Autotracing Scheme") {
-                    public void run() {
-                        MemoryMap.getInstance();
-                    }
-                },
-                        SEPARATOR,
-                        new EMenuItem("Copy Keys") {
-                    public void run() {
-                    }
-                },
-                        new EMenuItem("Paste Keys") {
-                    public void run() {
-                    }
-                },
-                        new EMenuItem("Delete Unused Part") {
-                    public void run() {
-                    }
-                },
-                        new EMenuItem("Delete Keys") {
                     public void run() {
                     }
                 }),
@@ -1155,34 +1128,24 @@ public class ToolMenu {
                 // ------------------- DCS
                 // mnemonic keys available: BCDEF HIJKLMN QR U XYZ
                 new EMenu("DCS scripts",
-                        new EMenuItem("Export keys") {
+                        new EMenuItem("Verilog synthesis") {
                     public void run() {
-                        try {
-                            new ExportKeys().formConfigFromScheme();
-                        } catch(FunctionalException fe) {
-                            fe.printStackTrace();
-                            assert false;
-                        }
-                        
+                        //DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName)
+                        String simLibName = "5400TP094";
+                        String simCellName = "5400TP094";
+                        String FPGAnodeInstName = "FPGA";
+                        ExportKeys ek = ExportKeys.getInstance();
+                        ek.new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
                     }
-                },
-                        new EMenuItem("tryFilterUI") {
+                },/*
+                        new EMenuItem("Filter UI") {
                     public void run() {
                         new FilterDesignWindowUIFrame.InitiateForm();
                     }
-                },
-                        new EMenuItem("345") {
+                },*/
+                        new EMenuItem("Fpga UI") {
                     public void run() {
-                        try {
-                            new ExportKeys().formConfig();
-                        } catch (FunctionalException ex) {
-                            Logger.getLogger(ToolMenu.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                },
-                        new EMenuItem("567") {
-                    public void run() {
-                        new testLocalGraph().setVisible(true);
+                        new FpgaArgumentsUI.InitiateForm();
                     }
                 }));
     }

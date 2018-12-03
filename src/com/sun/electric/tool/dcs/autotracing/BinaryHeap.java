@@ -19,7 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.dcs.Pair;
+import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import java.util.ArrayList;
 
 /**

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.sun.electric.tool.dcs.FilterDesign;
+package com.sun.electric.tool.dcs.Design;
 
 import java.io.Serializable;
 import java.util.ArrayList;

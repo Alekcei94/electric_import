@@ -27,7 +27,7 @@ import com.sun.electric.database.topology.ArcInst;
 
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
-import com.sun.electric.tool.dcs.Pair;
+import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import com.sun.electric.tool.user.User;
 import java.io.BufferedReader;
 import java.io.File;

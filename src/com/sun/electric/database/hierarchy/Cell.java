@@ -4218,7 +4218,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the main schematic Cell associated with this Cell.
+     * Method to return the main schematic or verilog Cell associated with this Cell.
      * Examines the group for the main schematic.
      *
      * @return the main schematic Cell associated with this Cell.
@@ -5329,6 +5329,21 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
      */
     public Cell getEquivalent() {
         return isIcon() ? getMainSchematicOrVerilogInGroup() : this;
+    }
+    
+    /**
+     * Finds the Verilog Cell associated with this Icon Cell.
+     *
+     * @return the Verilog Cell. Returns null if there is no equivalent.
+     */
+    public Cell getVerilogEquivalent() {
+        List<Cell> cellsInGroup = getCellsInGroup();
+        for (Cell cellInGroup : cellsInGroup) {
+            if (cellInGroup.getView() == View.VERILOG) {
+                return cellInGroup;
+            }
+        }
+        return null;
     }
 
     /**

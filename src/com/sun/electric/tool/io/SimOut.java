@@ -39,10 +39,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-/**
- *
- * @author diivanov
- */
+
 public class SimOut {
 
     public static void executeNgSpice(String pathInput, String pathOutput) {
@@ -131,24 +128,7 @@ public class SimOut {
         // special case for spice
         if (type == FileType.SPICE
                 && !SimulationTool.getSpiceRunChoice().equals(SimulationTool.spiceRunChoiceDontRun)) {
-            // check if user specified working dir
-            if (SimulationTool.getSpiceUseRunDir()) {
-                filePath = SimulationTool.getSpiceRunDir() + File.separator + filePath;
-            } else {
-                filePath = User.getWorkingDirectory() + File.separator + filePath;
-            }
-            // check for automatic overwrite
-            if (User.isShowFileSelectionForNetlists() && !SimulationTool.getSpiceOutputOverwrite()) {
-                String saveDir = User.getWorkingDirectory();
-                filePath = OpenFile.chooseOutputFile(type, null, filePath);
-                User.setWorkingDirectory(saveDir);
-                if (filePath == null) {
-                    return;
-                }
-            }
-
-            Output.exportCellCommand(cell, context, filePath, type, override);
-            //new SimulateWithPath(filePath, filePath);
+            Accessory.showMessage("Use don't run option to initiate simulation");
             return;
         }
 
