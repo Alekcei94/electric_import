@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
+import com.sun.electric.tool.dcs.FilterDesign.FilterDesignWindowUIFrame;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +124,7 @@ public class ExportKeys {
         //Accessory.showMessage("Please wait.");
         SchemeConfigExport SchemeConfigExport = new SchemeConfigExport();
         FilterConfigExport FilterConfigExport = new FilterConfigExport();
-       
+
         String simLibName = "5400TP094";
         String simCellName = "5400TP094";
         String FPGAnodeInstName = "FPGA";
@@ -133,7 +134,10 @@ public class ExportKeys {
         try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
             String config = DigitalConfigExport.getConfigurationFPGA();
             config = config + SchemeConfigExport.schemeConfigExport();
-            config = config + FilterConfigExport.formConfigFiltersExportFile();
+            FilterDesignWindowUIFrame test = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
+            if (test.getEnableStatus()) {
+                config = config + FilterConfigExport.formConfigFiltersExportFile();
+            }
             writer.write(config);
             //Accessory.showMessage("Finish.");
         } catch (IOException ex) {
@@ -434,13 +438,13 @@ public class ExportKeys {
             } catch (IOException ex) {
                 Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } 
-        
+        }
+
         private DigitalConfigExport() {
             throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
         }
 
-         /**
+        /**
          * This method reads file at a given address and displays all
          * information without processing.
          */
@@ -457,7 +461,7 @@ public class ExportKeys {
             }
             return informKeyInFileOfFPGA;
         }
-        
+
         /**
          * Method to get FPGA verilog/icon cell. Method finds cell with given
          * name.
