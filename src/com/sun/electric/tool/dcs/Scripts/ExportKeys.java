@@ -37,6 +37,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Data.MemoryMap;
+import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
@@ -67,7 +68,10 @@ public class ExportKeys implements Exportable {
         try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
             String config = DigitalConfigExport.getConfigurationFPGA();
             config = config + SchemeConfigExport.schemeConfigExport();
-            config = config + FilterConfigExport.formConfigFiltersExportFile();
+            FilterDesignWindowUIFrame test = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
+            if (test.getEnableStatus()) {
+                config = config + FilterConfigExport.formConfigFiltersExportFile();
+            }
             writer.write(config);
             // здесь полностью меняется принцип выдачи конфигурационной последовательности
             // все ConfigExport имеют метод getConfig()

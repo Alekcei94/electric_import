@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: FunctionalException.java
+ * File: InvalidStructureError.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *
