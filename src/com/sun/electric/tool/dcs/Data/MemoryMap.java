@@ -50,6 +50,11 @@ public class MemoryMap {
         }
         return memoryMap;
     }
+    
+    public String getTrueAddress(String block, String internalAddress) {
+        MemoryFile mf = nameToMemoryAddressMap.get(block);
+        return mf.getDependency(internalAddress);
+    }
 
     /**
      * Method to get all memory files from txt files
@@ -92,8 +97,8 @@ public class MemoryMap {
                     String trueAddress = split[0];
                     String internalAddress = split[1];
                     mf.addDependency(internalAddress, trueAddress);
-                    System.out.println(internalAddress);
-                    System.out.println(trueAddress);
+                    //System.out.println(internalAddress);
+                    //System.out.println(trueAddress);
                 }
             }
         }

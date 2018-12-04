@@ -31,161 +31,32 @@ import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
-import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
+import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
+import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author diivanov
  */
-public class ExportKeys {
-
-    private static ExportKeys exportKeys;
-    private final Map<String, Map<String, String>> fullCollectionAddress = new HashMap<>();
+public class ExportKeys implements Exportable {
 
     /**
-     * Instantination of exportKeys singleton.
-     *
-     * @return instance.
+     * This method creates config file at ../config/config.txt .
      */
-    public static ExportKeys getInstance() {
-        if (exportKeys == null) {
-            exportKeys = new ExportKeys();
-        }
-        return exportKeys;
-    }
-
-    /*
-     * This method forms Map address from a given file. Map<real address, address in electric>
-     */
-    private Map<String, String> formCollection(String urlFile) {
-        Map<String, String> list = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
-            String line;
-            String[] key;
-            while ((line = br.readLine()) != null) {
-                key = line.split(" ");
-                list.put(key[1], key[0]);
-            }
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return list;
-    }
-
-    /*
-     * This method search name all files in directory.
-     */
-    private List<File> searchFile(String urlFile) {
-        File dir = new File(urlFile);
-        File[] arrFiles = dir.listFiles();
-        List<File> lst = Arrays.asList(arrFiles);
-        return lst;
-    }
-
-    /*
-     * This method forms Map all addresses and names block. Map<Name block, Map<adress electric, real adress>>
-     */
-    private void formMapFullAddress() {
-        String urlFile = LinksHolder.getPathTo("MAP");
-        //String urlFile = "../MAP";
-        List<File> adr = searchFile(urlFile);
-        for (int i = 0; i < adr.size(); i++) {
-            List<File> adrOnFile = searchFile(adr.get(i).toString());
-            for (int j = 0; j < adrOnFile.size(); j++) {
-                String[] splitKey;
-                String gAdr = adrOnFile.get(j).toString();
-                gAdr = gAdr.replace('\\', '/');
-                splitKey = gAdr.split("/");
-                splitKey = splitKey[3].split("\\.");
-                fullCollectionAddress.put(splitKey[0], formCollection(gAdr));
-            }
-        }
-    }
-
-    /*
-     * This method reads file at a given address and displays all information without processing.
-     */
-    private String getConfigurationFilters(String urlFile) {
-        String informKeyInFileOfFilters = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
-            String line;
-            informKeyInFileOfFilters = "";
-            while ((line = br.readLine()) != null) {
-                informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
-            }
-        } catch (IOException ex) {
-            Accessory.showMessage("At this address " + urlFile + " missing file.");
-        }
-        return informKeyInFileOfFilters;
-    }
-
-    /*
-     * This method reads the parameters NodeInst and determines the number of the closed key in Electric.
-     */
-    private String getRealKeyInFile(NodeInst ni, NodeInst key) {
-        Iterator<Variable> paramItr = ni.getParameters();
-        while (paramItr.hasNext()) {
-            Variable param = paramItr.next();
-            String address = "";
-            if (param.toString().contains("gAdr")) {
-                try {
-                    address = getConfigForKey(key, ni) + "\n";
-                } catch (FunctionalException ex) {
-                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                return address;
-            } else if (param.toString().contains("uniq")) {
-                Map<String, String> list = new HashMap<>();
-                try {
-                    address = getOnlyParamOfNodeInst(key);
-                } catch (FunctionalException ex) {
-                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                list = fullCollectionAddress.get(param.getObject().toString());
-                if (list == null) {
-                    Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
-                    break;
-                }
-                address = list.get(address);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
-                //adres = readFileMap(param, address);//method to perform config formation with reading from file.     (2)
-                if (address == null) {
-                    Accessory.printLog("The file or number of the key being found could not be found.");
-                    return null;
-                } else {
-                    address = address + "\n";
-                }
-                return address;
-            }
-        }
-        return null;
-    }
-
-    /*
-     * This method creates config file at ../config/config.txt  .
-     */
-    public void formConfig() throws FunctionalException {
-        if (fullCollectionAddress.isEmpty()) {
-            formMapFullAddress();
-        }
+    public static void formConfig() {
         //Accessory.showMessage("Please wait.");
-        SchemeConfigExport SchemeConfigExport = new SchemeConfigExport();
+        AnalogConfigExport SchemeConfigExport = new AnalogConfigExport();
         FilterConfigExport FilterConfigExport = new FilterConfigExport();
 
         String simLibName = "5400TP094";
@@ -198,78 +69,25 @@ public class ExportKeys {
             config = config + SchemeConfigExport.schemeConfigExport();
             config = config + FilterConfigExport.formConfigFiltersExportFile();
             writer.write(config);
-            //Accessory.showMessage("Finish.");
+            // здесь полностью меняется принцип выдачи конфигурационной последовательности
+            // все ConfigExport имеют метод getConfig()
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
+            //TODO: обработать ошибку
         }
     }
 
     /**
-     * Method to create configuration file (software -> programming -> FPAA)
+     * This method delete a "h" simbol in the param to write to the file. It was
+     * gAdr = 0eh; It became gAdr = 0e else return param
      */
-    public void formConfigFromScheme() throws FunctionalException {
-        Cell curcell = Job.getUserInterface().getCurrentCell();
-        ArrayList<String> configurationList = new ArrayList<>();
-        Iterator<NodeInst> niItr = curcell.getNodes();
-        while (niItr.hasNext()) {
-            NodeInst ni = niItr.next();
-            System.out.println(ni.toString());
-            // HERE WE SHOULD AVOID OTHER BLOCKS WHICH MAYBE HAVE PARAMETERS
-            configurationList.addAll(getConfigFromOneNodeInst(ni));
-        }
-
-        for (String str : configurationList) {
-            System.out.println("mainResult " + str);
-        }
-    }
-
-
-    /*
-    * This method delete a "h" simbol in the param to write to the file. It was gAdr = 0eh; It became gAdr = 0e
-    * else return param
-     */
-    private String deleteACharacterInTheParam(String param) {
+    private static String deleteACharacterInTheParam(String param) {
         if (param.charAt(param.length() - 1) == 'h') {
             param = param.substring​(0, param.length() - 1);
             return param;
+            // return param не нужен
         }
         return param;
-    }
-
-    private ArrayList<String> getConfigFromOneNodeInst(NodeInst ni) throws FunctionalException {
-        // There are some unintersting blocks like "node generic:Facet-Center['art@0']" 
-        ArrayList<String> listOfBlocks = new ArrayList<>();
-        listOfBlocks.add("CB");
-        listOfBlocks.add("PPC");
-
-        boolean isBlock = false;
-        /*if(listOfBlocks.contains(ni.toString())) {
-            isBlock = true;
-        }*/
-        // node basic:key{ic}['key@437']
-        for (String block : listOfBlocks) {
-            if (ni.toString().contains(block)) {
-                isBlock = true;
-            }
-        }
-        // return if this block is not block with keys
-        if (!isBlock) {
-            return new ArrayList<>();
-        }
-
-        ArrayList<String> partConfigList = new ArrayList<>();
-
-        Cell equiv = ni.getProtoEquivalent();
-        Iterator<NodeInst> niItr = equiv.getNodes();
-        while (niItr.hasNext()) {
-            NodeInst key = niItr.next();
-            if (key.getProto().getName().equals("key")) {
-                if (isClosedKey(ni, key)) {
-                    partConfigList.add(getConfigForKey(key, ni));
-                }
-            }
-        }
-        return partConfigList;
     }
 
     /**
@@ -280,18 +98,15 @@ public class ExportKeys {
      * the M1 outside export, checks it for connection and get 2nd port by
      * connection.
      */
-    private boolean isClosedKey(NodeInst ni, NodeInst key) throws FunctionalException {
+    private static boolean isClosedKey(NodeInst ni, NodeInst key) {
         Iterator<PortInst> itrPorts = key.getPortInsts();
         while (itrPorts.hasNext()) {
             PortInst pi = itrPorts.next();
             String port = CommonMethods.parsePortToPort(pi.toString());
-            //System.out.println("port " + port);
             if (port.equals("M1")) {
-                //System.out.println(pi.getNodeInst().toString());
                 Iterator<Connection> ctnItr = pi.getConnections();
-                Connection ctn = getOnlyIteratorObject(ctnItr);
+                Connection ctn = Accessory.getOnlyIteratorObject(ctnItr);
                 ArcInst ai = ctn.getArc();
-                //System.out.println("port " + ai.toString());
 
                 Connection ctnTail = ai.getConnection(0);
                 Connection ctnHead = ai.getConnection(1);
@@ -304,22 +119,20 @@ public class ExportKeys {
 
                 PortInst outPort = ctnNext.getPortInst();
 
-                //System.out.println("outPort " + outPort.toString());
-                Export outExport = getOnlyIteratorObject(outPort.getExports());
+                Export outExport = Accessory.getOnlyIteratorObject(outPort.getExports());
                 PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
 
-                //System.out.println("outsidePort " + outsidePort.toString());
-                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_1")) {
-                    throw new FunctionalException("Incorrect block map");
+                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"
+                        + Accessory.getOnlyParamOfNodeInst(key) + "_1")) {
+                    throw new InvalidStructureError("Incorrect block map");
                 }
 
                 if (!outsidePort.hasConnections()) {
                     return false;
                 }
-                Connection outsideCtn = getOnlyIteratorObject(outsidePort.getConnections());
+                Connection outsideCtn = Accessory.getOnlyIteratorObject(outsidePort.getConnections());
 
                 ArcInst outsideArc = outsideCtn.getArc();
-                //System.out.println("outsideArc " + outsideArc.toString());
 
                 ctnTail = outsideArc.getConnection(0);
                 ctnHead = outsideArc.getConnection(1);
@@ -329,7 +142,8 @@ public class ExportKeys {
                     ctnNext = ctnTail;
                 }
                 PortInst secondPort = ctnNext.getPortInst();
-                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_2")) {
+                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd"
+                        + Accessory.getOnlyParamOfNodeInst(key) + "_2")) {
                     //System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
                     return true;
                 }
@@ -338,72 +152,51 @@ public class ExportKeys {
         return false;
     }
 
-    private String getConfigForKey(NodeInst key, NodeInst ni) throws FunctionalException {
-        String parameterOfBlock = getOnlyParamOfNodeInst(ni);
+    private static String getConfigForKey(NodeInst key, NodeInst ni) {
+        String parameterOfBlock = Accessory.getOnlyParamOfNodeInst(ni);
         parameterOfBlock = deleteACharacterInTheParam(parameterOfBlock);
-        String parameterOfKey = getOnlyParamOfNodeInst(key);
+        String parameterOfKey = Accessory.getOnlyParamOfNodeInst(key);
         return parameterOfBlock + parameterOfKey;
     }
 
     /**
-     * Method to get ONE parameter of nodeInst if there are no more parameters
+     * Class holds analog exporting logic.
      */
-    private String getOnlyParamOfNodeInst(NodeInst ni) throws FunctionalException {
-        ArrayList<String> paramList = new ArrayList<>();
-        Iterator<Variable> varItr = ni.getParameters();
-        while (varItr.hasNext()) {
-            Variable var = varItr.next();
-            paramList.add(var.getObject().toString());
-            //System.out.println("var " + var.getObject().toString());
-        }
-        if (paramList.size() != 1) {
-            throw new FunctionalException("There shouldn't be more than one parameters for global blocks");
-        }
-        return paramList.get(0);
-    }
+    private static class AnalogConfigExport implements Exportable {
 
-    /**
-     * Method to get ONE object from any iterator if there are no more objects
-     * there.
-     */
-    private <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) throws FunctionalException {
-        ArrayList<A> objectsList = new ArrayList<>();
-        while (iterator.hasNext()) {
-            objectsList.add(iterator.next());
-        }
-        if (objectsList.size() != 1) {
-            throw new FunctionalException("More than one object in iterator");
-        }
-        return objectsList.get(0);
-    }
-
-    /*
-     * In this class the config is formed. Reading the keys of the general scheme
-     */
-    public class SchemeConfigExport {
-
-        public String schemeConfigExport() throws FunctionalException {
+        public String schemeConfigExport() {
             String configSchemeExportFile;
             Cell curcell = Job.getUserInterface().getCurrentCell();
+            // TODO: нужно сделать для произвольной схемы
             configSchemeExportFile = "-- Scheme configuration --" + "\n";//Made to validate the formation netList.
             Iterator<NodeInst> niItr = curcell.getNodes();
-            String[] listNameBloc = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP", "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
+            String[] listNameBlock = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP",
+                "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
+            // REV: listNameBlock - не лист, а массив. Название может ввести в заблуждение.
+            // TODO: желательно попробовать убрать привязку к конкретным блокам.
             while (niItr.hasNext()) {
                 NodeInst ni = niItr.next();
                 boolean flag = false;
-                for (String list : listNameBloc) {
+                for (String list : listNameBlock) {
+                    // REV: list - не элемент.
                     if (ni.getName().contains(list)) {
+                        // TODO: в идеале использовать equals
                         flag = true;
                     }
+
                 }
+                // TODO: следует убрать лишние проходы в цикле
                 if (flag) {
                     Cell equiv = ni.getProtoEquivalent();
                     Iterator<NodeInst> keyItr = equiv.getNodes();
                     while (keyItr.hasNext()) {
                         NodeInst key = keyItr.next();
                         if (key.getProto().getName().equals("key")) {
+                            // TODO: нужно будет заменить хардкод key на считывание из класса констант.
                             if (isClosedKey(ni, key)) {
-                                configSchemeExportFile = configSchemeExportFile + getRealKeyInFile(ni, key);
+                                configSchemeExportFile = configSchemeExportFile
+                                        + getRealKeyInFile(ni, key);
+                                // REV: лучше использовать +=
                             }
                         }
                     }
@@ -412,57 +205,43 @@ public class ExportKeys {
             return configSchemeExportFile;
         }
 
-        /*
-         * This method reads the parameters NodeInst and determines the number of the closed key in Electric.
+        /**
+         * This method reads the parameters NodeInst and determines the number
+         * of the closed key in Electric.
          */
         private String getRealKeyInFile(NodeInst ni, NodeInst key) {
             Iterator<Variable> paramItr = ni.getParameters();
             while (paramItr.hasNext()) {
                 Variable param = paramItr.next();
-                String adres = "";
                 if (param.toString().contains("gAdr")) {
-                    try {
-                        adres = getConfigForKey(key, ni) + "\n";
-                    } catch (FunctionalException ex) {
-                        Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    return adres;
+                    String address = getConfigForKey(key, ni) + "\n";
+                    return address;
                 } else if (param.toString().contains("uniq")) {
-                    Map<String, String> list = new HashMap<>();
-                    try {
-                        adres = getOnlyParamOfNodeInst(key);
-                    } catch (FunctionalException ex) {
-                        Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                    String address = MemoryMap.getInstance().getTrueAddress(param.getObject().toString(),
+                            Accessory.getOnlyParamOfNodeInst(key));
+                    if (address == null) {
+                        throw new InvalidStructureError("Local address is not correct: "
+                                + param + "/" + Accessory.getOnlyParamOfNodeInst(key));
                     }
-                    list = fullCollectionAddress.get(param.getObject().toString());
-                    if (list == null) {
-                        Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
-                        break;
-                    }
-                    adres = list.get(adres);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
-                    //adres = readFileMap(param, adres);//method to perform config formation with reading from file.     (2)
-                    if (adres == null) {
-                        Accessory.printLog("The file or number of the key being found could not be found.");
-                        return null;
-                    } else {
-                        adres = adres + "\n";
-                    }
-                    return adres;
+                    address += "\n";
+                    return address;
+                } else {
+                    // else is not needed (we shouldn't handle other parameters)
                 }
             }
-            return null;
+            throw new InvalidStructureError("No parameters found");
         }
     }
 
     /**
-     * In this class the config is formed. Reading the keys of the filter
+     * Class holds filter exporting logic.
      */
-    public class FilterConfigExport {
+    private static class FilterConfigExport implements Exportable {
 
         public String formConfigFiltersExportFile() {
-            String configFiltersExportFile;
             String urlFile = "filterDesign.txt";
-            configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
+            // TODO: убрать хардкод (LinksHolder)
+            String configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
             configFiltersExportFile = configFiltersExportFile + getConfigurationFilters(urlFile);
             return configFiltersExportFile;
         }
@@ -486,7 +265,10 @@ public class ExportKeys {
         }
     }
 
-    public class DigitalConfigExport {
+    /**
+     * Class holds digital exporting logic.
+     */
+    private static class DigitalConfigExport implements Exportable {
 
         /**
          * Main constructor, by creating object you're doing digital export job.
@@ -527,11 +309,7 @@ public class ExportKeys {
             NodeInst FPGAcell = getFPGACell(mainCell, FPGAnodeInstName);
             String pathToVerilog = LinksHolder.getProjectSimulationPath();
             writeVerilogToFile(FPGAcell, pathToVerilog);
-            try {
-                formDigitalConfig(pathToVerilog);
-            } catch (IOException ex) {
-                Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            formDigitalConfig(pathToVerilog);
         }
 
         /**
@@ -560,6 +338,7 @@ public class ExportKeys {
         private String getConfigurationFPGA() {
             String informKeyInFileOfFPGA = null;
             try (BufferedReader br = new BufferedReader(new FileReader("../Projects/5400TP094/simulation/Verilog.bitnum"))) {
+                //TODO: hardcode/address (LinksHolder)
                 String line;
                 informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
                 while ((line = br.readLine()) != null) {
@@ -568,6 +347,7 @@ public class ExportKeys {
             } catch (IOException ex) {
                 //Accessory.showMessage("Missing file.");
                 throw new AssertionError("Missing file");
+                //TODO: обработка ошибки
             }
             return informKeyInFileOfFPGA;
         }
@@ -591,7 +371,6 @@ public class ExportKeys {
                 }
             }
             return null;
-            //return simCell.findNode(FPGAnodeInstName);
         }
 
         /**
@@ -622,7 +401,7 @@ public class ExportKeys {
          * @param pathToVerilog
          * @throws IOException
          */
-        private void formDigitalConfig(String pathToVerilog) throws IOException {
+        private void formDigitalConfig(String pathToVerilog) {
             String verilogFilePath = pathToVerilog + File.separator + "Verilog.v";
             String xcadPath = LinksHolder.getXCADPath();
             String shPath = xcadPath + File.separator + "xa_sh.exe";
@@ -635,7 +414,7 @@ public class ExportKeys {
             }
             command = addTopArgument(command);
             System.out.println(command);
-            
+
             ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
             File dir = new File(pathToVerilog);
             dialog.startProcess(command, null, dir);
@@ -661,5 +440,7 @@ public class ExportKeys {
         private String addArgument(String command, String argument) {
             return command + " " + argument;
         }
+
     }
+
 }

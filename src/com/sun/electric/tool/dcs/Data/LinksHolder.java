@@ -42,7 +42,7 @@ public class LinksHolder {
         return linksHolder;
     }
     
-    private String memoryMapRoot = "./MAP_PACIS/";
+    private final String memoryMapRoot = "./MEMORY_MAP/";
     
     public String getMemoryMapRoot() {
         return memoryMapRoot;
@@ -63,10 +63,6 @@ public class LinksHolder {
      */
     private static final String GLOBAL_PATH = "./autotracing/global.trc";
 
-    /**
-     * Path to global graph, typically in /electric/autotracing/global.trc
-     */
-    private static String MAP = "./MAP";
     
     /**
      * Path to electric folder (.../electric/).
@@ -87,8 +83,6 @@ public class LinksHolder {
                 return CONFIG_PATH;
             case "global graph":
                 return GLOBAL_PATH;
-            case "MAP":
-                return MAP;
             default:
                 return null;
         }

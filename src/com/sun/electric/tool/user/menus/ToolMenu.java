@@ -69,13 +69,8 @@ import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
-import com.sun.electric.tool.dcs.Data.MemoryMap;
-import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
-import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
-import com.sun.electric.tool.dcs.autotracing.testLocalGraph;
-import com.sun.electric.tool.dcs.Scripts.ExportKeys.DigitalConfigExport;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;
@@ -169,8 +164,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -1132,8 +1125,8 @@ public class ToolMenu {
                     public void run() {
                         String FPGAnodeInstName = "FPGA";
                         Cell mainCell = Job.getUserInterface().getCurrentCell();
-                        ExportKeys.getInstance().new DigitalConfigExport(mainCell,
-                                FPGAnodeInstName);
+                        //new ExportKeys.DigitalConfigExport(mainCell,
+                        //        FPGAnodeInstName);
                     }
                 },/*
                         new EMenuItem("Filter UI") {
