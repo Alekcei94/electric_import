@@ -21,6 +21,7 @@ package com.sun.electric.tool.dcs.Scripts;
 
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.hierarchy.Export;
+import com.sun.electric.database.hierarchy.Library;
 import com.sun.electric.database.hierarchy.View;
 import com.sun.electric.database.topology.ArcInst;
 import com.sun.electric.database.topology.Connection;
@@ -190,9 +191,8 @@ public class ExportKeys {
         String simLibName = "5400TP094";
         String simCellName = "5400TP094";
         String FPGAnodeInstName = "FPGA";
-        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
-        //ExportKeys ek = ExportKeys.getInstance();
-        //ek.new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
+        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName,
+                simCellName, FPGAnodeInstName);
         try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
             String config = DigitalConfigExport.getConfigurationFPGA();
             config = config + SchemeConfigExport.schemeConfigExport();
@@ -488,12 +488,43 @@ public class ExportKeys {
 
     public class DigitalConfigExport {
 
-        public DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName) {
-            if(!FpgaArgumentsUI.checkForTopArgument()) {
+        /**
+         * Main constructor, by creating object you're doing digital export job.
+         *
+         * @param mainCell
+         * @param FPGAnodeInstName
+         */
+        public DigitalConfigExport(Cell mainCell, String FPGAnodeInstName) {
+            doExport(mainCell, FPGAnodeInstName);
+        }
+
+        /**
+         * Something like telescoping constructor, using strings to get cell.
+         *
+         * @param simLibName
+         * @param simCellName
+         * @param FPGAnodeInstName
+         */
+        public DigitalConfigExport(String simLibName,
+                String simCellName, String FPGAnodeInstName) {
+            doExport(getCellFromLibAndCellName(simLibName, simCellName), FPGAnodeInstName);
+        }
+
+        /**
+         * Export job controller is incapsulated here. Actions: get fgpa
+         * nodeInst from mainCell, then write Verilog code from fpga's nodeInst
+         * to external file. Last step is to invoke XCAD script to synthesys,
+         * place and route verilog into real fpga configuration.
+         *
+         * @param mainCell
+         * @param FPGAnodeInstName
+         */
+        private void doExport(Cell mainCell, String FPGAnodeInstName) {
+            if (!FpgaArgumentsUI.checkForTopArgument()) {
                 Accessory.showMessage("Top argument wasn't set");
                 return;
             }
-            NodeInst FPGAcell = getFPGACell(simLibName, simCellName, FPGAnodeInstName);
+            NodeInst FPGAcell = getFPGACell(mainCell, FPGAnodeInstName);
             String pathToVerilog = LinksHolder.getProjectSimulationPath();
             writeVerilogToFile(FPGAcell, pathToVerilog);
             try {
@@ -503,8 +534,23 @@ public class ExportKeys {
             }
         }
 
-        private DigitalConfigExport() {
-            throw new IllegalStateException("DigitalConfigExport constructor must be used with <cell> parameter");
+        /**
+         * Method to get cell from cell and lib names.
+         *
+         * @param simLibName
+         * @param simCellName
+         * @return
+         */
+        private Cell getCellFromLibAndCellName(String simLibName, String simCellName) {
+            Library lib = Library.findLibrary(simLibName);
+            if (lib == null) {
+                throw new AssertionError("Main library was not found");
+            }
+            Cell mainCell = lib.findNodeProto(simCellName);
+            if (mainCell == null) {
+                throw new AssertionError("Main cell was not found");
+            }
+            return mainCell;
         }
 
         /**
@@ -533,10 +579,8 @@ public class ExportKeys {
          * @param cell
          * @return
          */
-        private NodeInst getFPGACell(String simLibName, String simCellName,
-                String FPGAnodeInstName) {
-            Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
-            if(simCell == null) {
+        private NodeInst getFPGACell(Cell simCell, String FPGAnodeInstName) {
+            if (simCell == null) {
                 throw new AssertionError("FPGA cell was not found");
             }
             Iterator<NodeInst> niItr = simCell.getNodes();
@@ -550,6 +594,13 @@ public class ExportKeys {
             //return simCell.findNode(FPGAnodeInstName);
         }
 
+        /**
+         * Method to write text from FPGAcell's verilog TextView to external
+         * File.
+         *
+         * @param FPGAcell
+         * @param pathToVerilog
+         */
         private void writeVerilogToFile(NodeInst FPGAcell, String pathToVerilog) {
             Cell verilogCell = (Cell) FPGAcell.getProto();
             Cell verEquiv = verilogCell.getVerilogEquivalent();
@@ -565,36 +616,50 @@ public class ExportKeys {
             }
         }
 
+        /**
+         * Method to invoke XCAD script for verilog file.
+         *
+         * @param pathToVerilog
+         * @throws IOException
+         */
         private void formDigitalConfig(String pathToVerilog) throws IOException {
             String verilogFilePath = pathToVerilog + File.separator + "Verilog.v";
             String xcadPath = LinksHolder.getXCADPath();
             String shPath = xcadPath + File.separator + "xa_sh.exe";
             String shxaPath = xcadPath + File.separator + "xa";
-            String command = shPath + " "
-                    + shxaPath
-                    + " -i ";
-
-            command += verilogFilePath + " -y++";
-            File dir = new File(pathToVerilog);
-            ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
-            //dialog.startProcess(command, null, dir);
-            //test 22.11.2018
+            String command = shPath + " " + shxaPath + " -i";
+            command = addArgument(command, verilogFilePath + " -y++");
             List<String> argumentsList = FpgaArgumentsUI.getArgumentList();
-            for(String argument : argumentsList) {
-                command = addParameterToCommand(command, argument);
+            for (String argument : argumentsList) {
+                command = addArgument(command, argument);
             }
             command = addTopArgument(command);
             System.out.println(command);
+            
+            ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
+            File dir = new File(pathToVerilog);
             dialog.startProcess(command, null, dir);
         }
-        
-        private String addParameterToCommand(String before, String parameter) {
-            String after = before + " " + parameter;
-            return after;
-        }
-        
+
+        /**
+         * Supportive method to add top argument to main command.
+         *
+         * @param arguments
+         * @return
+         */
         private String addTopArgument(String arguments) {
-            return arguments + " " + FpgaArgumentsUI.getTopArgument();
+            return addArgument(arguments, FpgaArgumentsUI.getTopArgument());
+        }
+
+        /**
+         * Supportive method to add any argument to main command.
+         *
+         * @param command
+         * @param argument
+         * @return
+         */
+        private String addArgument(String command, String argument) {
+            return command + " " + argument;
         }
     }
 }

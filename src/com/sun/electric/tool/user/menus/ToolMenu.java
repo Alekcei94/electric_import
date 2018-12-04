@@ -1130,12 +1130,10 @@ public class ToolMenu {
                 new EMenu("DCS scripts",
                         new EMenuItem("Verilog synthesis") {
                     public void run() {
-                        //DigitalConfigExport(String simLibName, String simCellName, String FPGAnodeInstName)
-                        String simLibName = "5400TP094";
-                        String simCellName = "5400TP094";
                         String FPGAnodeInstName = "FPGA";
-                        ExportKeys ek = ExportKeys.getInstance();
-                        ek.new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
+                        Cell mainCell = Job.getUserInterface().getCurrentCell();
+                        ExportKeys.getInstance().new DigitalConfigExport(mainCell,
+                                FPGAnodeInstName);
                     }
                 },/*
                         new EMenuItem("Filter UI") {

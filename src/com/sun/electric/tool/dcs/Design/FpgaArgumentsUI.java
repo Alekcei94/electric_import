@@ -22,7 +22,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -80,6 +79,10 @@ public class FpgaArgumentsUI extends EModelessDialog {
 
     }
 
+    /**
+     * Method to get list of arguments for filter processing.
+     * @return 
+     */
     public static List<String> getArgumentList() {
         List<String> argumentList = new ArrayList<>();
         parametersMap.entrySet().forEach((entry) -> {
@@ -147,6 +150,11 @@ public class FpgaArgumentsUI extends EModelessDialog {
         }).findFirst();
     }
 
+    /**
+     * Method to get path by from user.
+     * Using typical JFileChooser.
+     * @return 
+     */
     private String getUserDefinedAbsolutePath() {
         JFrame jf = null;
         if (TopLevel.isMDIMode()) {
