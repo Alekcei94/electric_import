@@ -54,10 +54,12 @@ import java.util.logging.Logger;
 public class ExportKeys {
 
     private static ExportKeys exportKeys;
-    private final Map<String, Map<String, String>> fullColectionAdres = new HashMap<>();
+    private final Map<String, Map<String, String>> fullCollectionAddress = new HashMap<>();
 
     /**
      * Instantination of exportKeys singleton.
+     *
+     * @return instance.
      */
     public static ExportKeys getInstance() {
         if (exportKeys == null) {
@@ -67,7 +69,7 @@ public class ExportKeys {
     }
 
     /*
-     * This method forms Map adress from a given file. Map<real adress, adress in electric>
+     * This method forms Map address from a given file. Map<real address, address in electric>
      */
     private Map<String, String> formCollection(String urlFile) {
         Map<String, String> list = new HashMap<>();
@@ -85,7 +87,7 @@ public class ExportKeys {
     }
 
     /*
-     * This method serch name all files in directory.
+     * This method search name all files in directory.
      */
     private List<File> searchFile(String urlFile) {
         File dir = new File(urlFile);
@@ -109,16 +111,74 @@ public class ExportKeys {
                 gAdr = gAdr.replace('\\', '/');
                 splitKey = gAdr.split("/");
                 splitKey = splitKey[3].split("\\.");
-                fullColectionAdres.put(splitKey[0], formCollection(gAdr));
+                fullCollectionAddress.put(splitKey[0], formCollection(gAdr));
             }
         }
     }
 
     /*
-     * This method creates the netList at ../config/config.txt  .
+     * This method reads file at a given address and displays all information without processing.
+     */
+    private String getConfigurationFilters(String urlFile) {
+        String informKeyInFileOfFilters = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
+            String line;
+            informKeyInFileOfFilters = "";
+            while ((line = br.readLine()) != null) {
+                informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
+            }
+        } catch (IOException ex) {
+            Accessory.showMessage("At this address " + urlFile + " missing file.");
+        }
+        return informKeyInFileOfFilters;
+    }
+
+    /*
+     * This method reads the parameters NodeInst and determines the number of the closed key in Electric.
+     */
+    private String getRealKeyInFile(NodeInst ni, NodeInst key) {
+        Iterator<Variable> paramItr = ni.getParameters();
+        while (paramItr.hasNext()) {
+            Variable param = paramItr.next();
+            String address = "";
+            if (param.toString().contains("gAdr")) {
+                try {
+                    address = getConfigForKey(key, ni) + "\n";
+                } catch (FunctionalException ex) {
+                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                return address;
+            } else if (param.toString().contains("uniq")) {
+                Map<String, String> list = new HashMap<>();
+                try {
+                    address = getOnlyParamOfNodeInst(key);
+                } catch (FunctionalException ex) {
+                    Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                list = fullCollectionAddress.get(param.getObject().toString());
+                if (list == null) {
+                    Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
+                    break;
+                }
+                address = list.get(address);//method to perform config generation once having read all the files at once.  (1)    choose 1 or 2
+                //adres = readFileMap(param, address);//method to perform config formation with reading from file.     (2)
+                if (address == null) {
+                    Accessory.printLog("The file or number of the key being found could not be found.");
+                    return null;
+                } else {
+                    address = address + "\n";
+                }
+                return address;
+            }
+        }
+        return null;
+    }
+
+    /*
+     * This method creates config file at ../config/config.txt  .
      */
     public void formConfig() throws FunctionalException {
-        if (fullColectionAdres.isEmpty()) {
+        if (fullCollectionAddress.isEmpty()) {
             formMapFullAddress();
         }
         //Accessory.showMessage("Please wait.");
@@ -164,6 +224,7 @@ public class ExportKeys {
         }
     }
 
+
     /*
     * This method delete a "h" simbol in the param to write to the file. It was gAdr = 0eh; It became gAdr = 0e
     * else return param
@@ -174,6 +235,42 @@ public class ExportKeys {
             return param;
         }
         return param;
+    }
+
+    private ArrayList<String> getConfigFromOneNodeInst(NodeInst ni) throws FunctionalException {
+        // There are some unintersting blocks like "node generic:Facet-Center['art@0']" 
+        ArrayList<String> listOfBlocks = new ArrayList<>();
+        listOfBlocks.add("CB");
+        listOfBlocks.add("PPC");
+
+        boolean isBlock = false;
+        /*if(listOfBlocks.contains(ni.toString())) {
+            isBlock = true;
+        }*/
+        // node basic:key{ic}['key@437']
+        for (String block : listOfBlocks) {
+            if (ni.toString().contains(block)) {
+                isBlock = true;
+            }
+        }
+        // return if this block is not block with keys
+        if (!isBlock) {
+            return new ArrayList<>();
+        }
+
+        ArrayList<String> partConfigList = new ArrayList<>();
+
+        Cell equiv = ni.getProtoEquivalent();
+        Iterator<NodeInst> niItr = equiv.getNodes();
+        while (niItr.hasNext()) {
+            NodeInst key = niItr.next();
+            if (key.getProto().getName().equals("key")) {
+                if (isClosedKey(ni, key)) {
+                    partConfigList.add(getConfigForKey(key, ni));
+                }
+            }
+        }
+        return partConfigList;
     }
 
     /**
@@ -234,49 +331,12 @@ public class ExportKeys {
                 }
                 PortInst secondPort = ctnNext.getPortInst();
                 if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd" + getOnlyParamOfNodeInst(key) + "_2")) {
-
                     //System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    private ArrayList<String> getConfigFromOneNodeInst(NodeInst ni) throws FunctionalException {
-        // There are some unintersting blocks like "node generic:Facet-Center['art@0']" 
-        ArrayList<String> listOfBlocks = new ArrayList<>();
-        listOfBlocks.add("CB");
-        listOfBlocks.add("PPC");
-
-        boolean isBlock = false;
-        /*if(listOfBlocks.contains(ni.toString())) {
-            isBlock = true;
-        }*/
-        // node basic:key{ic}['key@437']
-        for (String block : listOfBlocks) {
-            if (ni.toString().contains(block)) {
-                isBlock = true;
-            }
-        }
-        // return if this block is not block with keys
-        if (!isBlock) {
-            return new ArrayList<>();
-        }
-
-        ArrayList<String> partConfigList = new ArrayList<>();
-
-        Cell equiv = ni.getProtoEquivalent();
-        Iterator<NodeInst> niItr = equiv.getNodes();
-        while (niItr.hasNext()) {
-            NodeInst key = niItr.next();
-            if (key.getProto().getName().equals("key")) {
-                if (isClosedKey(ni, key)) {
-                    partConfigList.add(getConfigForKey(key, ni));
-                }
-            }
-        }
-        return partConfigList;
     }
 
     private String getConfigForKey(NodeInst key, NodeInst ni) throws FunctionalException {
@@ -375,7 +435,7 @@ public class ExportKeys {
                     } catch (FunctionalException ex) {
                         Logger.getLogger(ExportKeys.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    list = fullColectionAdres.get(param.getObject().toString());
+                    list = fullCollectionAddress.get(param.getObject().toString());
                     if (list == null) {
                         Accessory.printLog("The file or number of the key being found could not be found - " + param.getObject().toString());
                         break;
@@ -461,7 +521,7 @@ public class ExportKeys {
             }
             return informKeyInFileOfFPGA;
         }
-
+		
         /**
          * Method to get FPGA verilog/icon cell. Method finds cell with given
          * name.
@@ -469,7 +529,8 @@ public class ExportKeys {
          * @param cell
          * @return
          */
-        private NodeInst getFPGACell(String simLibName, String simCellName, String FPGAnodeInstName) {
+        private NodeInst getFPGACell(String simLibName, String simCellName,
+                String FPGAnodeInstName) {
             Cell simCell = CommonMethods.getCellFromName(simLibName, simCellName);
             Iterator<NodeInst> niItr = simCell.getNodes();
             while (niItr.hasNext()) {

@@ -9,8 +9,6 @@ package com.sun.electric.tool.dcs.autotracing;
  *
  * @author diivanov
  */
-public interface GlobalGraphFactoryInterface {
+public interface ITraceable {
     
-    public GlobalGraphInterface createGlobalGraph(String graphName);
-
 }

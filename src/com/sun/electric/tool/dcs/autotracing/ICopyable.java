@@ -9,9 +9,6 @@ package com.sun.electric.tool.dcs.autotracing;
  *
  * @author diivanov
  */
-public interface ConnectionGraphFactory {
+public interface ICopyable {
     
-    public ConnectionGraphInterface createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX);
-    
-    public ConnectionGraphInterface createConnectionGraphCBLarge(String graphName);
 }

@@ -37,7 +37,7 @@ import java.util.Iterator;
  * This class is used to describe local CB graph, this global graph is the
  * complex of verteces and links between them.
  */
-public final class NonOrientedCBGraph implements ConnectionGraphInterface {
+public final class NonOrientedCBGraph {
 
     private static final BinaryHeap.BinaryHeapFactory HEAP_FAB = new BinaryHeap.BinaryHeapFactory();
 
@@ -129,8 +129,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      *
      * @return the name of local graph.
      */
-    @Override
-    public String getLabel() {
+    public String getName() {
         return graphName;
     }
 
@@ -141,7 +140,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @return external pins which should be marked as used coz there is USED
      * DIRECT connection to them in CB graph.
      */
-    @Override
     public List<Pair<String, String>> deleteKeyFromCBGraph(String key) {//*
         int keyNum = findVertex(key);
         if (keyNum != -1) {
@@ -174,7 +172,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @return
      * @Params elemFrom, elemTo mean .
      */
-    @Override
     public int getWeight(String elemFrom, String elemTo) {
         // WE SHOULD RETURN -1 OR SMTH LIKE THAT IF WE CAN'T FIND THE WAY THROUGH GRAPH.
         return linksMatrix[findIntForLinksMatrix(elemFrom)][findIntForLinksMatrix(elemTo)];
@@ -187,11 +184,11 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @param elemTo
      * @Params elemFrom, elemTo mean.
      */
-    @Override
-    public void getConfigurationPath(String elemFrom, String elemTo) {//*
+    public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete) {//*
         deikstra(findVertex(elemFrom));
         deikstra_backway_with_config(findVertex(elemTo), findVertex(elemFrom), true);
         resetVertices();
+        return new ArrayList<>();
     }
 
     /**
@@ -200,7 +197,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @return external pins which should be marked as used coz there is USED
      * DIRECT connection to them in CB graph.
      */
-    @Override
     public List<Pair<String, String>> doDeleteUsedVerts() {//*
         Iterator<Integer> deleteItr = VertToDeleteList.iterator();
         while (deleteItr.hasNext()) {
@@ -232,7 +228,6 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
     /**
      * Reset for using in another Global graph.
      */
-    @Override
     public void reset() {
         VertToDeleteList = new ArrayList<>();
     }
@@ -249,7 +244,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         //check for same label
         for (int j = 0; j < vertexCount; j++) {
             if (vertexArray[j] != null) {
-                if (vertexArray[j].getLabel().equals(label)) {
+                if (vertexArray[j].getName().equals(label)) {
                     return false;
                 }
             }
@@ -257,7 +252,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
 
         vertexArray[vertexCount++] = new Vertex(label);
         /*System.out.println(vertexCount);
-        System.out.println(vertexArray[vertexCount-1].getLabel());*/
+        System.out.println(vertexArray[vertexCount-1].getName());*/
         return true;
     }
 
@@ -277,7 +272,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                 matrix[i][count] = 0;
                 matrix[count][i] = 0;
             }
-            String label = vertexArray[count].getLabel();
+            String label = vertexArray[count].getName();
             vertexArray[count] = null;
             //Accessory.printLog(graphName);
             // Accessory.printLog("label " + label);
@@ -353,7 +348,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         List<Integer> Verts = new ArrayList<>();
         for (int j = 0; j < vertexCount; j++) {
             if (vertexArray[j] != null) {
-                if ((matrix[v][j] > 0) && (vertexArray[j].getVisited() == false)) {
+                if ((matrix[v][j] > 0) && (vertexArray[j].isVisited() == false)) {
                     Verts.add(j);
                 }
             }
@@ -403,7 +398,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * of the ways, one of the local deikstraFindAll methods.
      */
     private void deikstra(int startPoint) {//*
-        GraphHeapInterface heap = HEAP_FAB.createBinaryHeap();
+        BinaryHeap heap = HEAP_FAB.createBinaryHeap();
         int curPathCount;
         Integer closestVertex;
         int currentVertex = startPoint;
@@ -411,10 +406,10 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         vertexArray[currentVertex].setVisited(true);
         vertexArray[currentVertex].setPathCount(0);
 
-        heap.add(vertexArray[currentVertex].getPathCount(), currentVertex);
+        //heap.add(vertexArray[currentVertex].getPathCount(), currentVertex);
 
         int counter = 0;
-        while ((closestVertex = heap.getValueOfMinKeyElement()) != -1) {
+        /*while ((closestVertex = heap.getValueOfMinKeyElement()) != -1) {
             counter++;
             assert counter < 1000;
             vertexArray[closestVertex].setVisited(true);
@@ -431,7 +426,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
                 }
                 heap.add(vertexArray[currentVertex].getPathCount(), currentVertex);
             }
-        }
+        }*/
         // reset all paths
         for (int j = 0; j < vertexCount; j++) {
             if (vertexArray[j] != null) {
@@ -456,7 +451,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
             a = getCloseVerteces(currentVertex);
             for (Integer a1 : a) {
                 if (((vertexArray[currentVertex].getPathCount() - vertexArray[a1].getPathCount()) == matrix[currentVertex][a1]) && (matrix[currentVertex][a1] != 0)) {
-                    int labelNumber = Integer.parseInt(getLabel().split("<")[1]);
+                    int labelNumber = Integer.parseInt(getName().split("<")[1]);
                     labelNumber += Integer.parseInt(keyMatrix[currentVertex][a1]);
                     Accessory.write(LinksHolder.getPathTo("config"), String.valueOf(labelNumber));
                     currentVertex = a1;
@@ -490,18 +485,18 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      * @Param startPoint shows the number of vertice in main matrix.
      */
     private void renewOneLineForLinksMatrix(int startPoint) {//*
-        int internalInt = findIntForLinksMatrix(vertexArray[startPoint].getLabel());
+        int internalInt = findIntForLinksMatrix(vertexArray[startPoint].getName());
         int InternalSecondInt;
         for (int i = 0; i < vertexCount; i++) {
             if ((vertexArray[i] != null) && (i != startPoint)) {
                 for (String vert : globVerts) {
-                    if (vertexArray[i].getLabel().equals(vert)) {
+                    if (vertexArray[i].getName().equals(vert)) {
                         // linksMatrix element is 0 if there is no path.
                         if (vertexArray[i].getPathCount() == vertexArray[i].getMaxPathCount()) {
                             continue;
                         }
 
-                        InternalSecondInt = findIntForLinksMatrix(vertexArray[i].getLabel());
+                        InternalSecondInt = findIntForLinksMatrix(vertexArray[i].getName());
                         linksMatrix[internalInt][InternalSecondInt] = vertexArray[i].getPathCount();
                         linksMatrix[InternalSecondInt][internalInt] = vertexArray[i].getPathCount();
                     }
@@ -549,7 +544,7 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
      */
     private int findVertex(String label) {//*
         for (int i = 0; i < vertexCount; i++) {
-            if ((vertexArray[i] != null) && (vertexArray[i].getLabel().equals(label))) {
+            if ((vertexArray[i] != null) && (vertexArray[i].getName().equals(label))) {
                 return i;
             }
         }
@@ -590,18 +585,15 @@ public final class NonOrientedCBGraph implements ConnectionGraphInterface {
         }
     }
 
-    public static class CBFactory implements ConnectionGraphFactory {
+    public static class CBFactory {
 
         private static NonOrientedCBGraph largeCB;
 
-        @Override
-        public ConnectionGraphInterface createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
+        public NonOrientedCBGraph createConnectionGraph(String graphName, String[] globVerts, int VERTEX_MAX) {
             return new NonOrientedCBGraph(graphName, globVerts, VERTEX_MAX);
         }
 
-        @Override
-
-        public ConnectionGraphInterface createConnectionGraphCBLarge(String graphName) {          
+        public NonOrientedCBGraph createConnectionGraphCBLarge(String graphName) {          
             String[] globVerts = {"X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11", "X12",
                 "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12",
                 "Z1", "Z2", "Z3", "Z4", "Z5", "Z6", "Z7", "Z8", "Z9", "Z10", "Z11", "Z12",

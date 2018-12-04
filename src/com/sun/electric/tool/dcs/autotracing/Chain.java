@@ -68,7 +68,7 @@ public class Chain extends Vertex {
      * @param chain
      */
     public Chain(Chain chain) {
-        super(chain.getLabel());
+        super(chain.getName());
         this.vertsFromGlobalGraph = chain.getLine();
         String[] connectedVertices = vertsFromGlobalGraph.split(" ");
         for (String connectedVertice : connectedVertices) {

@@ -35,13 +35,21 @@ public final class Pair<T, V> {
      * @param second
      */
     public Pair(T first, V second) {
+        if ((first == null) || (second == null)) {
+            throw new NullPointerException("Transfer null object to pair");
+        }
         this.first = first;
         this.second = second;
+    }
+    
+    private Pair() {
+        throw new AssertionError("shouldn't be created with empty constructor");
     }
 
     /**
      * Get First Object with generic type.
-     * @return 
+     *
+     * @return
      */
     public T getFirstObject() {
         return first;
@@ -49,7 +57,8 @@ public final class Pair<T, V> {
 
     /**
      * Get Second Object with generic type.
-     * @return 
+     *
+     * @return
      */
     public V getSecondObject() {
         return second;
@@ -57,17 +66,54 @@ public final class Pair<T, V> {
 
     /**
      * Sometimes you have to use another object instead.
+     *
      * @param first
      */
     public void setFirstObject(T first) {
+        if (first == null) {
+            throw new NullPointerException("Transfer null object to pair");
+        }
         this.first = first;
     }
 
     /**
      * Sometimes you have to use another object instead.
+     *
      * @param second
      */
     public void setSecondObject(V second) {
+        if (second == null) {
+            throw new NullPointerException("Transfer null object to pair");
+        }
         this.second = second;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Pair)) {
+            return false;
+        }
+        if (!(((Pair) o).getFirstObject().equals(this.getFirstObject()))) {
+            return false;
+        }
+        if (!(((Pair) o).getSecondObject().equals(this.getSecondObject()))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getFirstObject().hashCode() / 2 + this.getSecondObject().hashCode() / 2;
+    }
+    
+    @Override
+    public String toString() {
+        String answer = "first object: " + getFirstObject().toString()
+                + ", second object: " + getSecondObject().toString();
+        return answer;
     }
 }

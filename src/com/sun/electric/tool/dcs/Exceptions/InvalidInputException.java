@@ -1,6 +1,6 @@
 /* Electric(tm) VLSI Design System
  *
- * File: GraphHeapInterface.java
+ * File: InvalidInputException.java
  *
  * Copyright (c) 2003, Oracle and/or its affiliates. All rights reserved.
  *
@@ -17,13 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.dcs.Exceptions;
+
+import com.sun.electric.tool.dcs.Accessory;
 
 /**
  *
- * @author diivanov
+ * @author Dmitrii
  */
-public interface GraphHeapFactory {
-    
-    public GraphHeapInterface createBinaryHeap();
+public class InvalidInputException extends RuntimeException {
+
+    public InvalidInputException() {
+        super();
+    }
+
+    public InvalidInputException(String message) {
+        super(message);
+        Accessory.showMessage(message);
+    }
+
+    public InvalidInputException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidInputException(Throwable cause) {
+        super(cause);
+    }
 }

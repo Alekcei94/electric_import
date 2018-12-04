@@ -14,7 +14,8 @@ import javax.swing.ImageIcon;
  *
  * @author diivanov
  */
-public class ResizableImagePane extends javax.swing.JPanel {
+
+public final class ResizableImagePane extends javax.swing.JPanel {
 
     private Image img;
 

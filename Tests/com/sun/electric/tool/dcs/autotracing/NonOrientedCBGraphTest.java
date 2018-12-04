@@ -35,7 +35,7 @@ public class NonOrientedCBGraphTest {
     @BeforeClass
     public static void setUpClass() {
         fab = new NonOrientedCBGraph.CBFactory();
-        ConnectionGraphInterface instance = fab.createConnectionGraphCBLarge("CB<100"); //used to create first UNMODIFIED copy
+        IConnectable instance = fab.createConnectionGraphCBLarge("CB<100"); //used to create first UNMODIFIED copy
     }
 
     @AfterClass
@@ -84,7 +84,7 @@ public class NonOrientedCBGraphTest {
     /*
     * Method reflection global variable int[][] Matrix.
      */
-    private int[][] getReflectionMatrix(Class example, ConnectionGraphInterface sc) throws Exception {
+    private int[][] getReflectionMatrix(Class example, IConnectable sc) throws Exception {
         Field varible = example.getDeclaredField("matrix");
         varible.setAccessible(true);
         int[][] matrix = (int[][]) varible.get(sc);
@@ -94,7 +94,7 @@ public class NonOrientedCBGraphTest {
     /*
     * Method reflection global variable String[] globVerts.
      */
-    private String[] getReflectionGlobVerts(Class example, ConnectionGraphInterface sc) throws Exception {
+    private String[] getReflectionGlobVerts(Class example, IConnectable sc) throws Exception {
         Field varible = example.getDeclaredField("globVerts");
         varible.setAccessible(true);
         String[] globVerts = (String[]) varible.get(sc);
@@ -104,7 +104,7 @@ public class NonOrientedCBGraphTest {
     /*
     *Use Reflection metod FindVertex original
      */
-    private int getReflectionMethodFindVertex(Class example, ConnectionGraphInterface sc, String connectedVertices) throws Exception {
+    private int getReflectionMethodFindVertex(Class example, IConnectable sc, String connectedVertices) throws Exception {
         Class[] paramTypes = new Class[]{String.class};
         Method findVertex = example.getDeclaredMethod("findVertex", paramTypes);
         findVertex.setAccessible(true);
@@ -126,7 +126,7 @@ public class NonOrientedCBGraphTest {
     /*
     *Use Reflection metod findIntForLinksMatrix original
      */
-    private int getReflectionFindIntForLinksMatrix(Class example, ConnectionGraphInterface sc, String findThis) throws Exception {
+    private int getReflectionFindIntForLinksMatrix(Class example, IConnectable sc, String findThis) throws Exception {
         Class[] paramTypes = new Class[]{String.class};
         Method findIntForLinksMatrix = example.getDeclaredMethod("findIntForLinksMatrix", paramTypes);
         findIntForLinksMatrix.setAccessible(true);
@@ -135,12 +135,12 @@ public class NonOrientedCBGraphTest {
     }
 
     /**
-     * Test of getLabel method, of class NonOrientedCBGraph.
+     * Test of getName method, of class NonOrientedCBGraph.
      */
     @Test
     public void testGetLabel() {
         System.out.println("getLabel+");
-        ConnectionGraphInterface instance = fab.createConnectionGraphCBLarge("CB<100");
+        IConnectable instance = fab.createConnectionGraphCBLarge("CB<100");
         String expResult = "CB<100";
         String result = instance.getLabel();
         assertEquals(expResult, result);
@@ -155,7 +155,7 @@ public class NonOrientedCBGraphTest {
         System.out.println("deleteKeyFromCBGraph");
 
         Class example = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
-        ConnectionGraphInterface sc = fab.createConnectionGraphCBLarge("CB");
+        IConnectable sc = fab.createConnectionGraphCBLarge("CB");
 
         Field varible = example.getDeclaredField("matrix");
         varible.setAccessible(true);
@@ -236,7 +236,7 @@ public class NonOrientedCBGraphTest {
         System.out.println("findIntForLinksMatrix");
 
         Class CBGraph = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
-        ConnectionGraphInterface sc = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
+        IConnectable sc = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
         String[] globVerts = getReflectionGlobVerts(CBGraph, sc);
 
         int[] result = new int[10];
@@ -257,7 +257,7 @@ public class NonOrientedCBGraphTest {
         Class CBClass = Class.forName("com.sun.electric.tool.dcs.autotracing.NonOrientedCBGraph");
         Class[] paramTypes = new Class[]{String.class};
 
-        ConnectionGraphInterface nocbg = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
+        IConnectable nocbg = (new NonOrientedCBGraph.CBFactory()).createConnectionGraphCBLarge("CB<0");
 
         Field vertexCountField = CBClass.getDeclaredField("vertexCount");
         vertexCountField.setAccessible(true);

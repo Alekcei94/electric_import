@@ -12,17 +12,13 @@ import java.util.List;
  *
  * @author diivanov
  */
-public interface ConnectionGraphInterface {
+public interface IConnectable {
     
-    public List<Pair<String, String>> deleteKeyFromCBGraph(String key);
+    public void deleteKeyFromCBGraph(String key);
     
-    public String getLabel();
+    public String getName();
     
     public int getWeight(String elemFrom, String elemTo);
     
-    public void getConfigurationPath(String elemFrom, String elemTo);
-    
-    public List<Pair<String, String>> doDeleteUsedVerts();
-    
-    public void reset();
+    public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete);
 }
