@@ -44,10 +44,10 @@ import java.util.Map;
  *
  * @author diivanov
  */
-public class ConnectionGraph implements IConnectable, ICopyable {
+public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
 
     // Main structure of connection graph including import methods
-    private final ConnectionGraphStructure STRUCTURE;
+    private final GraphStructure STRUCTURE;
     // Object to manage deikstra algorithm
     private final Deikstra DEIKSTRA;
     // Object to manage all weights between external verteces.
@@ -64,7 +64,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
         System.out.println(STRUCTURE.getVertMap().toString());
         System.out.println(STRUCTURE.getAdjacencyMap().toString());
         System.out.println(STRUCTURE.getEdgeMap().toString());
-        System.out.println(STRUCTURE.getListOfExternalVerteces().toString());
+        System.out.println(STRUCTURE.getExternalVertexList().toString());
     }
 
     /**
@@ -73,7 +73,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * @param key
      */
     @Override
-    public void deleteKeyFromCBGraph(String key) {
+    public void deleteKeyFromGraph(String key) {
         STRUCTURE.deleteVertexFromStructure(key);
     }
 
@@ -107,7 +107,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * Import default graph while constructing new object.
      */
     private ConnectionGraph(String graphName, File importFile) {
-        STRUCTURE = new ConnectionGraphStructure(importFile);
+        STRUCTURE = new GraphStructure(importFile, this);
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
@@ -117,17 +117,10 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * Copy constructor for connection graph.
      */
     private ConnectionGraph(String graphName, ConnectionGraph conGraph) {
-        this.STRUCTURE = new ConnectionGraphStructure(conGraph.getStructure());
+        this.STRUCTURE = new GraphStructure(conGraph.getStructure(), this);
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
-    }
-
-    /**
-     * avoid empty constructor.
-     */
-    private ConnectionGraph() {
-        throw new AssertionError("Constructor shouldn't be used.");
     }
 
     /**
@@ -136,7 +129,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      *
      * @return
      */
-    private ConnectionGraphStructure getStructure() {
+    private GraphStructure getStructure() {
         return STRUCTURE;
     }
 
@@ -155,8 +148,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * should be updated with every change to structure.
      */
     private class LinksMatrix {
-
-        private boolean isChanged = true;
+        
         // map keeps all internalLinksMatrix that shows distance from each vertex to all others.
         private Map<ImmutableUnorderedPairOfStrings, Integer> mapOfLinks;
 
@@ -166,10 +158,6 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * distances to other verteces.
          */
         private void updateLinksMatrix() {
-            if (isChanged == false) {
-                System.out.println("Trying to change unaltered structure");
-                return;
-            }
             mapOfLinks = new HashMap<>();
             List<String> externalVertList = STRUCTURE.getExternalVertexList();
             // TO DO: fix problem with double running vert1->vert2 and vert2->vert1
@@ -177,8 +165,6 @@ public class ConnectionGraph implements IConnectable, ICopyable {
                 DEIKSTRA.deikstra(vert1);
                 for (String vert2 : externalVertList) {
                     if (!vert1.equals(vert2)) {
-                        //System.out.println("1: " + STRUCTURE.getVertMap().get(vert1).getPathCount());
-                        //System.out.println("2: " + STRUCTURE.getVertMap().get(vert2).getPathCount());
                         mapOfLinks.put(new ImmutableUnorderedPairOfStrings(vert1, vert2),
                                 DEIKSTRA.getDistanceTo(vert2));
                     }
@@ -186,7 +172,6 @@ public class ConnectionGraph implements IConnectable, ICopyable {
                 }
                 DEIKSTRA.resetPathes();
             }
-            this.setChanged(false);
         }
 
         /**
@@ -196,14 +181,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @return 
          */
         private int getWeight(String vertexFrom, String vertexTo) {
-            if (isChanged) {
-                updateLinksMatrix();
-            }
             return mapOfLinks.get(new ImmutableUnorderedPairOfStrings(vertexFrom, vertexTo));
-        }
-
-        private void setChanged(boolean set) {
-            isChanged = set;
         }
     }
 
@@ -211,10 +189,11 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * Class to implement deikstra method and all it's internal logic
      */
     private class Deikstra {
-
-        // flag shows that some keys was deleted and graph wasn't updated after
-        private boolean isChanged;
-
+        /**
+         * Method to get distance to vertex after deikstra method.
+         * @param vertexTo
+         * @return 
+         */
         private int getDistanceTo(String vertexTo) {
             Vertex vert = STRUCTURE.getVertMap().get(vertexTo);
             if (vert.getPathCount() == vert.getMaxPathCount()) {
@@ -245,11 +224,6 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @param vertexFrom
          */
         private void deikstra(String vertexFrom) {
-            if (isChanged()) {
-                throw new AssertionError("Working with dirty file is not allowed."
-                        + " Graph should be reset before another deikstra.");
-            }
-
             BinaryHeap heap = HEAP_FAB.createBinaryHeap();
             //init
             Vertex currentVertex = STRUCTURE.getVertMap().get(vertexFrom);
@@ -286,11 +260,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @param VertexTo
          */
         private List<String> deikstraBackway(Vertex vertexFrom, Vertex VertexTo, boolean doDelete) {
-            if (doDelete) {
-                setChanged(true);
-            }
-
-            Map<Pair<String, String>, String> edgeMap = STRUCTURE.getEdgeMap();
+            Map<ImmutableUnorderedPairOfStrings, String> edgeMap = STRUCTURE.getEdgeMap();
             Vertex currentVertex = VertexTo;
 
             List<Vertex> vertecesToDeleteList = new ArrayList<>();
@@ -303,7 +273,8 @@ public class ConnectionGraph implements IConnectable, ICopyable {
                 for (Vertex vert : closestVerteces) {
                     if ((currentVertex.getPathCount() - vert.getPathCount()) == 1) {
                         vertecesToDeleteList.add(vert);
-                        String key = edgeMap.get(new Pair<>(currentVertex.getName(), vert.getName()));
+                        String key = edgeMap.get(
+                                new ImmutableUnorderedPairOfStrings(currentVertex.getName(), vert.getName()));
                         configPath.add(key); // add each key that we passed to configuration
                         currentVertex = vert;
                         nextStep = true;
@@ -334,7 +305,6 @@ public class ConnectionGraph implements IConnectable, ICopyable {
                 vert.setVisited(false);
                 vert.resetPathCount();
             }
-            setChanged(false);
         }
 
         /**
@@ -365,321 +335,15 @@ public class ConnectionGraph implements IConnectable, ICopyable {
         private List<Vertex> getCloseVerteces(String mainName) {
             return getCloseVerteces(STRUCTURE.getVertMap().get(mainName));
         }
-
-        /**
-         * @return the isChanged
-         */
-        private boolean isChanged() {
-            return isChanged;
-        }
-
-        /**
-         * @param isChanged the isChanged to set
-         */
-        private void setChanged(boolean isChanged) {
-            this.isChanged = isChanged;
-            if (isChanged) {
-                LINKS_MATRIX.setChanged(true);
-            }
-        }
     }
 
-    /**
-     * Class incapsulates the importing logic that shouldn't be used after
-     * creation.
-     */
-    private class ConnectionGraphStructure {
-
-        private final Map<String, Vertex> vertMap; //keeps all vertices
-        private final Map<String, LinkedList<String>> adjacencyMap; // keeps main vertex as String and LinkedList with all connected verteces
-        private final Map<Pair<String, String>, String> edgeMap; // keeps edges as values for vertice+vertice pair as key
-        private final List<String> externalVertexList; // keeps names of external verteces
-
-        /**
-         * Constructor shouldn't allow more than one instance of class.
-         */
-        private ConnectionGraphStructure(File graphFile) {
-            if (STRUCTURE != null) {
-                throw new AssertionError("There should be only one connection graph structure");
-            }
-            this.vertMap = new HashMap<>();
-            this.adjacencyMap = new HashMap<>();
-            this.edgeMap = new HashMap<>();
-            try {
-                importGraph(graphFile);
-            } catch (IOException ex) {
-                Accessory.showMessage("Local graph file is corrupted.");
-            }
-            this.externalVertexList = getListOfExternalVerteces();
-        }
-
-        /**
-         * Copy constructor.
-         *
-         * @param structure
-         */
-        private ConnectionGraphStructure(ConnectionGraphStructure structure) {
-            if (STRUCTURE != null) {
-                throw new AssertionError("There should be only one connection graph structure");
-            }
-            CloneGraphStructure clone = new CloneGraphStructure();
-            this.vertMap = clone.createDeepCopyOfMap(structure.getVertMap());
-            this.adjacencyMap = clone.createDeepCopyOfMap(structure.getAdjacencyMap());
-            this.edgeMap = clone.createDeepCopyOfMap(structure.getEdgeMap());
-            this.externalVertexList = new ArrayList(structure.getExternalVertexList());
-        }
-
-        /**
-         * Method to delete vertex from all structure's collections, for now
-         * there are 3 maps and 1 list.
-         *
-         * @param vertName
-         */
-        private void deleteVertexFromStructure(String vertName) {
-            vertMap.remove(vertName);
-            externalVertexList.remove(vertName); //remove if exists
-            LinkedList<String> conVertList = adjacencyMap.get(vertName);
-            // remove from edgeMap
-            for (String conVert : conVertList) {
-                edgeMap.remove(new Pair<>(vertName, conVert));
-                edgeMap.remove(new Pair<>(conVert, vertName));
-            }
-            //remove from all other LinkedLists
-            for (String conVert : conVertList) {
-                adjacencyMap.get(conVert).remove(vertName);
-            }
-            LINKS_MATRIX.setChanged(true);
-
-        }
-
-        private void deleteVertexFromStructure(Vertex vert) {
-            deleteVertexFromStructure(vert.getName());
-        }
-
-        /**
-         * Method to get list with only external verteces from main map of
-         * verteces.
-         *
-         * @return
-         */
-        private List<String> getListOfExternalVerteces() {
-            List<String> extVertexList = new ArrayList<>();
-            vertMap.entrySet().forEach((entry) -> {
-                if (entry.getValue().isExternal()) {
-                    extVertexList.add(entry.getKey());
-                }
-            });
-            return extVertexList;
-        }
-
-        /**
-         * Method to import graph object from text file.
-         *
-         * @param graphFile
-         * @throws IOException
-         */
-        private void importGraph(File graphFile) throws IOException {
-            try (BufferedReader br = new BufferedReader(new FileReader(graphFile))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    importOneLine(line);
-                }
-            }
-        }
-
-        /**
-         * Satellite method that is used by importGraph(), Structure is fixed:
-         * "address:Vert1 Vert2", Method adds vertices to the main Set and
-         * insert edge value to map.
-         *
-         * @param line
-         */
-        private void importOneLine(String line) {
-            String[] split = line.split(":");
-            String[] vertices = split[1].split(" ");
-            String adr = split[0];
-            //should I verify input with regex?
-            if (vertices.length != 2) {
-                throw new InvalidInputException("Incorrect structure of graph file");
-            }
-            for (String vert : vertices) {
-                addVertex(vert, false);
-            }
-            handleEdges(vertices[0], vertices[1], adr);
-            handleAdjacency(vertices[0], vertices[1]);
-        }
-
-        /**
-         * Add vertex to the Map of vertices.
-         *
-         * @throws IllegalArgumentException if vertex was in Set before.
-         * @param name
-         * @param throwIfExists
-         */
-        private void addVertex(String name, boolean throwIfExists) {
-            if (getVertMap().get(name) != null) {
-                if (throwIfExists) {
-                    throw new IllegalArgumentException("Vertex with name" + name + "already exists");
-                }
-            } else {
-                Vertex vert = new Vertex(name);
-                getVertMap().put(name, vert);
-            }
-        }
-
-        /**
-         * Telescopic method.
-         *
-         * @param name
-         */
-        private void addVertex(String name) {
-            addVertex(name, true);
-        }
-
-        /**
-         * Method to tie edges with vertex pairs. Automatically added reverse
-         * pair to list.
-         *
-         * @param vert1
-         * @param vert2
-         * @param adr
-         */
-        private void handleEdges(String vert1, String vert2, String adr) {
-            Pair<String, String> pair = new Pair<>(vert1, vert2);
-            getEdgeMap().put(pair, adr);
-            // handle reverse situation
-            Pair<String, String> pair2 = new Pair<>(vert2, vert1);
-            getEdgeMap().put(pair2, adr);
-        }
-
-        /**
-         * Method to fill adjacencyMap as vertex -> ajacencyList(Vertex). Should
-         * be used twice for vert1+vert2 and inverse.
-         *
-         * @param vert1
-         * @param vert2
-         */
-        private void handleAdjacency(String vert1, String vert2) {
-            LinkedList<String> adjacencyList = getAdjacencyMap().get(vert1);
-            if (adjacencyList == null) {
-                adjacencyList = new LinkedList<>();
-                getAdjacencyMap().put(vert1, adjacencyList);
-            }
-            // check vert2 existance in list?
-            adjacencyList.add(getVertMap().get(vert2).getName());
-            // handle reverse situation
-            adjacencyList = getAdjacencyMap().get(vert2);
-            if (adjacencyList == null) {
-                adjacencyList = new LinkedList<>();
-                getAdjacencyMap().put(vert2, adjacencyList);
-            }
-            // check vert1 existance in list?
-            adjacencyList.add(getVertMap().get(vert1).getName());
-        }
-
-        /**
-         * @return the vertMap
-         */
-        private Map<String, Vertex> getVertMap() {
-            return vertMap;
-        }
-
-        /**
-         * @return the adjacencyMap
-         */
-        private Map<String, LinkedList<String>> getAdjacencyMap() {
-            return adjacencyMap;
-        }
-
-        /**
-         * @return the edgeMap
-         */
-        private Map<Pair<String, String>, String> getEdgeMap() {
-            return edgeMap;
-        }
-
-        /**
-         * @return the externalVertexList
-         */
-        public List<String> getExternalVertexList() {
-            return externalVertexList;
-        }
-
-        /**
-         * Class to implement cloning logic to use it as copy constructor.
-         */
-        private class CloneGraphStructure {
-
-            /**
-             * Constructor executes cloning all complex objects of mother's
-             * class.
-             */
-            private CloneGraphStructure() {
-            }
-
-            /**
-             * Method to create deep copy of hashmap by copying every object
-             * while iterating through map with copyObject method, Default
-             * copyObject method works with Strings, Verteces, Pairs and several
-             * types of Lists of these elements.
-             *
-             * @param mapToCopy
-             * @return
-             */
-            private <A, B> HashMap<A, B> createDeepCopyOfMap(Map<A, B> mapToCopy) {
-                HashMap<A, B> copiedMap = new HashMap<>();
-                mapToCopy.entrySet().forEach((entry) -> {
-                    A key = (A) entry.getKey();
-                    A copiedKey = (A) copyObject(key);
-                    B value = (B) entry.getValue();
-                    B copiedValue = (B) copyObject(value);
-                    copiedMap.put(copiedKey, copiedValue);
-                });
-                return copiedMap;
-            }
-
-            /**
-             * Method to support deep copy of complex objects. Method should be
-             * extended for new object types.
-             *
-             * @param object
-             * @return
-             */
-            private <E> Object copyObject(Object object) {
-                if (object instanceof String) {
-                    return (String) object;
-                } else if (object instanceof Pair) {
-                    // Pair's objects can't be deep copied so it must be used only with strings or other immutable classes.
-                    return new Pair(((Pair) object).getFirstObject(), ((Pair) object).getSecondObject());
-                } else if (object instanceof Vertex) {
-                    return new Vertex((Vertex) object);
-                } else if (object instanceof LinkedList) {
-                    List<E> list = (LinkedList<E>) object;
-                    LinkedList<E> copiedList = new LinkedList<>();
-                    for (E obj : list) {
-                        copiedList.add((E) copyObject(obj));
-                    }
-                    return copiedList;
-                } else if (object instanceof ArrayList) {
-                    List<E> list = (ArrayList<E>) object;
-                    ArrayList<E> copiedList = new ArrayList<>();
-                    for (E obj : list) {
-                        copiedList.add((E) copyObject(obj));
-                    }
-                    return copiedList;
-                } else {
-                    throw new InvalidInputException("Unexpected object type to copy.");
-                }
-            }
-        }
-    }
 
     /**
      *
      */
     public static class ConnectionFactory {
 
-        private static final Map<Pair<String, String>, ConnectionGraph> graphMap = new HashMap<>();
+        private static final Map<ImmutableUnorderedPairOfStrings, ConnectionGraph> graphMap = new HashMap<>();
 
         // TO DO: return interface.
 
@@ -701,10 +365,12 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @return
          */
         public static ConnectionGraph createConnectionGraphFromFile(String graphName, File importFile) {
-            ConnectionGraph conGraph = graphMap.get(new Pair<>(graphName, importFile.getName()));
+            ConnectionGraph conGraph = graphMap.get(
+                    new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()));
             if (conGraph == null) {
                 conGraph = new ConnectionGraph(graphName, importFile);
-                graphMap.put(new Pair<>(graphName, importFile.getName()), conGraph);
+                graphMap.put(
+                        new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()), conGraph);
             }
             return new ConnectionGraph(graphName, conGraph);
         }

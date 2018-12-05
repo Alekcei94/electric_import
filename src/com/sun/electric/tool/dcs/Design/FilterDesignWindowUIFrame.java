@@ -27,10 +27,7 @@ import com.sun.electric.tool.user.dialogs.EModelessDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.awt.CardLayout;
 import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,13 +47,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 /**
  *
@@ -64,7 +58,7 @@ import javax.swing.JPanel;
  */
 public class FilterDesignWindowUIFrame extends EModelessDialog {
 
-    private static FilterDesignWindowUIFrame theDialog = null;
+    private static FilterDesignWindowUIFrame theDialog;
     private final String[] nameListFilters = new String[3];
     private final List<BuildFilters> objectConfigFiltersAutosave = new ArrayList<>();
 

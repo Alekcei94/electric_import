@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface IConnectable {
     
-    public void deleteKeyFromCBGraph(String key);
+    public void deleteKeyFromGraph(String key);
     
     public String getName();
     

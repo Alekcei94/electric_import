@@ -21,7 +21,6 @@ package com.sun.electric.tool.dcs.Scripts;
 
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.hierarchy.Export;
-import com.sun.electric.database.hierarchy.Library;
 import com.sun.electric.database.hierarchy.View;
 import com.sun.electric.database.topology.ArcInst;
 import com.sun.electric.database.topology.Connection;
@@ -293,7 +292,8 @@ public class ExportKeys implements Exportable {
          */
         public DigitalConfigExport(String simLibName,
                 String simCellName, String FPGAnodeInstName) {
-            doExport(getCellFromLibAndCellName(simLibName, simCellName), FPGAnodeInstName);
+            doExport(CommonMethods.getCellFromLibAndCellName(simLibName, simCellName),
+                    FPGAnodeInstName);
         }
 
         /**
@@ -306,6 +306,10 @@ public class ExportKeys implements Exportable {
          * @param FPGAnodeInstName
          */
         private void doExport(Cell mainCell, String FPGAnodeInstName) {
+            if(mainCell == null) {
+                Accessory.showMessage("Main cell was not found");
+                return;
+            }
             if (!FpgaArgumentsUI.checkForTopArgument()) {
                 Accessory.showMessage("Top argument wasn't set");
                 return;
@@ -314,25 +318,6 @@ public class ExportKeys implements Exportable {
             String pathToVerilog = LinksHolder.getProjectSimulationPath();
             writeVerilogToFile(FPGAcell, pathToVerilog);
             formDigitalConfig(pathToVerilog);
-        }
-
-        /**
-         * Method to get cell from cell and lib names.
-         *
-         * @param simLibName
-         * @param simCellName
-         * @return
-         */
-        private Cell getCellFromLibAndCellName(String simLibName, String simCellName) {
-            Library lib = Library.findLibrary(simLibName);
-            if (lib == null) {
-                throw new AssertionError("Main library was not found");
-            }
-            Cell mainCell = lib.findNodeProto(simCellName);
-            if (mainCell == null) {
-                throw new AssertionError("Main cell was not found");
-            }
-            return mainCell;
         }
 
         /**

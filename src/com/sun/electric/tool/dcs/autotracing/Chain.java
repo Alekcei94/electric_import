@@ -20,11 +20,9 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.CommonMethods;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -48,18 +46,7 @@ public class Chain extends Vertex {
         super(label);
         this.vertsFromGlobalGraph = vertsFromGlobalGraph;
         String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        for (String connectedVertice : connectedVertices) {
-            this.vertsList.add(connectedVertice);
-            /*if (connectedVertice.endsWith(".X") || (connectedVertice.endsWith(".Y"))) {
-                this.isXYGlobal = true;
-            }
-            if (connectedVertice.contains("ION")) {
-                this.isIonChain = true;
-            }*/
-        }
-        /*if (connectedVertices.length > 8) {
-            weight += 4;
-        }*/
+        this.vertsList.addAll(Arrays.asList(connectedVertices));
     }
 
     /**
@@ -71,108 +58,8 @@ public class Chain extends Vertex {
         super(chain.getName());
         this.vertsFromGlobalGraph = chain.getLine();
         String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        for (String connectedVertice : connectedVertices) {
-            this.vertsList.add(connectedVertice);
-            /*if (connectedVertice.endsWith(".X") || (connectedVertice.endsWith(".Y"))) {
-                this.isXYGlobal = true;
-            }
-            if (connectedVertice.contains("ION")) {
-                this.isIonChain = true;
-            }*/
-        }
+        this.vertsList.addAll(Arrays.asList(connectedVertices));
         this.weight = chain.getWeight();
-    }
-
-    /**
-     * Method implements searching mechanism inside chain.
-     *
-     * @return
-     */
-    public String[] searchForCB() {
-        List<String> cbChains = new ArrayList<>();
-        for (String vert : vertsList) {
-            if (CommonMethods.parsePortToBlock(vert).contains("CB")) {
-                cbChains.add(CommonMethods.parsePortToBlock(vert));
-                cbChains.add(CommonMethods.parsePortToPort(vert));
-            }
-        }
-        assert (cbChains.size() > 0);
-        String[] a = new String[cbChains.size()];
-        a = cbChains.toArray(a);
-        return a;
-    }
-
-    /**
-     * Method implements searching mechanism inside chain.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForBlock(String blockPiece) {
-        for (String vert : vertsList) {
-            if (CommonMethods.parsePortToBlock(vert).contains(blockPiece)) {
-                return vert;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Method implements searching mechanism inside chain, used in external
-     * autotracing scheme.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForPattern(String blockPiece) {         /// !!!! /// MAYBE SHOULD BE USED MATCHES INSTEAD OF FIND
-        Pattern p = Pattern.compile(blockPiece);
-
-        for (String vert : vertsList) {
-            if (p.matcher(vert).find()) {
-                return vert;
-            }
-        }
-        return null;
-    }
-    
-     /**
-     * Method implements searching mechanism inside chain, used in external
-     * autotracing scheme.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForPatternMatch(String blockPiece) {         /// !!!! /// MAYBE SHOULD BE USED MATCHES INSTEAD OF FIND
-        Pattern p = Pattern.compile(blockPiece);
-
-        for (String vert : vertsList) {
-            if (p.matcher(vert).matches()) {
-                return vert;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * check if String @Vert contains String @port.
-     */
-    private boolean contains(String Vert, String port) {
-        return CommonMethods.parsePortToBlock(Vert).equals(port);
-    }
-
-    /**
-     * Check if vert from vertsList contains string.
-     *
-     * @param port
-     * @return
-     */
-    public boolean checkForContains(String port) {
-        for (String vert : vertsList) {
-            if (contains(vert, port)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -182,17 +69,6 @@ public class Chain extends Vertex {
      */
     public String getLine() {
         return vertsFromGlobalGraph;
-    }
-
-    /**
-     * Method to delete verteces connected to this chain.
-     *
-     * @return
-     */
-    public String[] getConnectedVerteces() {
-        String[] a = new String[0];
-        a = vertsList.toArray(a);
-        return a;
     }
 
     /**
@@ -234,6 +110,6 @@ public class Chain extends Vertex {
      */
     public void addWeight() {
         Accessory.printLog("WIncrease. " + weight);
-        weight += 4;
+        weight += 2;
     }
 }

@@ -22,6 +22,9 @@ public final class ImmutableUnorderedPairOfStrings {
         if ((first == null) || (second == null)) {
             throw new NullPointerException("Transfer null object to pair");
         }
+        if(first.equals(second)) {
+            throw new AssertionError("Pair elements must not be equals");
+        }
         this.first = first;
         this.second = second;
     }
@@ -52,6 +55,7 @@ public final class ImmutableUnorderedPairOfStrings {
         if (!(o instanceof ImmutableUnorderedPairOfStrings)) {
             return false;
         }
+        
         ImmutableUnorderedPairOfStrings pair = (ImmutableUnorderedPairOfStrings) o;
         
         boolean firstCondition = false;
