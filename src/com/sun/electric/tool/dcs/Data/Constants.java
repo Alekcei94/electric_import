@@ -24,6 +24,14 @@ package com.sun.electric.tool.dcs.Data;
  * @author diivanov
  */
 public class Constants {
+    
+    private static final String splitter = "_";
 
+    /**
+     * @return the splitter
+     */
+    public static String getSplitter() {
+        return splitter;
+    }
     
 }

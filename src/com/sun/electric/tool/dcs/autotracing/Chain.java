@@ -19,10 +19,12 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.dcs.Accessory;
-import java.util.ArrayList;
+import com.sun.electric.tool.dcs.Data.Constants;
+import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  *
@@ -30,7 +32,7 @@ import java.util.List;
  */
 public class Chain extends Vertex {
 
-    private final List<String> vertsList = new ArrayList<>();
+    private final Map<String, ChainElement> chainElements = new HashMap<>();
     private final String vertsFromGlobalGraph;
     private int weight = 1;
     private boolean isDeleted;
@@ -45,21 +47,32 @@ public class Chain extends Vertex {
     public Chain(String vertsFromGlobalGraph, String label) {
         super(label);
         this.vertsFromGlobalGraph = vertsFromGlobalGraph;
-        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        this.vertsList.addAll(Arrays.asList(connectedVertices));
+        formChainElementsMap(vertsFromGlobalGraph);
     }
 
     /**
-     * Constructor: copy Contructor.
+     * Constructor: copy Contructor. Parameter isDeleted won't be copied because
+     * should be used as local.
      *
      * @param chain
      */
     public Chain(Chain chain) {
         super(chain.getName());
         this.vertsFromGlobalGraph = chain.getLine();
-        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        this.vertsList.addAll(Arrays.asList(connectedVertices));
+        formChainElementsMap(chain.getLine());
         this.weight = chain.getWeight();
+    }
+
+    private void formChainElementsMap(String vertsFromGlobalGraph) {
+        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
+        for (String element : connectedVertices) {
+            ChainElement chainElement = chainElements.get(element);
+            if (chainElement != null) {
+                throw new InvalidStructureError("Incorrect configuration of graph file");
+            }
+            chainElement = new ChainElement(element);
+            chainElements.put(element, chainElement);
+        }
     }
 
     /**
@@ -109,7 +122,76 @@ public class Chain extends Vertex {
      * Add weight to count cost function.
      */
     public void addWeight() {
-        Accessory.printLog("WIncrease. " + weight);
         weight += 2;
+    }
+
+    public class ChainElement {
+        
+        private final String context;
+
+        private final String name;
+        private final String globalAddr;
+        private final String port;
+
+        private ChainElement(String context) {
+            this.context = context;
+            String splitter = Constants.getSplitter();
+            String[] split = context.split(splitter);
+            if (split.length != 3) {
+                throw new InvalidStructureError("Incorrect configuration of graph file");
+            }
+            this.name = split[0];
+            this.globalAddr = split[1];
+            this.port = split[2];
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return the globalAddr
+         */
+        public String getGlobalAddr() {
+            return globalAddr;
+        }
+
+        /**
+         * @return the port
+         */
+        public String getPort() {
+            return port;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 79 * hash + Objects.hashCode(this.context);
+            return hash;
+        }
+        
+        @Override
+        public boolean equals(Object o) {
+            if(o == null) {
+                return false;
+            } else if(!(o instanceof ChainElement)) {
+                return false;
+            } else if(!((ChainElement) o).getContext().equals(getContext())) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * @return the context
+         */
+        public String getContext() {
+            return context;
+        }
+        
+        
     }
 }

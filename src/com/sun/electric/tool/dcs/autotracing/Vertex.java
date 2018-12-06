@@ -25,7 +25,7 @@ package com.sun.electric.tool.dcs.autotracing;
  */
 public class Vertex {
 
-    private final String LABEL;
+    private final String NAME;
     
     private final int MAXPATHCOUNT = 1000;
     private int pathCount = MAXPATHCOUNT;
@@ -35,11 +35,11 @@ public class Vertex {
     
 
     /**
-     * @param label
+     * @param name
      */
-    public Vertex(String label) {
-        this.LABEL = label;
-        isExternal = LABEL.contains("#");
+    public Vertex(String name) {
+        this.NAME = name;
+        isExternal = name.contains("#");
     }
     
     /**
@@ -57,7 +57,7 @@ public class Vertex {
      * @return label.
      */
     public String getName() {
-        return LABEL;
+        return NAME;
     }
 
     /**

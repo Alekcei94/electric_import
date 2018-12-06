@@ -33,6 +33,8 @@ public class GraphStructure {
 
     /**
      * Constructor shouldn't allow more than one instance of class.
+     * @param graphFile is the file with graph structure
+     * @param graph is the parent of this object
      */
     public GraphStructure(File graphFile, ITraceable graph) {
         this.graph = graph;
