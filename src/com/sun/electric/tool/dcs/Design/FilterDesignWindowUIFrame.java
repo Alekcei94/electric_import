@@ -22,6 +22,7 @@ package com.sun.electric.tool.dcs.Design;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.user.User;
 import com.sun.electric.tool.user.dialogs.EModelessDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
@@ -93,7 +94,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      */
     private List<String> readFileConfigFilters() {
         List<String> configFilterInFile = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader("./filterDesign.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(LinksHolder.getFilterConfig()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 configFilterInFile.add(line);
@@ -109,7 +110,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      * This method read config Filters in file in address ./filterDesing.txt .
      */
     private void writeFileConfigFilters(List<String> configFilterInFile) {
-        try (FileWriter writer = new FileWriter("./filterDesign.txt", false)) {
+        try (FileWriter writer = new FileWriter(LinksHolder.getFilterConfig(), false)) {
             for (String config : configFilterInFile) {
                 writer.write(config);
             }
@@ -124,7 +125,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      */
     private String useImportFile() {
         JFileChooser chooser = new JFileChooser();
-        File Dir = new File("../config/Filters/");
+        File Dir = new File(LinksHolder.getPathFiltetrs());
         String pathToFile;
         chooser.setCurrentDirectory(Dir);
         chooser.setDialogTitle("Import config");
@@ -168,7 +169,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      */
 
     private boolean serchAddressName(String name) throws IOException {
-        File dir = new File("../config/Filters");
+        File dir = new File(LinksHolder.getPathFiltetrs());
         String[] thisName;
         name = name.replace("\\", "/");
         thisName = name.split("/");
@@ -195,7 +196,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      */
     private String useExportFile() {
         JFileChooser chooser = new JFileChooser();
-        File Dir = new File("../config/Filters/");
+        File Dir = new File(LinksHolder.getPathFiltetrs());
         String pathToFile;
         chooser.setCurrentDirectory(Dir);
         chooser.setDialogTitle("Export config");
@@ -258,7 +259,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void formCmdRequestForPython() {
         if (EllipticRadioButton.isSelected()) {
             System.out.println("Filter design process started.");
-            String path = "FilterScripts/FilterDesign.py";
+            String path = "FilterScripts/FilterDesign.py"; /// ВОПРОС к Диме
             String order = ellipticOrderTextField.getText();
             String rp = ellipticMaximumRippleTextField.getText();
             String rs = ellipticMinimumAttenuationTextField.getText();
@@ -376,9 +377,9 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         enable = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         historyList = new javax.swing.JList<>();
-        jButton3 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setIconImages(null);
         setPreferredSize(new java.awt.Dimension(1400, 800));
         setResizable(false);
 
@@ -683,26 +684,26 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             .addGroup(jPanelEllipticLayout.createSequentialGroup()
                 .addComponent(nameEllipticPanel)
                 .addGap(18, 18, 18)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(orderPanel)
-                    .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(orderPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
+                    .addComponent(ellipticOrderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(filterTypePanel)
-                    .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ellipticFilterTypeChoiceComboBox, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(maximumRipplePanel)
-                    .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(ellipticMaximumRippleTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(minimumAttenuationPanel)
-                    .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(ellipticMinimumAttenuationTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanelEllipticLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cutoffFrequencyPanel)
-                    .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                    .addComponent(ellipticCutoffFrequencyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         ((JLabel) filterTypeChoiceComboBox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
@@ -895,13 +896,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         });
         jScrollPane1.setViewportView(historyList);
 
-        jButton3.setText("jButton3");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -912,6 +906,9 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addGap(34, 34, 34)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                .addGap(84, 84, 84))
+                            .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGap(16, 16, 16)
@@ -920,11 +917,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                                     .addComponent(ChebyRadioButton)
                                     .addComponent(EllipticRadioButton)
                                     .addComponent(BesselRadioButton)
-                                    .addComponent(enable, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(150, 150, 150))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                                .addGap(84, 84, 84)))
+                                    .addComponent(enable, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(150, 150, 150)))
                         .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -937,9 +931,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addContainerGap()
                         .addComponent(importKey)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(exportKey)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton3)))
+                        .addComponent(exportKey)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -950,8 +942,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                     .addComponent(jPanelAfc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanelForCardLayout, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(StartButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(19, 19, 19)
+                        .addComponent(StartButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(10, 10, 10)
@@ -963,14 +955,13 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                         .addGap(3, 3, 3)
                         .addComponent(BesselRadioButton)
                         .addGap(80, 80, 80)
-                        .addComponent(enable)
-                        .addGap(37, 37, 37)
+                        .addComponent(enable, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(importKey)
-                    .addComponent(exportKey)
-                    .addComponent(jButton3))
+                    .addComponent(exportKey))
                 .addContainerGap())
         );
 
@@ -1103,10 +1094,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_exportKeyActionPerformed
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-
-    }//GEN-LAST:event_jButton3ActionPerformed
 
     /*
     * This method set historu list.
@@ -1256,7 +1243,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private javax.swing.JLabel filterTypePanel;
     private javax.swing.JList<String> historyList;
     private javax.swing.JButton importKey;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel18;

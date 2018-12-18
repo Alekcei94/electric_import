@@ -24,6 +24,15 @@ package com.sun.electric.tool.dcs.Data;
  * @author diivanov
  */
 public class Constants {
-
     
+    private Constants() {
+        throw new AssertionError("Constructor is not reqired here.");
+    }
+
+    private static final String KEY_NAME = "key";
+
+    public static String getKey() {
+        return KEY_NAME;
+    }
+
 }

@@ -70,6 +70,7 @@ import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
+import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
@@ -1125,8 +1126,13 @@ public class ToolMenu {
                     public void run() {
                         String FPGAnodeInstName = "FPGA";
                         Cell mainCell = Job.getUserInterface().getCurrentCell();
-                        //new ExportKeys.DigitalConfigExport(mainCell,
-                        //        FPGAnodeInstName);
+                        ExportKeys.getContructionDigitalConfigExport(mainCell,
+                               FPGAnodeInstName);
+                    }
+                },
+                         new EMenuItem("tryFilterUI") {
+                    public void run() {
+                        new FilterDesignWindowUIFrame.InitiateForm();
                     }
                 },/*
                         new EMenuItem("Filter UI") {
@@ -1137,6 +1143,11 @@ public class ToolMenu {
                         new EMenuItem("Fpga UI") {
                     public void run() {
                         new FpgaArgumentsUI.InitiateForm();
+                    }
+                },
+                 new EMenuItem("Export keys") {
+                    public void run() {
+                        ExportKeys.formConfig();
                     }
                 }));
     }

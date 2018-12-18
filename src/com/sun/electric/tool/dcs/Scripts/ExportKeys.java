@@ -28,6 +28,7 @@ import com.sun.electric.database.topology.Connection;
 import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
+import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
@@ -43,6 +44,7 @@ import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -56,29 +58,36 @@ public class ExportKeys implements Exportable {
      * This method creates config file at ../config/config.txt .
      */
     public static void formConfig() {
-        //Accessory.showMessage("Please wait.");
+        try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
+            StringBuilder configAllScheme = new ExportKeys().getConfigExport();
+            writer.write(configAllScheme.toString());
+        } catch (IOException ex) {
+            Accessory.showMessage("Unable to write data to file.");
+            throw new AssertionError("Unable to write data to file.");
+            //TODO: обработать ошибку (Тоже, наверно, готово)
+        }
+    }
+
+    public StringBuilder getConfigExport() {
+        StringBuilder configAllScheme = new StringBuilder();
         AnalogConfigExport SchemeConfigExport = new AnalogConfigExport();
         FilterConfigExport FilterConfigExport = new FilterConfigExport();
 
-        String simLibName = "5400TP094";
-        String simCellName = "5400TP094";
+        //String simLibName = "5400TP094";
+        //String simCellName = "5400TP094";
+        //String FPGAnodeInstName = "FPGA";
+        //DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
         String FPGAnodeInstName = "FPGA";
-        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName,
-                simCellName, FPGAnodeInstName);
-        try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
-            String config = DigitalConfigExport.getConfigurationFPGA();
-            config = config + SchemeConfigExport.schemeConfigExport();
-            FilterDesignWindowUIFrame test = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
-            if (test.getEnableStatus()) {
-                config = config + FilterConfigExport.formConfigFiltersExportFile();
-            }
-            writer.write(config);
-            // здесь полностью меняется принцип выдачи конфигурационной последовательности
-            // все ConfigExport имеют метод getConfig()
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-            //TODO: обработать ошибку
+        Cell mainCell = Job.getUserInterface().getCurrentCell();
+        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(mainCell, FPGAnodeInstName);
+        configAllScheme.append(DigitalConfigExport.getConfigExport().toString());
+        configAllScheme.append(SchemeConfigExport.getConfigExport().toString());
+        FilterDesignWindowUIFrame flagReadConfigFilters = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
+        System.out.println(" test = " + flagReadConfigFilters.getEnableStatus());
+        if (flagReadConfigFilters.getEnableStatus()) {
+            configAllScheme.append(FilterConfigExport.getConfigExport().toString());
         }
+        return configAllScheme;
     }
 
     /**
@@ -88,10 +97,16 @@ public class ExportKeys implements Exportable {
     private static String deleteACharacterInTheParam(String param) {
         if (param.charAt(param.length() - 1) == 'h') {
             param = param.substring​(0, param.length() - 1);
-            return param;
-            // return param не нужен
+            // return param не нужен (Готово)
         }
         return param;
+    }
+
+    /*
+    *
+     */
+    public static void getContructionDigitalConfigExport(Cell mainCell, String FPGAnodeInstName) {
+        new DigitalConfigExport(mainCell, FPGAnodeInstName);
     }
 
     /**
@@ -168,45 +183,80 @@ public class ExportKeys implements Exportable {
      */
     private static class AnalogConfigExport implements Exportable {
 
-        public String schemeConfigExport() {
+        /*
+         * This method forms the Analog configuration 
+         */
+        public StringBuilder getConfigExport() {
+            StringBuilder configAnalogSchem;
             String configSchemeExportFile;
             Cell curcell = Job.getUserInterface().getCurrentCell();
-            // TODO: нужно сделать для произвольной схемы
+            // TODO: нужно сделать для произвольной схемы, из определенных схем, (ВАЖНО, найти решение)(Хммм)
             configSchemeExportFile = "-- Scheme configuration --" + "\n";//Made to validate the formation netList.
             Iterator<NodeInst> niItr = curcell.getNodes();
-            String[] listNameBlock = {"CB", "AOP", "BUS14SW5V", "RESA", "CAPA", "DIOP",
-                "DIOP_EN_key", "MUX", "LSHDIRLINE", "HVAOP", "OR", "PPC"};
-            // REV: listNameBlock - не лист, а массив. Название может ввести в заблуждение.
-            // TODO: желательно попробовать убрать привязку к конкретным блокам.
+            String[] arrayStringNameBlock = getArrayNameBlocks();
+            // REV: listNameBlock - не лист, а массив. Название может ввести в заблуждение. (Готово)
+            // TODO: желательно попробовать убрать привязку к конкретным блокам. (Готово)
             while (niItr.hasNext()) {
                 NodeInst ni = niItr.next();
                 boolean flag = false;
-                for (String list : listNameBlock) {
-                    // REV: list - не элемент.
-                    if (ni.getName().contains(list)) {
+                for (String nameBlock : arrayStringNameBlock) {
+                    // REV: list - не элемент. (Готово)
+                    //System.out.print(ni.getName());
+                    //System.out.print(" : ");
+                    //System.out.print(nameBlock + '\n' + '\n');
+                    if (ni.getName().contains(nameBlock)) {
                         // TODO: в идеале использовать equals
                         flag = true;
+                        break;
                     }
 
                 }
-                // TODO: следует убрать лишние проходы в цикле
+                // TODO: следует убрать лишние проходы в цикле (Готово)
                 if (flag) {
                     Cell equiv = ni.getProtoEquivalent();
                     Iterator<NodeInst> keyItr = equiv.getNodes();
                     while (keyItr.hasNext()) {
                         NodeInst key = keyItr.next();
-                        if (key.getProto().getName().equals("key")) {
-                            // TODO: нужно будет заменить хардкод key на считывание из класса констант.
+                        if (key.getProto().getName().equals(Constants.getKey())) {
+                            // TODO: нужно будет заменить хардкод key на считывание из класса констант. (Готово)
                             if (isClosedKey(ni, key)) {
-                                configSchemeExportFile = configSchemeExportFile
-                                        + getRealKeyInFile(ni, key);
-                                // REV: лучше использовать +=
+                                configSchemeExportFile += getRealKeyInFile(ni, key);
+                                // REV: лучше использовать += (Готово)
                             }
                         }
                     }
                 }
             }
-            return configSchemeExportFile;
+            configAnalogSchem = new StringBuilder(configSchemeExportFile);
+            return configAnalogSchem;
+        }
+
+        /*
+         * Forms an array of names of used blocks. Path: electric/accessory/allUsedBlocks.acc
+         */
+        private String[] getArrayNameBlocks() {
+            //try (FileReader reader = new FileReader(LinksHolder.getPathFileAllUsedBlocksInScheme())) {
+            ArrayList<String> arraylistReadInFileNameBLocks = new ArrayList<>();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(LinksHolder.getPathFileAllUsedBlocksInScheme()));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    arraylistReadInFileNameBLocks.add(line);
+                }
+            } catch (IOException ex) {
+                //Сделать обработку ошибки(Готово)
+                Accessory.showMessage("At this address " + LinksHolder.getPathFileAllUsedBlocksInScheme() + " missing file.");
+                throw new AssertionError("At this address " + LinksHolder.getPathFileAllUsedBlocksInScheme() + " missing file.");
+
+            }
+            String[] arrayNameBlocks = new String[arraylistReadInFileNameBLocks.size()];
+            int i = 0;
+            System.out.println(arraylistReadInFileNameBLocks.size());
+            for (String nameBlock : arraylistReadInFileNameBLocks) {
+                arrayNameBlocks[i] = nameBlock;
+                i++;
+            }
+            return arrayNameBlocks;
         }
 
         /**
@@ -242,12 +292,21 @@ public class ExportKeys implements Exportable {
      */
     private static class FilterConfigExport implements Exportable {
 
-        public String formConfigFiltersExportFile() {
-            String urlFile = "filterDesign.txt";
-            // TODO: убрать хардкод (LinksHolder)
+        /*public String formConfigFiltersExportFile() {
+            String urlFile = LinksHolder.getFilterConfig();
+            // TODO: убрать хардкод (LinksHolder) (Готово)
+            String configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
+            configFiltersExportFile += getConfigurationFilters(urlFile);
+            return configFiltersExportFile;
+        }*/
+        public StringBuilder getConfigExport() {
+            String urlFile = LinksHolder.getFilterConfig();
+            StringBuilder configFilters;
+            // TODO: убрать хардкод (LinksHolder)(Готово)
             String configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
             configFiltersExportFile = configFiltersExportFile + getConfigurationFilters(urlFile);
-            return configFiltersExportFile;
+            configFilters = new StringBuilder(configFiltersExportFile);
+            return configFilters;
         }
 
         /**
@@ -255,10 +314,10 @@ public class ExportKeys implements Exportable {
          * information without processing.
          */
         private String getConfigurationFilters(String urlFile) {
-            String informKeyInFileOfFilters = null;
+            String informKeyInFileOfFilters = "";
             try (BufferedReader br = new BufferedReader(new FileReader(urlFile))) {
                 String line;
-                informKeyInFileOfFilters = "";
+                //informKeyInFileOfFilters;
                 while ((line = br.readLine()) != null) {
                     informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
                 }
@@ -339,21 +398,25 @@ public class ExportKeys implements Exportable {
          * This method reads file at a given address and displays all
          * information without processing.
          */
-        private String getConfigurationFPGA() {
-            String informKeyInFileOfFPGA = null;
-            try (BufferedReader br = new BufferedReader(new FileReader("../Projects/5400TP094/simulation/Verilog.bitnum"))) {
-                //TODO: hardcode/address (LinksHolder)
+        @Override
+        public StringBuilder getConfigExport() {
+            StringBuilder configFPGA;
+            String address = LinksHolder.getPathInFileConfigFPGABlock();
+            try (BufferedReader br = new BufferedReader(new FileReader(address))) {
+                String informKeyInFileOfFPGA;
+                //TODO: hardcode/address (LinksHolder)(Готово)
                 String line;
                 informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
                 while ((line = br.readLine()) != null) {
-                    informKeyInFileOfFPGA = informKeyInFileOfFPGA + line + '\n';
+                    informKeyInFileOfFPGA += line + '\n';
                 }
+                configFPGA = new StringBuilder(informKeyInFileOfFPGA);
             } catch (IOException ex) {
-                //Accessory.showMessage("Missing file.");
-                throw new AssertionError("Missing file");
-                //TODO: обработка ошибки
+                Accessory.showMessage("Missing file in address" + LinksHolder.getPathInFileConfigFPGABlock());
+                throw new AssertionError("Missing file in address" + LinksHolder.getPathInFileConfigFPGABlock());
+                //TODO: обработка ошибки (Вроде готово)
             }
-            return informKeyInFileOfFPGA;
+            return configFPGA;
         }
 
         /**

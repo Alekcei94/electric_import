@@ -25,14 +25,15 @@ import java.io.IOException;
 
 /**
  * Class to hold links and relative/absolute addresses
+ *
  * @author diivanov
  */
-public class LinksHolder {   
-    
+public class LinksHolder {
+
     private static LinksHolder linksHolder;
 
     private LinksHolder() {
-        
+
     }
 
     public static LinksHolder getInstance() {
@@ -41,29 +42,43 @@ public class LinksHolder {
         }
         return linksHolder;
     }
-    
+
     private final String memoryMapRoot = "./MEMORY_MAP/";
-    
+
     public String getMemoryMapRoot() {
         return memoryMapRoot;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////
-    
     /**
      * Path to CB graph in .trc file.
      */
     private static final String CB_PATH = "./autotracing/CBGraph.trc";
     /**
-     * Path to configuration String (list of keys), typically in /config/config.txt
+     * Path to configuration String (list of keys), typically in
+     * /config/config.txt
      */
     private static final String CONFIG_PATH = "../config/config.txt";
     /**
      * Path to global graph, typically in /electric/autotracing/global.trc
      */
     private static final String GLOBAL_PATH = "./autotracing/global.trc";
-
-    
+    /*
+     * Path to file config filters
+     */
+    private static final String FILER_CONFIG = "./filterDesign.txt";
+    /*
+     * Path to file all used block in scheme.
+     */
+    private static final String PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME = "./accessory/allUsedBlocks.acc";
+    /*
+     * Path in file config FPGA.
+     */
+    private static final String PATH_FILE_CONFIG_FPGA_BLOCK = "../Projects/5400TP094/simulation/Verilog.bitnum";
+    /*
+     *
+     */
+    private static final String PATH_FILTERS = "../config/Filters/";
     /**
      * Path to electric folder (.../electric/).
      */
@@ -73,7 +88,6 @@ public class LinksHolder {
      * Path to main folder of app.
      */
     private static final String PARENT_PATH = setStaticPath();
-
 
     public static String getPathTo(String pathTo) {
         switch (pathTo) {
@@ -86,6 +100,22 @@ public class LinksHolder {
             default:
                 return null;
         }
+    }
+
+    public static String getPathInFileConfigFPGABlock() {
+        return PATH_FILE_CONFIG_FPGA_BLOCK;
+    }
+
+    public static String getPathFileAllUsedBlocksInScheme() {
+        return PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME;
+    }
+
+    public static String getPathFiltetrs() {
+        return PATH_FILTERS;
+    }
+
+    public static String getFilterConfig() {
+        return FILER_CONFIG;
     }
 
     /**
@@ -118,37 +148,35 @@ public class LinksHolder {
         }
         return null;
     }
-    
-    
+
     //////////////////////////////////////////////////////////////////////////
-    
     /**
-     * Method to get absolutePath to project.
-     * ex: C:/CYGELENG/Projects/5400TP094/
-     * @return 
+     * Method to get absolutePath to project. ex:
+     * C:/CYGELENG/Projects/5400TP094/
+     *
+     * @return
      */
     public static String getProjectPath() {
         return User.getWorkingDirectory();
     }
-    
+
     /**
-     * Method to get absolutePath to projectSimulationFolder.
-     * ex: C:/CYGELENG/Projects/5400TP094/simulation
-     * @return 
+     * Method to get absolutePath to projectSimulationFolder. ex:
+     * C:/CYGELENG/Projects/5400TP094/simulation
+     *
+     * @return
      */
     public static String getProjectSimulationPath() {
         return getProjectPath() + File.separator + "simulation";
     }
-    
-    
+
     /////////////////////////////////////////////////////////////////////////
-    
     private static final String pathToXCAD = PARENT_PATH + "\\XCAD\\bin";
-    
+
     /**
-     * Method to get path to xcad.
-     * ex: C:/CYGELENG/xcad/bin/
-     * @return 
+     * Method to get path to xcad. ex: C:/CYGELENG/xcad/bin/
+     *
+     * @return
      */
     public static String getXCADPath() {
         return pathToXCAD;
