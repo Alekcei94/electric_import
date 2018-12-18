@@ -25,13 +25,21 @@ package com.sun.electric.tool.dcs.Data;
  */
 public class Constants {
     
-    private static final String splitter = "_";
+    private static final String SPLITTER = "_";
+    private static final String CONNECTION_ELEMENT_NAME = "CB";
 
     /**
      * @return the splitter
      */
     public static String getSplitter() {
-        return splitter;
+        return SPLITTER;
+    }
+
+    /**
+     * @return the CONNECTION_ELEMENT_NAME
+     */
+    public static String getConnectionElementName() {
+        return CONNECTION_ELEMENT_NAME;
     }
     
 }

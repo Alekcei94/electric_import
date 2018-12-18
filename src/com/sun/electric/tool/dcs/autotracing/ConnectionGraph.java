@@ -19,19 +19,16 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
-import com.sun.electric.tool.dcs.Exceptions.InvalidInputException;
-import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,10 +41,10 @@ import java.util.Map;
  *
  * @author diivanov
  */
-public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
+public class ConnectionGraph implements IConnectable, ICopyable {
 
     // Main structure of connection graph including import methods
-    private final GraphStructure STRUCTURE;
+    private final ConnectionGraphStructure STRUCTURE;
     // Object to manage deikstra algorithm
     private final Deikstra DEIKSTRA;
     // Object to manage all weights between external verteces.
@@ -107,7 +104,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
      * Import default graph while constructing new object.
      */
     private ConnectionGraph(String graphName, File importFile) {
-        STRUCTURE = new GraphStructure(importFile, this);
+        STRUCTURE = new ConnectionGraphStructure(importFile);
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
@@ -117,7 +114,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
      * Copy constructor for connection graph.
      */
     private ConnectionGraph(String graphName, ConnectionGraph conGraph) {
-        this.STRUCTURE = new GraphStructure(conGraph.getStructure(), this);
+        this.STRUCTURE = new ConnectionGraphStructure(conGraph.getStructure());
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
@@ -129,7 +126,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
      *
      * @return
      */
-    private GraphStructure getStructure() {
+    private ConnectionGraphStructure getStructure() {
         return STRUCTURE;
     }
 
@@ -244,7 +241,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
                     }
                     if (vert.getPathCount() > (closestVertex.getPathCount() + 1)) {
                         vert.setPathCount(closestVertex.getPathCount() + 1);
-                        //System.out.println(vert.getName());
+                        //System.out.println(vert.getContext());
                         //System.out.println(vert.getPathCount());
                     }
                     heap.add(vert, vert.getPathCount());
@@ -274,7 +271,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
                     if ((currentVertex.getPathCount() - vert.getPathCount()) == 1) {
                         vertecesToDeleteList.add(vert);
                         String key = edgeMap.get(
-                                new ImmutableUnorderedPairOfStrings(currentVertex.getName(), vert.getName()));
+                                new ImmutableUnorderedPairOfStrings(currentVertex.getContext(), vert.getContext()));
                         configPath.add(key); // add each key that we passed to configuration
                         currentVertex = vert;
                         nextStep = true;
@@ -288,7 +285,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
                     throw new RuntimeException("Deikstra method failed");
                     //return null;
                 }
-            } while (!currentVertex.getName().equals(vertexFrom.getName()));
+            } while (!currentVertex.getContext().equals(vertexFrom.getContext()));
 
             if (doDelete) {
                 deleteVerteces(vertecesToDeleteList);
@@ -323,7 +320,7 @@ public class ConnectionGraph implements IConnectable, ICopyable, ITraceable {
          * @return
          */
         private List<Vertex> getCloseVerteces(Vertex main) {
-            List<String> vertexStringList = STRUCTURE.getAdjacencyMap().get(main.getName());
+            List<String> vertexStringList = STRUCTURE.getAdjacencyMap().get(main.getContext());
             Map<String, Vertex> vertMap = STRUCTURE.getVertMap();
             List<Vertex> vertexAjacencyList = new ArrayList<>();
             for (String vertexString : vertexStringList) {

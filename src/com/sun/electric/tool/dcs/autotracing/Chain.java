@@ -21,10 +21,11 @@ package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,7 +34,7 @@ import java.util.Objects;
 public class Chain extends Vertex {
 
     private final Map<String, ChainElement> chainElements = new HashMap<>();
-    private final String vertsFromGlobalGraph;
+    //private final List<ChainElement> connectionChainElementsList = new ArrayList<>();
     private int weight = 1;
     private boolean isDeleted;
 
@@ -41,26 +42,30 @@ public class Chain extends Vertex {
      * Constructor: parse input String to port elements, adding parse return to
      * ArrayList.
      *
-     * @param vertsFromGlobalGraph
-     * @param label
+     * @param context
      */
-    public Chain(String vertsFromGlobalGraph, String label) {
-        super(label);
-        this.vertsFromGlobalGraph = vertsFromGlobalGraph;
-        formChainElementsMap(vertsFromGlobalGraph);
+    public Chain(String context) {
+        super(context);
+        formChainElementsMap(context);
     }
 
     /**
      * Constructor: copy Contructor. Parameter isDeleted won't be copied because
      * should be used as local.
      *
-     * @param chain
+     * @param vertex
      */
-    public Chain(Chain chain) {
-        super(chain.getName());
-        this.vertsFromGlobalGraph = chain.getLine();
-        formChainElementsMap(chain.getLine());
+    public Chain(Vertex vertex) {
+        super(vertex.getContext());
+        Chain chain = (Chain) vertex;
+        formChainElementsMap(chain.getContext());
         this.weight = chain.getWeight();
+    }
+    
+    public List getConnectionChainElementsList() {
+        return chainElements.values().stream()
+                .filter(value -> value.isConnectionElement())
+                .collect(Collectors.toList());
     }
 
     private void formChainElementsMap(String vertsFromGlobalGraph) {
@@ -73,15 +78,6 @@ public class Chain extends Vertex {
             chainElement = new ChainElement(element);
             chainElements.put(element, chainElement);
         }
-    }
-
-    /**
-     * Method to get String line of chain.
-     *
-     * @return
-     */
-    public String getLine() {
-        return vertsFromGlobalGraph;
     }
 
     /**
@@ -125,13 +121,49 @@ public class Chain extends Vertex {
         weight += 2;
     }
 
+    /**
+     * Not sure if it will be used
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.getContext());
+        return hash;
+    }
+
+    /**
+     * Not sure if it will be used.
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof Chain)) {
+            return false;
+        } else if (!((Chain) o).getContext().equals(this.getContext())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Class incapsulates parameters of each object inside chain.
+     * @Contract: global address is unique.
+     */
     public class ChainElement {
-        
-        private final String context;
+
+        private final String context; // PADDR.13676.PX3 (name.globalAddr.port)
 
         private final String name;
         private final String globalAddr;
         private final String port;
+
+        private final boolean connectionElement;
 
         private ChainElement(String context) {
             this.context = context;
@@ -143,6 +175,7 @@ public class Chain extends Vertex {
             this.name = split[0];
             this.globalAddr = split[1];
             this.port = split[2];
+            connectionElement = this.name.equals(Constants.getConnectionElementName());
         }
 
         /**
@@ -150,6 +183,13 @@ public class Chain extends Vertex {
          */
         public String getName() {
             return name;
+        }
+
+        /**
+         * @return the connectionElement
+         */
+        public boolean isConnectionElement() {
+            return connectionElement;
         }
 
         /**
@@ -165,6 +205,16 @@ public class Chain extends Vertex {
         public String getPort() {
             return port;
         }
+        
+        /**
+         * Method to check if object relates to same block as this object.
+         * Suggesting that global address is unique.
+         * @param chainElement
+         * @return 
+         */
+        public boolean isSameBlock(ChainElement chainElement) {
+            return chainElement.getGlobalAddr().equals(this.getGlobalAddr()); 
+        }
 
         @Override
         public int hashCode() {
@@ -172,14 +222,14 @@ public class Chain extends Vertex {
             hash = 79 * hash + Objects.hashCode(this.context);
             return hash;
         }
-        
+
         @Override
         public boolean equals(Object o) {
-            if(o == null) {
+            if (o == null) {
                 return false;
-            } else if(!(o instanceof ChainElement)) {
+            } else if (!(o instanceof ChainElement)) {
                 return false;
-            } else if(!((ChainElement) o).getContext().equals(getContext())) {
+            } else if (!((ChainElement) o).getContext().equals(getContext())) {
                 return false;
             }
             return true;
@@ -191,7 +241,6 @@ public class Chain extends Vertex {
         public String getContext() {
             return context;
         }
-        
-        
+
     }
 }

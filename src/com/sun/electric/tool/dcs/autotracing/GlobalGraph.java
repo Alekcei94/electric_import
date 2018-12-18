@@ -19,6 +19,8 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import java.io.File;
@@ -67,14 +69,14 @@ public class GlobalGraph implements IConnectable, ICopyable {
          * @return
          */
         public static GlobalGraph createGlobalGraphFromFile(String graphName, File importFile) {
-            GlobalGraph conGraph = graphMap.get(
+            GlobalGraph globalGraph = graphMap.get(
                     new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()));
-            if (conGraph == null) {
-                conGraph = new GlobalGraph(graphName, importFile);
+            if (globalGraph == null) {
+                globalGraph = new GlobalGraph(graphName, importFile);
                 graphMap.put(
-                        new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()), conGraph);
+                        new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()), globalGraph);
             }
-            return new GlobalGraph(graphName, conGraph);
+            return new GlobalGraph(graphName, globalGraph);
         }
     }
 }

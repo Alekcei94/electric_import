@@ -20,32 +20,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class incapsulates the importing logic that shouldn't be used after
- * creation.
+ * Class incapsulates the importing logic that shouldn't be used after creation.
  */
-public class GraphStructure {
+public final class ConnectionGraphStructure extends AbstractGraphStructure {
 
     private final Map<String, Vertex> vertMap; //keeps all vertices
     private final Map<String, LinkedList<String>> adjacencyMap; // keeps main vertex as String and LinkedList with all connected verteces
     private final Map<ImmutableUnorderedPairOfStrings, String> edgeMap; // keeps edges as values for vertice+vertice pair as key
     private final List<String> externalVertexList; // keeps names of external verteces
-    private final ITraceable graph;
 
     /**
      * Constructor shouldn't allow more than one instance of class.
+     *
      * @param graphFile is the file with graph structure
-     * @param graph is the parent of this object
      */
-    public GraphStructure(File graphFile, ITraceable graph) {
-        this.graph = graph;
+    public ConnectionGraphStructure(File graphFile) {
         this.vertMap = new HashMap<>();
         this.adjacencyMap = new HashMap<>();
         this.edgeMap = new HashMap<>();
-        try {
-            importGraph(graphFile);
-        } catch (IOException ex) {
-            Accessory.showMessage("Local graph file is corrupted.");
-        }
+        importGraph(graphFile);
         this.externalVertexList = getListOfExternalVerteces();
     }
 
@@ -54,8 +47,7 @@ public class GraphStructure {
      *
      * @param structure
      */
-    public GraphStructure(GraphStructure structure, ITraceable graph) {
-        this.graph = graph;
+    public ConnectionGraphStructure(ConnectionGraphStructure structure) {
         CloneGraphStructure clone = new CloneGraphStructure();
         this.vertMap = clone.createDeepCopyOfMap(structure.getVertMap());
         this.adjacencyMap = clone.createDeepCopyOfMap(structure.getAdjacencyMap());
@@ -64,8 +56,8 @@ public class GraphStructure {
     }
 
     /**
-     * Method to delete vertex from all structure's collections, for now
-     * there are 3 maps and 1 list.
+     * Method to delete vertex from all structure's collections, for now there
+     * are 3 maps and 1 list.
      *
      * @param vertName
      */
@@ -81,21 +73,22 @@ public class GraphStructure {
         for (String conVert : conVertList) {
             adjacencyMap.get(conVert).remove(vertName);
         }
+        //delete initial context
+        adjacencyMap.remove(vertName);
     }
-    
+
     /**
-     * Method to delete vertex from all structure's collections, for now
-     * there are 3 maps and 1 list.
+     * Method to delete vertex from all structure's collections, for now there
+     * are 3 maps and 1 list.
      *
      * @param vert
      */
     public void deleteVertexFromStructure(Vertex vert) {
-        deleteVertexFromStructure(vert.getName());
+        deleteVertexFromStructure(vert.getContext());
     }
 
     /**
-     * Method to get list with only external verteces from main map of
-     * verteces.
+     * Method to get list with only external verteces from main map of verteces.
      *
      * @return
      */
@@ -110,27 +103,13 @@ public class GraphStructure {
     }
 
     /**
-     * Method to import graph object from text file.
-     *
-     * @param graphFile
-     * @throws IOException
-     */
-    private void importGraph(File graphFile) throws IOException {
-        try (final BufferedReader br = new BufferedReader(new FileReader(graphFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                importOneLine(line);
-            }
-        }
-    }
-
-    /**
      * Satellite method that is used by importGraph(), Structure is fixed:
-     * "address:Vert1 Vert2", Method adds vertices to the main Set and
-     * insert edge value to map.
+     * "address:Vert1 Vert2", Method adds vertices to the main Set and insert
+     * edge value to map.
      *
      * @param line
      */
+    @Override
     protected void importOneLine(String line) {
         String[] split = line.split(":");
         String[] vertices = split[1].split(" ");
@@ -165,17 +144,8 @@ public class GraphStructure {
     }
 
     /**
-     * Telescoping method.
-     *
-     * @param name
-     */
-    private void addVertex(String name) {
-        addVertex(name, true);
-    }
-
-    /**
-     * Method to tie edges with vertex pairs. Automatically added reverse
-     * pair to list.
+     * Method to tie edges with vertex pairs. Automatically added reverse pair
+     * to list.
      *
      * @param vert1
      * @param vert2
@@ -190,8 +160,8 @@ public class GraphStructure {
     }
 
     /**
-     * Method to fill adjacencyMap as vertex -> ajacencyList(Vertex). Should
-     * be used twice for vert1+vert2 and inverse.
+     * Method to fill adjacencyMap as vertex -> ajacencyList(Vertex). Should be
+     * used twice for vert1+vert2 and inverse.
      *
      * @param vert1
      * @param vert2
@@ -203,7 +173,7 @@ public class GraphStructure {
             getAdjacencyMap().put(vert1, adjacencyList);
         }
         // check vert2 existance in list?
-        adjacencyList.add(getVertMap().get(vert2).getName());
+        adjacencyList.add(getVertMap().get(vert2).getContext());
         // handle reverse situation
         adjacencyList = getAdjacencyMap().get(vert2);
         if (adjacencyList == null) {
@@ -211,27 +181,27 @@ public class GraphStructure {
             getAdjacencyMap().put(vert2, adjacencyList);
         }
         // check vert1 existance in list?
-        adjacencyList.add(getVertMap().get(vert1).getName());
+        adjacencyList.add(getVertMap().get(vert1).getContext());
     }
 
     /**
      * @return the vertMap
      */
-    Map<String, Vertex> getVertMap() {
+    public Map<String, Vertex> getVertMap() {
         return vertMap;
     }
 
     /**
      * @return the adjacencyMap
      */
-    Map<String, LinkedList<String>> getAdjacencyMap() {
+    public Map<String, LinkedList<String>> getAdjacencyMap() {
         return adjacencyMap;
     }
 
     /**
      * @return the edgeMap
      */
-    Map<ImmutableUnorderedPairOfStrings, String> getEdgeMap() {
+    public Map<ImmutableUnorderedPairOfStrings, String> getEdgeMap() {
         return edgeMap;
     }
 
@@ -242,72 +212,4 @@ public class GraphStructure {
         return externalVertexList;
     }
 
-    /**
-     * Class to implement cloning logic to use it as copy constructor.
-     */
-    private class CloneGraphStructure {
-
-        /**
-         * Constructor executes cloning all complex objects of mother's
-         * class.
-         */
-        private CloneGraphStructure() {
-        }
-
-        /**
-         * Method to create deep copy of hashmap by copying every object
-         * while iterating through map with copyObject method, Default
-         * copyObject method works with Strings, Verteces, Pairs and several
-         * types of Lists of these elements.
-         *
-         * @param mapToCopy
-         * @return
-         */
-        private <A, B> HashMap<A, B> createDeepCopyOfMap(Map<A, B> mapToCopy) {
-            HashMap<A, B> copiedMap = new HashMap<>();
-            mapToCopy.entrySet().forEach((entry) -> {
-                A key = (A) entry.getKey();
-                A copiedKey = (A) copyObject(key);
-                B value = (B) entry.getValue();
-                B copiedValue = (B) copyObject(value);
-                copiedMap.put(copiedKey, copiedValue);
-            });
-            return copiedMap;
-        }
-
-        /**
-         * Method to support deep copy of complex objects. Method should be
-         * extended for new object types.
-         *
-         * @param object
-         * @return
-         */
-        private <E> Object copyObject(Object object) {
-            if (object instanceof String) {
-                return (String) object;
-            } else if (object instanceof Pair) {
-                // Pair's objects can't be deep copied so it must be used only with strings or other immutable classes.
-                return new Pair(((Pair) object).getFirstObject(), ((Pair) object).getSecondObject());
-            } else if (object instanceof Vertex) {
-                return new Vertex((Vertex) object);
-            } else if (object instanceof LinkedList) {
-                List<E> list = (LinkedList<E>) object;
-                LinkedList<E> copiedList = new LinkedList<>();
-                for (E obj : list) {
-                    copiedList.add((E) copyObject(obj));
-                }
-                return copiedList;
-            } else if (object instanceof ArrayList) {
-                List<E> list = (ArrayList<E>) object;
-                ArrayList<E> copiedList = new ArrayList<>();
-                for (E obj : list) {
-                    copiedList.add((E) copyObject(obj));
-                }
-                return copiedList;
-            } else {
-                throw new InvalidInputException("Unexpected object type to copy.");
-            }
-        }
-    }
-    
 }
