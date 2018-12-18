@@ -19,7 +19,7 @@
  */
 package com.sun.electric.tool.dcs.Data;
 
-import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,8 +31,6 @@ import java.util.HashMap;
 
 /**
  * Class holds all data related to memory addresses.
- *
- * @author diivanov
  */
 public class MemoryMap {
 
@@ -63,19 +61,11 @@ public class MemoryMap {
         try {
             Files.walk(Paths.get(path))
                     .filter(Files::isRegularFile)
-                    .forEach(filePath -> {
-                        try {
-                            buildMemoryFile(filePath);
-                        } catch (IOException ioe) {
-                            Accessory.showMessage("Your internal map files are corrupted. "
-                                    + "Reinstall would be solution.");
-                            ioe.printStackTrace();
-                        }
-                    });
+                    .forEach(this::buildMemoryFile);
         } catch (IOException ioe) {
-            Accessory.showMessage("Your internal map files are corrupted. "
+            memoryMap = null;
+            throw new InvalidStructureError("Your internal map files are corrupted. "
                     + "Reinstall would be solution.");
-            ioe.printStackTrace();
         }
     }
 
@@ -85,9 +75,9 @@ public class MemoryMap {
      * @param path
      * @throws IOException 
      */
-    private void buildMemoryFile(Path path) throws IOException {
+    private void buildMemoryFile(Path path) {
         MemoryFile mf = new MemoryFile(path.getFileName().toString());
-        System.out.println(mf.getName());
+        //System.out.println(mf.getName());
         try (InputStream in = Files.newInputStream(path)) {
             try (BufferedReader reader
                     = new BufferedReader(new InputStreamReader(in))) {
@@ -101,6 +91,9 @@ public class MemoryMap {
                     //System.out.println(trueAddress);
                 }
             }
+        } catch(IOException ioe) {
+            memoryMap = null;
+            throw new InvalidStructureError("Map is corrupted");
         }
         nameToMemoryAddressMap.put(mf.getName(), mf);
     }
@@ -110,7 +103,6 @@ public class MemoryMap {
      * true address (real address in microscheme) and internal address (address
      * in software from 000 to xxx).
      *
-     * @author diivanov
      */
     private class MemoryFile {
 

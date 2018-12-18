@@ -19,12 +19,13 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.CommonMethods;
-import java.util.ArrayList;
-import java.util.Iterator;
+import com.sun.electric.tool.dcs.Data.Constants;
+import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
+import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -32,8 +33,8 @@ import java.util.regex.Pattern;
  */
 public class Chain extends Vertex {
 
-    private final List<String> vertsList = new ArrayList<>();
-    private final String vertsFromGlobalGraph;
+    private final Map<String, ChainElement> chainElements = new HashMap<>();
+    //private final List<ChainElement> connectionChainElementsList = new ArrayList<>();
     private int weight = 1;
     private boolean isDeleted;
 
@@ -41,158 +42,42 @@ public class Chain extends Vertex {
      * Constructor: parse input String to port elements, adding parse return to
      * ArrayList.
      *
-     * @param vertsFromGlobalGraph
-     * @param label
+     * @param context
      */
-    public Chain(String vertsFromGlobalGraph, String label) {
-        super(label);
-        this.vertsFromGlobalGraph = vertsFromGlobalGraph;
-        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        for (String connectedVertice : connectedVertices) {
-            this.vertsList.add(connectedVertice);
-            /*if (connectedVertice.endsWith(".X") || (connectedVertice.endsWith(".Y"))) {
-                this.isXYGlobal = true;
-            }
-            if (connectedVertice.contains("ION")) {
-                this.isIonChain = true;
-            }*/
-        }
-        /*if (connectedVertices.length > 8) {
-            weight += 4;
-        }*/
+    public Chain(String context) {
+        super(context);
+        formChainElementsMap(context);
     }
 
     /**
-     * Constructor: copy Contructor.
+     * Constructor: copy Contructor. Parameter isDeleted won't be copied because
+     * should be used as local.
      *
-     * @param chain
+     * @param vertex
      */
-    public Chain(Chain chain) {
-        super(chain.getName());
-        this.vertsFromGlobalGraph = chain.getLine();
-        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
-        for (String connectedVertice : connectedVertices) {
-            this.vertsList.add(connectedVertice);
-            /*if (connectedVertice.endsWith(".X") || (connectedVertice.endsWith(".Y"))) {
-                this.isXYGlobal = true;
-            }
-            if (connectedVertice.contains("ION")) {
-                this.isIonChain = true;
-            }*/
-        }
+    public Chain(Vertex vertex) {
+        super(vertex.getContext());
+        Chain chain = (Chain) vertex;
+        formChainElementsMap(chain.getContext());
         this.weight = chain.getWeight();
     }
-
-    /**
-     * Method implements searching mechanism inside chain.
-     *
-     * @return
-     */
-    public String[] searchForCB() {
-        List<String> cbChains = new ArrayList<>();
-        for (String vert : vertsList) {
-            if (CommonMethods.parsePortToBlock(vert).contains("CB")) {
-                cbChains.add(CommonMethods.parsePortToBlock(vert));
-                cbChains.add(CommonMethods.parsePortToPort(vert));
-            }
-        }
-        assert (cbChains.size() > 0);
-        String[] a = new String[cbChains.size()];
-        a = cbChains.toArray(a);
-        return a;
-    }
-
-    /**
-     * Method implements searching mechanism inside chain.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForBlock(String blockPiece) {
-        for (String vert : vertsList) {
-            if (CommonMethods.parsePortToBlock(vert).contains(blockPiece)) {
-                return vert;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Method implements searching mechanism inside chain, used in external
-     * autotracing scheme.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForPattern(String blockPiece) {         /// !!!! /// MAYBE SHOULD BE USED MATCHES INSTEAD OF FIND
-        Pattern p = Pattern.compile(blockPiece);
-
-        for (String vert : vertsList) {
-            if (p.matcher(vert).find()) {
-                return vert;
-            }
-        }
-        return null;
-    }
     
-     /**
-     * Method implements searching mechanism inside chain, used in external
-     * autotracing scheme.
-     *
-     * @param blockPiece
-     * @return
-     */
-    public String searchForPatternMatch(String blockPiece) {         /// !!!! /// MAYBE SHOULD BE USED MATCHES INSTEAD OF FIND
-        Pattern p = Pattern.compile(blockPiece);
+    public List getConnectionChainElementsList() {
+        return chainElements.values().stream()
+                .filter(value -> value.isConnectionElement())
+                .collect(Collectors.toList());
+    }
 
-        for (String vert : vertsList) {
-            if (p.matcher(vert).matches()) {
-                return vert;
+    private void formChainElementsMap(String vertsFromGlobalGraph) {
+        String[] connectedVertices = vertsFromGlobalGraph.split(" ");
+        for (String element : connectedVertices) {
+            ChainElement chainElement = chainElements.get(element);
+            if (chainElement != null) {
+                throw new InvalidStructureError("Incorrect configuration of graph file");
             }
+            chainElement = new ChainElement(element);
+            chainElements.put(element, chainElement);
         }
-        return null;
-    }
-
-    /**
-     * check if String @Vert contains String @port.
-     */
-    private boolean contains(String Vert, String port) {
-        return CommonMethods.parsePortToBlock(Vert).equals(port);
-    }
-
-    /**
-     * Check if vert from vertsList contains string.
-     *
-     * @param port
-     * @return
-     */
-    public boolean checkForContains(String port) {
-        for (String vert : vertsList) {
-            if (contains(vert, port)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Method to get String line of chain.
-     *
-     * @return
-     */
-    public String getLine() {
-        return vertsFromGlobalGraph;
-    }
-
-    /**
-     * Method to delete verteces connected to this chain.
-     *
-     * @return
-     */
-    public String[] getConnectedVerteces() {
-        String[] a = new String[0];
-        a = vertsList.toArray(a);
-        return a;
     }
 
     /**
@@ -233,7 +118,129 @@ public class Chain extends Vertex {
      * Add weight to count cost function.
      */
     public void addWeight() {
-        Accessory.printLog("WIncrease. " + weight);
-        weight += 4;
+        weight += 2;
+    }
+
+    /**
+     * Not sure if it will be used
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.getContext());
+        return hash;
+    }
+
+    /**
+     * Not sure if it will be used.
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof Chain)) {
+            return false;
+        } else if (!((Chain) o).getContext().equals(this.getContext())) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Class incapsulates parameters of each object inside chain.
+     * @Contract: global address is unique.
+     */
+    public class ChainElement {
+
+        private final String context; // PADDR.13676.PX3 (name.globalAddr.port)
+
+        private final String name;
+        private final String globalAddr;
+        private final String port;
+
+        private final boolean connectionElement;
+
+        private ChainElement(String context) {
+            this.context = context;
+            String splitter = Constants.getSplitter();
+            String[] split = context.split(splitter);
+            if (split.length != 3) {
+                throw new InvalidStructureError("Incorrect configuration of graph file");
+            }
+            this.name = split[0];
+            this.globalAddr = split[1];
+            this.port = split[2];
+            connectionElement = this.name.equals(Constants.getConnectionElementName());
+        }
+
+        /**
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+
+        /**
+         * @return the connectionElement
+         */
+        public boolean isConnectionElement() {
+            return connectionElement;
+        }
+
+        /**
+         * @return the globalAddr
+         */
+        public String getGlobalAddr() {
+            return globalAddr;
+        }
+
+        /**
+         * @return the port
+         */
+        public String getPort() {
+            return port;
+        }
+        
+        /**
+         * Method to check if object relates to same block as this object.
+         * Suggesting that global address is unique.
+         * @param chainElement
+         * @return 
+         */
+        public boolean isSameBlock(ChainElement chainElement) {
+            return chainElement.getGlobalAddr().equals(this.getGlobalAddr()); 
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 79 * hash + Objects.hashCode(this.context);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null) {
+                return false;
+            } else if (!(o instanceof ChainElement)) {
+                return false;
+            } else if (!((ChainElement) o).getContext().equals(getContext())) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * @return the context
+         */
+        public String getContext() {
+            return context;
+        }
+
     }
 }

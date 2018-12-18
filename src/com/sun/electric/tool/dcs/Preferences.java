@@ -20,7 +20,7 @@
 package com.sun.electric.tool.dcs;
 
 import com.sun.electric.database.text.Pref;
-import com.sun.electric.tool.dcs.autotracing.Autotracing;
+import com.sun.electric.tool.dcs.autotracing.AutotracingTool;
 
 /**
  *
@@ -33,12 +33,12 @@ public class Preferences {
      * when cursor is nearby or not.
      */
     private static final Pref keysIndicated = Pref.makeBooleanPref("keysIndicated",
-            Autotracing.getAutotracingTool().prefs, false);
+            AutotracingTool.getAutotracingTool().prefs, false);
     /**
      * Pref shows user choice about should app show logs or not.
      */
     private static final Pref logging = Pref.makeBooleanPref("traceLogging",
-            Autotracing.getAutotracingTool().prefs, false);
+            AutotracingTool.getAutotracingTool().prefs, false);
 
     /**
      * get keysIndicated variable

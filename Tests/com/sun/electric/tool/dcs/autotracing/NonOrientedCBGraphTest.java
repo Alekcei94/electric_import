@@ -5,6 +5,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import com.sun.electric.tool.dcs.Pair;
 import java.io.BufferedReader;
 
@@ -135,7 +136,7 @@ public class NonOrientedCBGraphTest {
     }
 
     /**
-     * Test of getName method, of class NonOrientedCBGraph.
+     * Test of getContext method, of class NonOrientedCBGraph.
      */
     @Test
     public void testGetLabel() {

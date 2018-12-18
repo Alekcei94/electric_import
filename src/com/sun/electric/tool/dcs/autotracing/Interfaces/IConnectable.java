@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.sun.electric.tool.dcs.autotracing;
+package com.sun.electric.tool.dcs.autotracing.Interfaces;
 
-import com.sun.electric.tool.dcs.SpecificStructures.Pair;
 import java.util.List;
 
 /**
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public interface IConnectable {
     
-    public void deleteKeyFromCBGraph(String key);
+    public void deleteKeyFromGraph(String key);
     
     public String getName();
     

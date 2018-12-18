@@ -5,6 +5,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.Constants;
 import java.io.BufferedReader;
@@ -94,8 +95,8 @@ public class NonOrientedCBGraphIT {
                         if (i > j) {
                             if (keyMatrix[i][j].equals("")) {
                             } else if (Integer.valueOf(keyMatrix[i][j]) == num) {
-                                System.out.println(vertArray[i].getName() + " " + vertArray[j].getName());
-                                listOfPathes.add(vertArray[i].getName() + " " + vertArray[j].getName());
+                                System.out.println(vertArray[i].getContext() + " " + vertArray[j].getContext());
+                                listOfPathes.add(vertArray[i].getContext() + " " + vertArray[j].getContext());
                                 break;
                             }
                         }

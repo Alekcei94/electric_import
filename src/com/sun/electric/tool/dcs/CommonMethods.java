@@ -21,6 +21,9 @@ package com.sun.electric.tool.dcs;
 
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.hierarchy.Library;
+import com.sun.electric.database.topology.NodeInst;
+import com.sun.electric.database.variable.Variable;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -42,7 +45,7 @@ public class CommonMethods {
      * @param libName
      * @return
      */
-    public static Cell getCellFromName(String libName, String cellName) {
+    public static Cell getCellFromLibAndCellName(String libName, String cellName) {
         Iterator<Library> itrLib = Library.getLibraries();
         while (itrLib.hasNext()) {
             Library lib = itrLib.next();
@@ -80,5 +83,36 @@ public class CommonMethods {
         assert port != null;
         return port.substring(port.indexOf(".") + 1, port.lastIndexOf("'")); // name smth like CB<7454
         // port '5400TP035:ION{ic}[ION<1].ION'
+    }
+    
+    /**
+     * Method to get ONE parameter of nodeInst if there are no more parameters
+     */
+    public static String getOnlyParamOfNodeInst(NodeInst ni) {
+        ArrayList<String> paramList = new ArrayList<>();
+        Iterator<Variable> varItr = ni.getParameters();
+        while (varItr.hasNext()) {
+            Variable var = varItr.next();
+            paramList.add(var.getObject().toString());
+        }
+        if (paramList.size() != 1) {
+            throw new IllegalStateException("There shouldn't be more than one parameters for global blocks");
+        }
+        return paramList.get(0);
+    }
+
+    /**
+     * Method to get ONE object from any iterator if there are no more objects
+     * there.
+     */
+    public static <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) {
+        ArrayList<A> objectsList = new ArrayList<>();
+        while (iterator.hasNext()) {
+            objectsList.add(iterator.next());
+        }
+        if (objectsList.size() != 1) {
+            throw new IllegalStateException("More than one object in iterator");
+        }
+        return objectsList.get(0);
     }
 }

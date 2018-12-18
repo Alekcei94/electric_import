@@ -25,11 +25,27 @@ package com.sun.electric.tool.dcs.Data;
  */
 public class Constants {
     
+    private static final String SPLITTER = "_";
+    private static final String CONNECTION_ELEMENT_NAME = "CB";
+	private static final String KEY_NAME = "key";
+
+    /**
+     * @return the splitter
+     */
+    public static String getSplitter() {
+        return SPLITTER;
+    }
+
+    /**
+     * @return the CONNECTION_ELEMENT_NAME
+     */
+    public static String getConnectionElementName() {
+        return CONNECTION_ELEMENT_NAME;
+    }
+    
     private Constants() {
         throw new AssertionError("Constructor is not reqired here.");
     }
-
-    private static final String KEY_NAME = "key";
 
     public static String getKey() {
         return KEY_NAME;

@@ -19,6 +19,7 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
