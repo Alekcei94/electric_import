@@ -69,6 +69,9 @@ import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.Tool;
 import com.sun.electric.tool.compaction.Compaction;
+import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.Data.Constants;
+import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
@@ -155,6 +158,7 @@ import com.sun.electric.tool.user.ui.WindowFrame;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1105,8 +1109,11 @@ public class ToolMenu {
                     }
                 }),
                 new EMenu("Autotracing",
-                        new EMenuItem("Simulate Autotracing Scheme") {
+                        new EMenuItem("Get configuration") {
                     public void run() {
+                        Cell mainCell = Library.findCellInLibraries(Constants.getMainCellName(),
+                                View.SCHEMATIC, Constants.getMainLibraryName());
+                        ExportKeys.startFormingConfig(mainCell);
                     }
                 }),
                 MenuCommands.makeExtraMenu("pcell.gui.MainMenu", false),
@@ -1124,30 +1131,31 @@ public class ToolMenu {
                 new EMenu("DCS scripts",
                         new EMenuItem("Verilog synthesis") {
                     public void run() {
-                        String FPGAnodeInstName = "FPGA";
+                        Accessory.showMessage("Function is now unavailable");
+                        /*String FPGAnodeInstName = "FPGA";
                         Cell mainCell = Job.getUserInterface().getCurrentCell();
                         ExportKeys.getContructionDigitalConfigExport(mainCell,
-                               FPGAnodeInstName);
+                               FPGAnodeInstName);*/
                     }
                 },
-                         new EMenuItem("tryFilterUI") {
-                    public void run() {
-                        new FilterDesignWindowUIFrame.InitiateForm();
-                    }
-                },/*
                         new EMenuItem("Filter UI") {
                     public void run() {
-                        new FilterDesignWindowUIFrame.InitiateForm();
+                        try {
+                            FilterDesignWindowUIFrame.invokeFilterUI();
+                        } catch (InterruptedException | InvocationTargetException e) {
+                            e.printStackTrace();
+                        };
                     }
-                },*/
-                        new EMenuItem("Fpga UI") {
+                },
+                        new EMenuItem("Fpga settings") {
                     public void run() {
                         new FpgaArgumentsUI.InitiateForm();
                     }
                 },
-                 new EMenuItem("Export keys") {
+                        new EMenuItem("Start XPlace") {
                     public void run() {
-                        ExportKeys.formConfig();
+                        Accessory.executeApplication(LinksHolder.getXCADPath() + "\\x-place",
+                                ".exe");
                     }
                 }));
     }

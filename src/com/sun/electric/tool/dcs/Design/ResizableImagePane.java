@@ -11,10 +11,9 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 /**
- *
- * @author diivanov
+ * Class to get image that scales in paintComponent event.
+ * Used firstly in FilterDesignUIFrame to get filter image.
  */
-
 public final class ResizableImagePane extends javax.swing.JPanel {
 
     private Image img;

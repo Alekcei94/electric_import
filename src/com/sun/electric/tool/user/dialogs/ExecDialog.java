@@ -19,7 +19,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.sun.electric.tool.user.dialogs;
 
 import com.sun.electric.tool.user.ActivityLogger;
@@ -30,18 +29,24 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 /**
  * A Dialog for running and interacting with an external process. Usage:
- * <p>Create a new ExecDialog
- * <p>Call the startProcess() method.
+ * <p>
+ * Create a new ExecDialog
+ * <p>
+ * Call the startProcess() method.
  */
 public class ExecDialog extends EDialog implements Exec.FinishedListener {
 
-    /** Reads from process, writes to text area */
+    /**
+     * Reads from process, writes to text area
+     */
     private static class ProcessOutput extends OutputStream {
 
         private JTextArea area;
@@ -53,15 +58,16 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
             caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
             this.area = area;
             processLineFeed = true;
-            if (System.getProperty("line.separator") == "\r")
+            if (System.getProperty("line.separator") == "\r") {
                 processLineFeed = false;
+            }
             prevChar = 0;
         }
 
         @Override
         public synchronized void write(int b) throws IOException {
-            byte [] bytes = new byte[1];
-            bytes[0] = (byte)b;
+            byte[] bytes = new byte[1];
+            bytes[0] = (byte) b;
             String str = new String(bytes);
 
             if (prevChar == '\r' && b != '\n' && processLineFeed) {
@@ -71,7 +77,7 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
                     area.replaceRange(str, start, end);
                 } catch (javax.swing.text.BadLocationException e) {
                     e.printStackTrace(System.out);
-                    ActivityLogger.logException(e);                
+                    ActivityLogger.logException(e);
                 }
             } else {
                 area.append(str);
@@ -87,18 +93,22 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
     private Exec exec;
     private List<Exec.FinishedListener> finishedListenersToAdd;
 
-    /** Creates new form ExecDialog */
+    /**
+     * Creates new form ExecDialog
+     */
     public ExecDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         exec = null;
         finishedListenersToAdd = new ArrayList<Exec.FinishedListener>();
-		finishInitialization();
+        finishInitialization();
     }
 
-    /** Do this before calling startProcess(). Listeners are only added before
+    /**
+     * Do this before calling startProcess(). Listeners are only added before
      * the process starts. There is no need to remove yourself unless the
      * process has not finished yet, and you do not want to be notified.
+     *
      * @param l
      */
     public synchronized void addFinishedListener(Exec.FinishedListener l) {
@@ -111,11 +121,14 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
 
     /**
      * Start a process within an interactive dialog.
+     *
      * @param command the command to run (NOT a shell command!!)
-     * @param envVars environment variables to use in the form name=value. If null, parent process vars are inherited
-     * @param dir the working dir. If null, the parent process' working dir is used
+     * @param envVars environment variables to use in the form name=value. If
+     * null, parent process vars are inherited
+     * @param dir the working dir. If null, the parent process' working dir is
+     * used
      */
-    public synchronized void startProcess(String command, String [] envVars, File dir) {
+    public synchronized void startProcess(String command, String[] envVars, File dir) {
         if (exec != null) {
             System.out.println("ERROR: ExecDialog can only execute one process at a time.");
             return;
@@ -129,18 +142,21 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
         }
         finishedListenersToAdd.clear();
         setTitle("External Process");
-        statusLabel.setText("Running '"+command+"'...");
+        statusLabel.setText("Running '" + command + "'...");
         setVisible(true);
         exec.start();
     }
 
     /**
      * Start a process within an interactive dialog.
+     *
      * @param command the command to run (NOT a shell command!!)
-     * @param envVars environment variables to use in the form name=value. If null, parent process vars are inherited
-     * @param dir the working dir. If null, the parent process' working dir is used
+     * @param envVars environment variables to use in the form name=value. If
+     * null, parent process vars are inherited
+     * @param dir the working dir. If null, the parent process' working dir is
+     * used
      */
-    public synchronized void startProcess(String [] command, String [] envVars, File dir) {
+    public synchronized void startProcess(String[] command, String[] envVars, File dir) {
         if (exec != null) {
             System.out.println("ERROR: ExecDialog can only execute one process at a time.");
             return;
@@ -154,13 +170,15 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
         }
         finishedListenersToAdd.clear();
         setTitle("External Process");
-        statusLabel.setText("Running "+command[0]+"...");
+        statusLabel.setText("Running " + command[0] + "...");
         setVisible(true);
         exec.start();
     }
 
     /**
-     * Called by Exec when it is done. Satifies the Exec.FinishedListener Interface.
+     * Called by Exec when it is done. Satifies the Exec.FinishedListener
+     * Interface.
+     *
      * @param e a finished event.
      */
     public void processFinished(Exec.FinishedEvent e) {
@@ -168,18 +186,21 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
     }
 
     /**
-     * Write one line to the process. Also writes that line to the output text area.
+     * Write one line to the process. Also writes that line to the output text
+     * area.
+     *
      * @param line the line to write
      */
     private synchronized void writeln(String line) {
         if (exec != null) {
-            outputTextArea.append(">>> " +line + "\n");
+            outputTextArea.append(">>> " + line + "\n");
             exec.writeln(line);
         }
     }
 
     /**
      * Clean up after getting a Exec.FinishedEvent.
+     *
      * @param e the event
      */
     private synchronized void endProcess(Exec.FinishedEvent e) {
@@ -187,18 +208,39 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
         exec = null;
         String str;
         if (e.getExitValue() != 0) {
-            JOptionPane.showMessageDialog(this, exec, "Exec '"+e.getExec()+"' failed: return value: "+e.getExitValue(), JOptionPane.ERROR_MESSAGE);
-            str = "Process FAILED [exit="+e.getExitValue()+"]: '"+e.getExec()+"'\n";
-        } else
-            str = "Process Done [exit="+e.getExitValue()+"]: '"+e.getExec()+"'\n";
+            JOptionPane.showMessageDialog(this, exec, "Exec '" + e.getExec() + "' failed: return value: " + e.getExitValue(), JOptionPane.ERROR_MESSAGE);
+            str = "Process FAILED [exit=" + e.getExitValue() + "]: '" + e.getExec() + "'\n";
+        } else {
+            str = "Process Done [exit=" + e.getExitValue() + "]: '" + e.getExec() + "'\n";
+        }
         statusLabel.setText(str);
         outputTextArea.append("*****" + str);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * Method to wait until external process will be finished.
+     */
+    public void waitForProcessToFinish() throws InterruptedException {
+        exec.join();
+    }
+
+    /**
+     * Method to close dialog in program logic.
+     */
+    public void externalCloseDialog() {
+        setVisible(false);
+        if (exec != null) {
+            // need to remove self as listener, otherwise will get call back via processFinished()
+            exec.removeFinishedListener(this);
+            exec.destroyProcess();
+        }
+        dispose();
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -278,8 +320,10 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
         writeln(inputTextField.getText());
         inputTextField.setText("");
     }//GEN-LAST:event_inputTextFieldActionPerformed
-    
-    /** Closes the dialog */
+
+    /**
+     * Closes the dialog
+     */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
         setVisible(false);
         if (exec != null) {
@@ -290,7 +334,7 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
         dispose();
     }//GEN-LAST:event_closeDialog
 
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField inputTextField;
     private javax.swing.JScrollPane jScrollPane1;
@@ -300,5 +344,5 @@ public class ExecDialog extends EDialog implements Exec.FinishedListener {
     private javax.swing.JTextArea outputTextArea;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
-    
+
 }

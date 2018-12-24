@@ -21,9 +21,9 @@ package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
 import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
-import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
+import com.sun.electric.tool.dcs.Exceptions.HardFunctionalException;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import java.io.File;
 import java.util.ArrayList;
@@ -96,8 +96,11 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * @return
      */
     @Override
-    public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete) {
-        return DEIKSTRA.deikstra(elemFrom, elemTo, doDelete);
+    public List<String> getConfigurationPath(String elemFrom, String elemTo,
+            boolean doDelete) {
+        return null;
+        // TO DO: throw exception when exception is thrown
+        //return DEIKSTRA.deikstra(elemFrom, elemTo, doDelete);
     }
 
     /**
@@ -154,7 +157,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * in local graph. For each vertex method initiates deikstra and get
          * distances to other verteces.
          */
-        private void updateLinksMatrix() {
+        private void updateLinksMatrix() throws HardFunctionalException {
             mapOfLinks = new HashMap<>();
             List<String> externalVertList = STRUCTURE.getExternalVertexList();
             // TO DO: fix problem with double running vert1->vert2 and vert2->vert1
@@ -186,12 +189,16 @@ public class ConnectionGraph implements IConnectable, ICopyable {
      * Class to implement deikstra method and all it's internal logic
      */
     private class Deikstra {
+        
         /**
          * Method to get distance to vertex after deikstra method.
          * @param vertexTo
          * @return 
          */
-        private int getDistanceTo(String vertexTo) {
+        private int getDistanceTo(String vertexTo) throws HardFunctionalException {
+            if(vertexTo == null) {
+                throw new HardFunctionalException("Null in Deikstra's getDistance method");
+            }
             Vertex vert = STRUCTURE.getVertMap().get(vertexTo);
             if (vert.getPathCount() == vert.getMaxPathCount()) {
                 throw new AssertionError("Algorithm failed");
@@ -206,7 +213,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          *
          * @param vertexFrom
          */
-        private List<String> deikstra(String vertexFrom, String vertexTo, boolean doDelete) {
+        private List<String> deikstra(String vertexFrom, String vertexTo, boolean doDelete) throws HardFunctionalException {
             deikstra(vertexFrom);
             List<String> configList = deikstraBackway(STRUCTURE.getVertMap().get(vertexFrom),
                     STRUCTURE.getVertMap().get(vertexTo), doDelete);
@@ -220,7 +227,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          *
          * @param vertexFrom
          */
-        private void deikstra(String vertexFrom) {
+        private void deikstra(String vertexFrom) throws HardFunctionalException {
             BinaryHeap heap = HEAP_FAB.createBinaryHeap();
             //init
             Vertex currentVertex = STRUCTURE.getVertMap().get(vertexFrom);
@@ -256,7 +263,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @param vertexFrom
          * @param VertexTo
          */
-        private List<String> deikstraBackway(Vertex vertexFrom, Vertex VertexTo, boolean doDelete) {
+        private List<String> deikstraBackway(Vertex vertexFrom, Vertex VertexTo, boolean doDelete) throws HardFunctionalException {
             Map<ImmutableUnorderedPairOfStrings, String> edgeMap = STRUCTURE.getEdgeMap();
             Vertex currentVertex = VertexTo;
 
@@ -319,7 +326,10 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @param main
          * @return
          */
-        private List<Vertex> getCloseVerteces(Vertex main) {
+        private List<Vertex> getCloseVerteces(Vertex main) throws HardFunctionalException {
+            if(main == null) {
+                throw new HardFunctionalException("Null vertex input");
+            }
             List<String> vertexStringList = STRUCTURE.getAdjacencyMap().get(main.getContext());
             Map<String, Vertex> vertMap = STRUCTURE.getVertMap();
             List<Vertex> vertexAjacencyList = new ArrayList<>();
@@ -329,7 +339,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
             return vertexAjacencyList;
         }
 
-        private List<Vertex> getCloseVerteces(String mainName) {
+        private List<Vertex> getCloseVerteces(String mainName) throws HardFunctionalException {
             return getCloseVerteces(STRUCTURE.getVertMap().get(mainName));
         }
     }
@@ -348,9 +358,13 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * Method to create only CB graph, won't be needed after.
          * @param graphName
          * @return
+         * @throws com.sun.electric.tool.dcs.Exceptions.HardFunctionalException
          */
-        public static ConnectionGraph createConnectionGraph(String graphName) {
+        public static ConnectionGraph createConnectionGraph(String graphName) throws HardFunctionalException {
             File importFile = new File(LinksHolder.getPathTo("connection graph"));
+            if(importFile == null) {
+                throw new HardFunctionalException("Connection graph file is not found.");
+            }
             return createConnectionGraphFromFile(graphName, importFile);
         }
 

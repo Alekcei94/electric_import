@@ -27,7 +27,10 @@ public class Constants {
     
     private static final String SPLITTER = "_";
     private static final String CONNECTION_ELEMENT_NAME = "CB";
-	private static final String KEY_NAME = "key";
+    private static final String KEY_NAME = "key";
+    private static final String FPGA_SCHEME_NAME = "FPGA";
+    private static final String MAIN_CELL_NAME = "5400TP094";
+    private static final String MAIN_LIBRARY_NAME = "5400TP094";
 
     /**
      * @return the splitter
@@ -44,11 +47,32 @@ public class Constants {
     }
     
     private Constants() {
-        throw new AssertionError("Constructor is not reqired here.");
+        throw new AssertionError("Constructor is not required here.");
     }
 
     public static String getKey() {
         return KEY_NAME;
+    }
+
+    /**
+     * @return the FPGA_SCHEME_NAME
+     */
+    public static String getFpgaSchemeName() {
+        return FPGA_SCHEME_NAME;
+    }
+
+    /**
+     * @return the MAIN_CELL_NAME
+     */
+    public static String getMainCellName() {
+        return MAIN_CELL_NAME;
+    }
+
+    /**
+     * @return the MAIN_LIBRARY_NAME
+     */
+    public static String getMainLibraryName() {
+        return MAIN_LIBRARY_NAME;
     }
 
 }

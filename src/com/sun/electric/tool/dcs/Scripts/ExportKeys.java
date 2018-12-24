@@ -27,154 +27,127 @@ import com.sun.electric.database.topology.Connection;
 import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
-import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.Job;
+import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
+import com.sun.electric.tool.user.User;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author diivanov
  */
-public class ExportKeys implements Exportable {
+public class ExportKeys {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExportKeys.class);
+    private final ExecutorService executor = Executors.newCachedThreadPool();
 
     /**
      * This method creates config file at ../config/config.txt .
-     */
-    public static void formConfig() {
-        try (FileWriter writer = new FileWriter(LinksHolder.getPathTo("config"), false)) {
-            StringBuilder configAllScheme = new ExportKeys().getConfigExport();
-            writer.write(configAllScheme.toString());
-        } catch (IOException ex) {
-            Accessory.showMessage("Unable to write data to file.");
-            throw new AssertionError("Unable to write data to file.");
-            //TODO: обработать ошибку (Тоже, наверно, готово)
-        }
-    }
-
-    public StringBuilder getConfigExport() {
-        StringBuilder configAllScheme = new StringBuilder();
-        AnalogConfigExport SchemeConfigExport = new AnalogConfigExport();
-        FilterConfigExport FilterConfigExport = new FilterConfigExport();
-
-        //String simLibName = "5400TP094";
-        //String simCellName = "5400TP094";
-        //String FPGAnodeInstName = "FPGA";
-        //DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(simLibName, simCellName, FPGAnodeInstName);
-        String FPGAnodeInstName = "FPGA";
-        Cell mainCell = Job.getUserInterface().getCurrentCell();
-        DigitalConfigExport DigitalConfigExport = new DigitalConfigExport(mainCell, FPGAnodeInstName);
-        configAllScheme.append(DigitalConfigExport.getConfigExport().toString());
-        configAllScheme.append(SchemeConfigExport.getConfigExport().toString());
-        FilterDesignWindowUIFrame flagReadConfigFilters = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
-        System.out.println(" test = " + flagReadConfigFilters.getEnableStatus());
-        if (flagReadConfigFilters.getEnableStatus()) {
-            configAllScheme.append(FilterConfigExport.getConfigExport().toString());
-        }
-        return configAllScheme;
-    }
-
-    /**
-     * This method delete a "h" simbol in the param to write to the file. It was
-     * gAdr = 0eh; It became gAdr = 0e else return param
-     */
-    private static String deleteACharacterInTheParam(String param) {
-        if (param.charAt(param.length() - 1) == 'h') {
-            param = param.substring​(0, param.length() - 1);
-            // return param не нужен (Готово)
-        }
-        return param;
-    }
-
-    /*
-    *
-     */
-    public static void getContructionDigitalConfigExport(Cell mainCell, String FPGAnodeInstName) {
-        new DigitalConfigExport(mainCell, FPGAnodeInstName);
-    }
-
-    /**
-     * Method to show if the key is closed or not. THERE SHOULDN'T BE MORE THAN
-     * 1
      *
-     * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2. Method finds
-     * the M1 outside export, checks it for connection and get 2nd port by
-     * connection.
+     * @param mainCell
      */
-    private static boolean isClosedKey(NodeInst ni, NodeInst key) {
-        Iterator<PortInst> itrPorts = key.getPortInsts();
-        while (itrPorts.hasNext()) {
-            PortInst pi = itrPorts.next();
-            String port = CommonMethods.parsePortToPort(pi.toString());
-            if (port.equals("M1")) {
-                Iterator<Connection> ctnItr = pi.getConnections();
-                Connection ctn = Accessory.getOnlyIteratorObject(ctnItr);
-                ArcInst ai = ctn.getArc();
-
-                Connection ctnTail = ai.getConnection(0);
-                Connection ctnHead = ai.getConnection(1);
-                Connection ctnNext;
-                if (ctn.toString().equals(ctnTail.toString())) {
-                    ctnNext = ctnHead;
-                } else {
-                    ctnNext = ctnTail;
-                }
-
-                PortInst outPort = ctnNext.getPortInst();
-
-                Export outExport = Accessory.getOnlyIteratorObject(outPort.getExports());
-                PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
-
-                if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"
-                        + Accessory.getOnlyParamOfNodeInst(key) + "_1")) {
-                    throw new InvalidStructureError("Incorrect block map");
-                }
-
-                if (!outsidePort.hasConnections()) {
-                    return false;
-                }
-                Connection outsideCtn = Accessory.getOnlyIteratorObject(outsidePort.getConnections());
-
-                ArcInst outsideArc = outsideCtn.getArc();
-
-                ctnTail = outsideArc.getConnection(0);
-                ctnHead = outsideArc.getConnection(1);
-                if (outsideCtn.toString().equals(ctnTail.toString())) {
-                    ctnNext = ctnHead;
-                } else {
-                    ctnNext = ctnTail;
-                }
-                PortInst secondPort = ctnNext.getPortInst();
-                if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd"
-                        + Accessory.getOnlyParamOfNodeInst(key) + "_2")) {
-                    //System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
-                    return true;
-                }
-            }
+    private static void formConfig(Cell mainCell) {
+        StringBuilder config;
+        try {
+            config = new ExportKeys().getConfigExport(mainCell);
+        } catch (InterruptedException ex) {
+            logger.error("Process was interrupted", ex);
+            Accessory.showMessage("Interrupted by user");
+            return;
+        } catch (ExecutionException ex) {
+            logger.error("ExecutionException in exporting process", ex);
+            Accessory.showMessage("Export process failed.");
+            return;
         }
-        return false;
+        Accessory.cleanFile(LinksHolder.getPathTo("config"));
+        Accessory.write(LinksHolder.getPathTo("config"), config.toString());
+        Accessory.showMessage("Export keys process completed.");
     }
 
-    private static String getConfigForKey(NodeInst key, NodeInst ni) {
-        String parameterOfBlock = Accessory.getOnlyParamOfNodeInst(ni);
-        parameterOfBlock = deleteACharacterInTheParam(parameterOfBlock);
-        String parameterOfKey = Accessory.getOnlyParamOfNodeInst(key);
-        return parameterOfBlock + parameterOfKey;
+    public static void startFormingConfig(Cell mainCell) {
+        new ExportKeys.ExportAllKeys(mainCell);
+    }
+
+    /**
+     * Method to get and unite all config files.
+     *
+     * @param mainCell
+     * @return
+     * @throws java.lang.InterruptedException
+     * @throws java.util.concurrent.ExecutionException
+     */
+    public StringBuilder getConfigExport(Cell mainCell) throws InterruptedException, ExecutionException {
+        StringBuilder analogFuture = executeConfigExport(new AnalogConfigExport(), mainCell);
+        StringBuilder digitalFuture = executeConfigExport(new DigitalConfigExport(), mainCell);
+        StringBuilder filterFuture = new StringBuilder();
+
+        FilterDesignWindowUIFrame filterUI = FilterDesignWindowUIFrame.getFilterDesignWindowUIFrame();
+
+        if (filterUI.getEnableStatus()) {
+            filterFuture = executeConfigExport(new FilterConfigExport(), mainCell);
+        }
+        StringBuilder config = analogFuture;
+        config.append(digitalFuture);
+        if (filterFuture != null) {
+            config.append(filterFuture);
+        }
+
+        return config;
+    }
+
+    /**
+     * Method to run exportable in new thread.
+     *
+     * @param export
+     */
+    private StringBuilder executeConfigExport(Exportable export, Cell mainCell) {
+        return export.getConfigExport(mainCell);
+    }
+
+    /**
+     * Method to run exportable in new thread.
+     *
+     * @param export
+     */
+    private Future<StringBuilder> executeConfigExportMultiThread(Exportable export, Cell mainCell) {
+        Callable<StringBuilder> callable = () -> {
+            try {
+                return export.getConfigExport(mainCell);
+            } catch (Exception e) {
+                StringBuilder sb = new StringBuilder();
+                for (StackTraceElement element : e.getStackTrace()) {
+                    sb.append(element.toString());
+                    sb.append("\n");
+                }
+                logger.info(sb.toString());
+                throw new Exception("Fatal error");
+            }
+
+        };
+        Future<StringBuilder> future = executor.submit(callable);
+        return future;
     }
 
     /**
@@ -182,45 +155,62 @@ public class ExportKeys implements Exportable {
      */
     private static class AnalogConfigExport implements Exportable {
 
-        /*
-         * This method forms the Analog configuration 
+        private StringBuilder analogConfigExport;
+
+        /**
+         * Method to get analog config export.
+         *
+         * @return
          */
-        public StringBuilder getConfigExport() {
+        @Override
+        public StringBuilder getConfigExport(Cell mainCell) {
+            prepareConfigExport(mainCell);
+            return analogConfigExport;
+        }
+
+        @Override
+        public StringBuilder getExistingConfigExport() {
+            if (analogConfigExport == null) {
+                String s = "Analog config was not created.";
+                logger.error(s);
+                //Accessory.showMessage(s);
+                throw new IllegalStateException(s);
+            }
+            return analogConfigExport;
+        }
+
+        private void prepareConfigExport(Cell mainCell) {
+            analogConfigExport = getAnalogConfig(mainCell);
+        }
+
+        /**
+         * This method forms the Analog configuration
+         */
+        public StringBuilder getAnalogConfig(Cell mainCell) {
             StringBuilder configAnalogSchem;
             String configSchemeExportFile;
-            Cell curcell = Job.getUserInterface().getCurrentCell();
             // TODO: нужно сделать для произвольной схемы, из определенных схем, (ВАЖНО, найти решение)(Хммм)
             configSchemeExportFile = "-- Scheme configuration --" + "\n";//Made to validate the formation netList.
-            Iterator<NodeInst> niItr = curcell.getNodes();
-            String[] arrayStringNameBlock = getArrayNameBlocks();
-            // REV: listNameBlock - не лист, а массив. Название может ввести в заблуждение. (Готово)
-            // TODO: желательно попробовать убрать привязку к конкретным блокам. (Готово)
+            Iterator<NodeInst> niItr = mainCell.getNodes();
+            List<String> stringNameBlocksList = getNamesOfBlocks();
             while (niItr.hasNext()) {
                 NodeInst ni = niItr.next();
                 boolean flag = false;
-                for (String nameBlock : arrayStringNameBlock) {
-                    // REV: list - не элемент. (Готово)
-                    //System.out.print(ni.getName());
-                    //System.out.print(" : ");
-                    //System.out.print(nameBlock + '\n' + '\n');
-                    if (ni.getName().contains(nameBlock)) {
+                for (String blockName : stringNameBlocksList) {
+                    if (ni.getName().contains(blockName)) {
                         // TODO: в идеале использовать equals
                         flag = true;
                         break;
                     }
-
                 }
-                // TODO: следует убрать лишние проходы в цикле (Готово)
                 if (flag) {
                     Cell equiv = ni.getProtoEquivalent();
                     Iterator<NodeInst> keyItr = equiv.getNodes();
                     while (keyItr.hasNext()) {
                         NodeInst key = keyItr.next();
                         if (key.getProto().getName().equals(Constants.getKey())) {
-                            // TODO: нужно будет заменить хардкод key на считывание из класса констант. (Готово)
                             if (isClosedKey(ni, key)) {
                                 configSchemeExportFile += getRealKeyInFile(ni, key);
-                                // REV: лучше использовать += (Готово)
                             }
                         }
                     }
@@ -230,32 +220,22 @@ public class ExportKeys implements Exportable {
             return configAnalogSchem;
         }
 
-        /*
-         * Forms an array of names of used blocks. Path: electric/accessory/allUsedBlocks.acc
+        /**
+         * Forms names list of used blocks. Path:
+         * electric/accessory/allUsedBlocks.acc
          */
-        private String[] getArrayNameBlocks() {
-            //try (FileReader reader = new FileReader(LinksHolder.getPathFileAllUsedBlocksInScheme())) {
-            ArrayList<String> arraylistReadInFileNameBLocks = new ArrayList<>();
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(LinksHolder.getPathFileAllUsedBlocksInScheme()));
+        private List<String> getNamesOfBlocks() {
+            List<String> listReadInFileNameBLocks = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new FileReader(LinksHolder.getPathFileAllUsedBlocksInScheme()))) {
                 String line;
                 while ((line = br.readLine()) != null) {
-                    arraylistReadInFileNameBLocks.add(line);
+                    listReadInFileNameBLocks.add(line);
                 }
             } catch (IOException ex) {
-                //Сделать обработку ошибки(Готово)
                 Accessory.showMessage("At this address " + LinksHolder.getPathFileAllUsedBlocksInScheme() + " missing file.");
                 throw new AssertionError("At this address " + LinksHolder.getPathFileAllUsedBlocksInScheme() + " missing file.");
-
             }
-            String[] arrayNameBlocks = new String[arraylistReadInFileNameBLocks.size()];
-            int i = 0;
-            System.out.println(arraylistReadInFileNameBLocks.size());
-            for (String nameBlock : arraylistReadInFileNameBLocks) {
-                arrayNameBlocks[i] = nameBlock;
-                i++;
-            }
-            return arrayNameBlocks;
+            return listReadInFileNameBLocks;
         }
 
         /**
@@ -271,10 +251,10 @@ public class ExportKeys implements Exportable {
                     return address;
                 } else if (param.toString().contains("uniq")) {
                     String address = MemoryMap.getInstance().getTrueAddress(param.getObject().toString(),
-                            Accessory.getOnlyParamOfNodeInst(key));
+                            CommonMethods.getOnlyParamOfNodeInst(key));
                     if (address == null) {
                         throw new InvalidStructureError("Local address is not correct: "
-                                + param + "/" + Accessory.getOnlyParamOfNodeInst(key));
+                                + param + "/" + CommonMethods.getOnlyParamOfNodeInst(key));
                     }
                     address += "\n";
                     return address;
@@ -284,6 +264,86 @@ public class ExportKeys implements Exportable {
             }
             throw new InvalidStructureError("No parameters found");
         }
+
+        /**
+         * This method delete a "h" simbol in the param to write to the file. It
+         * was gAdr = 0eh; It became gAdr = 0e else return param
+         */
+        private static String deleteACharacterInTheParam(String param) {
+            if (param.charAt(param.length() - 1) == 'h') {
+                param = param.substring​(0, param.length() - 1);
+            }
+            return param;
+        }
+
+        /**
+         * Method to show if the key is closed or not. THERE SHOULDN'T BE MORE
+         * THAN 1
+         *
+         * @Param key SHOULD BE ONLY KEY, ONLY WITH PORTS X,Y,M1,M2. Method
+         * finds the M1 outside export, checks it for connection and get 2nd
+         * port by connection.
+         */
+        private static boolean isClosedKey(NodeInst ni, NodeInst key) {
+            Iterator<PortInst> itrPorts = key.getPortInsts();
+            while (itrPorts.hasNext()) {
+                PortInst pi = itrPorts.next();
+                String port = CommonMethods.parsePortToPort(pi.toString());
+                if (port.equals("M1")) {
+                    Iterator<Connection> ctnItr = pi.getConnections();
+                    Connection ctn = CommonMethods.getOnlyIteratorObject(ctnItr);
+                    ArcInst ai = ctn.getArc();
+
+                    Connection ctnTail = ai.getConnection(0);
+                    Connection ctnHead = ai.getConnection(1);
+                    Connection ctnNext;
+                    if (ctn.toString().equals(ctnTail.toString())) {
+                        ctnNext = ctnHead;
+                    } else {
+                        ctnNext = ctnTail;
+                    }
+
+                    PortInst outPort = ctnNext.getPortInst();
+
+                    Export outExport = CommonMethods.getOnlyIteratorObject(outPort.getExports());
+                    PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
+
+                    if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"
+                            + CommonMethods.getOnlyParamOfNodeInst(key) + "_1")) {
+                        throw new InvalidStructureError("Incorrect block map");
+                    }
+
+                    if (!outsidePort.hasConnections()) {
+                        return false;
+                    }
+                    Connection outsideCtn = CommonMethods.getOnlyIteratorObject(outsidePort.getConnections());
+
+                    ArcInst outsideArc = outsideCtn.getArc();
+
+                    ctnTail = outsideArc.getConnection(0);
+                    ctnHead = outsideArc.getConnection(1);
+                    if (outsideCtn.toString().equals(ctnTail.toString())) {
+                        ctnNext = ctnHead;
+                    } else {
+                        ctnNext = ctnTail;
+                    }
+                    PortInst secondPort = ctnNext.getPortInst();
+                    if (CommonMethods.parsePortToPort(secondPort.toString()).equals("mAd"
+                            + CommonMethods.getOnlyParamOfNodeInst(key) + "_2")) {
+                        //System.out.println("mAd" + getOnlyParamOfNodeInst(key) + " is connected");
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static String getConfigForKey(NodeInst key, NodeInst ni) {
+            String parameterOfBlock = CommonMethods.getOnlyParamOfNodeInst(ni);
+            parameterOfBlock = deleteACharacterInTheParam(parameterOfBlock);
+            String parameterOfKey = CommonMethods.getOnlyParamOfNodeInst(key);
+            return parameterOfBlock + parameterOfKey;
+        }
     }
 
     /**
@@ -291,20 +351,58 @@ public class ExportKeys implements Exportable {
      */
     private static class FilterConfigExport implements Exportable {
 
-        /*public String formConfigFiltersExportFile() {
+        private StringBuilder filterConfigExport;
+
+        /**
+         * Method to get filter config export.
+         *
+         * @return
+         */
+        @Override
+        public StringBuilder getConfigExport(Cell mainCell) {
+            prepareConfigExport(mainCell);
+            return filterConfigExport;
+        }
+
+        /**
+         * Method to get configuration as StringBuilder.
+         *
+         * @param mainCell
+         * @return
+         */
+        @Override
+        public StringBuilder getExistingConfigExport() {
+            if (filterConfigExport == null) {
+                String s = "Filter config was not created.";
+                logger.error(s);
+                throw new IllegalStateException(s);
+            }
+            return filterConfigExport;
+        }
+
+        /**
+         * Method to get all configuration of this state.
+         *
+         * @param mainCell
+         */
+        private void prepareConfigExport(Cell mainCell) {
+            //TODO: invoke filter UI and process
+            filterConfigExport = getDigitalConfig();
+        }
+
+        /**
+         * Method to get configuration as StringBuilder.
+         *
+         * @param mainCell
+         * @return
+         */
+        private StringBuilder getDigitalConfig() {
             String urlFile = LinksHolder.getFilterConfig();
-            // TODO: убрать хардкод (LinksHolder) (Готово)
-            String configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
+            //We should validate the formation netList.
+            String configFiltersExportFile = "-- filter configuration --" + "\n";
+            // TODO: StringBuilder
             configFiltersExportFile += getConfigurationFilters(urlFile);
-            return configFiltersExportFile;
-        }*/
-        public StringBuilder getConfigExport() {
-            String urlFile = LinksHolder.getFilterConfig();
-            StringBuilder configFilters;
-            // TODO: убрать хардкод (LinksHolder)(Готово)
-            String configFiltersExportFile = "-- filter configuration --" + "\n";//Made to validate the formation netList.
-            configFiltersExportFile = configFiltersExportFile + getConfigurationFilters(urlFile);
-            configFilters = new StringBuilder(configFiltersExportFile);
+            StringBuilder configFilters = new StringBuilder(configFiltersExportFile);
             return configFilters;
         }
 
@@ -318,10 +416,10 @@ public class ExportKeys implements Exportable {
                 String line;
                 //informKeyInFileOfFilters;
                 while ((line = br.readLine()) != null) {
-                    informKeyInFileOfFilters = informKeyInFileOfFilters + line + "\n";
+                    informKeyInFileOfFilters += line + "\n";
                 }
             } catch (IOException ex) {
-                Accessory.showMessage("At this address " + urlFile + " missing file.");
+                //TODO: exception handle?
             }
             return informKeyInFileOfFilters;
         }
@@ -332,27 +430,48 @@ public class ExportKeys implements Exportable {
      */
     private static class DigitalConfigExport implements Exportable {
 
+        private StringBuilder digitalConfigExport;
+
         /**
-         * Main constructor, by creating object you're doing digital export job.
+         * Main constructor, Object keeps config information of state.
          *
          * @param mainCell
          * @param FPGAnodeInstName
          */
-        public DigitalConfigExport(Cell mainCell, String FPGAnodeInstName) {
-            doExport(mainCell, FPGAnodeInstName);
+        private DigitalConfigExport() {
         }
 
         /**
-         * Something like telescoping constructor, using strings to get cell.
+         * Method to get analog config export.
          *
-         * @param simLibName
-         * @param simCellName
-         * @param FPGAnodeInstName
+         * @return
          */
-        public DigitalConfigExport(String simLibName,
-                String simCellName, String FPGAnodeInstName) {
-            doExport(CommonMethods.getCellFromLibAndCellName(simLibName, simCellName),
-                    FPGAnodeInstName);
+        @Override
+        public StringBuilder getConfigExport(Cell mainCell) {
+            prepareConfigExport(mainCell);
+            return digitalConfigExport;
+        }
+
+        /**
+         * This method reads file at a given address and displays all
+         * information without processing.
+         */
+        @Override
+        public StringBuilder getExistingConfigExport() {
+            if (digitalConfigExport == null) {
+                String s = "Digital config was not created.";
+                logger.error(s);
+                throw new IllegalStateException(s);
+            }
+            return digitalConfigExport;
+        }
+
+        /**
+         * Method to get all configuration of this state.
+         */
+        private void prepareConfigExport(Cell mainCell) {
+            String FPGAnodeInstName = Constants.getFpgaSchemeName();
+            doExport(mainCell, FPGAnodeInstName);
         }
 
         /**
@@ -365,41 +484,38 @@ public class ExportKeys implements Exportable {
          * @param FPGAnodeInstName
          */
         private void doExport(Cell mainCell, String FPGAnodeInstName) {
-            if(mainCell == null) {
-                Accessory.showMessage("Main cell was not found");
+            if (mainCell == null) {
+                logger.info("Main cell was not found");
                 return;
             }
             if (!FpgaArgumentsUI.checkForTopArgument()) {
-                Accessory.showMessage("Top argument wasn't set");
+                logger.info("Top argument wasn't set");
                 return;
             }
             NodeInst FPGAcell = getFPGACell(mainCell, FPGAnodeInstName);
             String pathToVerilog = LinksHolder.getProjectSimulationPath();
             writeVerilogToFile(FPGAcell, pathToVerilog);
             formDigitalConfig(pathToVerilog);
+
+            digitalConfigExport = getDigitalConfigFromFile();
         }
 
         /**
-         * This method reads file at a given address and displays all
-         * information without processing.
+         * Method to save current state of digital config.
          */
-        @Override
-        public StringBuilder getConfigExport() {
+        public StringBuilder getDigitalConfigFromFile() {
             StringBuilder configFPGA;
             String address = LinksHolder.getPathInFileConfigFPGABlock();
             try (BufferedReader br = new BufferedReader(new FileReader(address))) {
-                String informKeyInFileOfFPGA;
-                //TODO: hardcode/address (LinksHolder)(Готово)
+                String informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
                 String line;
-                informKeyInFileOfFPGA = "-- FPGA configuration --" + '\n';
                 while ((line = br.readLine()) != null) {
                     informKeyInFileOfFPGA += line + '\n';
                 }
                 configFPGA = new StringBuilder(informKeyInFileOfFPGA);
             } catch (IOException ex) {
-                Accessory.showMessage("Missing file in address" + LinksHolder.getPathInFileConfigFPGABlock());
+                logger.info("Digital verilog config is not found", ex);
                 throw new AssertionError("Missing file in address" + LinksHolder.getPathInFileConfigFPGABlock());
-                //TODO: обработка ошибки (Вроде готово)
             }
             return configFPGA;
         }
@@ -437,11 +553,12 @@ public class ExportKeys implements Exportable {
             Cell verEquiv = verilogCell.getVerilogEquivalent();
             if ((verEquiv == null) || (verEquiv.getView() != View.VERILOG)) {
                 throw new IllegalStateException("Corrupted path to simulation folder."
-                        + " You should use main scheme with FPGA Cell. Otherwuse reinstall may help.");
+                        + " You should use main scheme with FPGA Cell. Otherwise reinstall may help.");
             }
             String[] content = verEquiv.getTextViewContents();
             String verilogFilePath = pathToVerilog + File.separator + "Verilog.v";
             Accessory.cleanFile(verilogFilePath);
+            //TODO: write big string once because it's faster.
             for (String str : content) {
                 Accessory.write(verilogFilePath, str);
             }
@@ -458,28 +575,25 @@ public class ExportKeys implements Exportable {
             String xcadPath = LinksHolder.getXCADPath();
             String shPath = xcadPath + File.separator + "xa_sh.exe";
             String shxaPath = xcadPath + File.separator + "xa";
+            //form command for XCAD
             String command = shPath + " " + shxaPath + " -i";
             command = addArgument(command, verilogFilePath + " -y++");
             List<String> argumentsList = FpgaArgumentsUI.getArgumentList();
             for (String argument : argumentsList) {
                 command = addArgument(command, argument);
             }
-            command = addTopArgument(command);
-            System.out.println(command);
+            command = addArgument(command, FpgaArgumentsUI.getTopArgument());
+
+            logger.debug(command);
 
             ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
             File dir = new File(pathToVerilog);
             dialog.startProcess(command, null, dir);
-        }
-
-        /**
-         * Supportive method to add top argument to main command.
-         *
-         * @param arguments
-         * @return
-         */
-        private String addTopArgument(String arguments) {
-            return addArgument(arguments, FpgaArgumentsUI.getTopArgument());
+            try {
+                dialog.waitForProcessToFinish();
+            } catch (InterruptedException ex) {
+                throw new IllegalStateException("Process was interrupted.");
+            }
         }
 
         /**
@@ -493,6 +607,22 @@ public class ExportKeys implements Exportable {
             return command + " " + argument;
         }
 
+    }
+
+    private static class ExportAllKeys extends Job {
+
+        private final Cell mainCell;
+
+        public ExportAllKeys(Cell mainCell) {
+            super("ExportAllKeys", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
+            this.mainCell = mainCell;
+            startJob();
+        }
+
+        public boolean doIt() {
+            ExportKeys.formConfig(mainCell);
+            return true;
+        }
     }
 
 }

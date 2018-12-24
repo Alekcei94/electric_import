@@ -19,11 +19,8 @@
  */
 package com.sun.electric.tool.dcs.Design;
 
-import com.sun.electric.tool.Job;
-import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
-import com.sun.electric.tool.user.User;
 import com.sun.electric.tool.user.dialogs.EModelessDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
 import java.awt.CardLayout;
@@ -54,13 +51,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
- *
- * @author diivanov
+ * Graphical class to implement filter user interface.
  */
 public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     private static FilterDesignWindowUIFrame theDialog;
-    private final String[] nameListFilters = new String[3];
+    
+    private final String[] filterNamesList = new String[3];
     private final List<BuildFilters> objectConfigFiltersAutosave = new ArrayList<>();
 
     /**
@@ -73,13 +70,16 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     }
 
     public static FilterDesignWindowUIFrame getFilterDesignWindowUIFrame() {
+        //TODO: обработка существования блока
         return theDialog;
     }
 
     /**
      * This method return status enable.
+     * @return 
      */
     public boolean getEnableStatus() {
+        //REV: enable что?
         return enable.isSelected();
     }
 
@@ -1106,7 +1106,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             setListHistoruName(nameFilters);
             SerializableImageWithTextObject objectFilters = new SerializableImageWithTextObject("filterDesignResult.png", exportConfigFilters, config);
             objectConfigFiltersAutosave.add(0, new BuildFilters(nameFilters, objectFilters));
-            historyList.setListData(nameListFilters);
+            historyList.setListData(filterNamesList);
         }
         if (objectConfigFiltersAutosave.size() > 3) {
             objectConfigFiltersAutosave.remove(3);
@@ -1146,31 +1146,10 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     /**
      * Invoke frame.
+     * @throws java.lang.InterruptedException
+     * @throws java.lang.reflect.InvocationTargetException
      */
     public static void invokeFilterUI() throws InterruptedException, InvocationTargetException {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FilterDesignWindowUIFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
         if (theDialog == null) {
             JFrame jf = null;
             if (TopLevel.isMDIMode()) {
@@ -1180,39 +1159,15 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         }
 
         theDialog.setVisible(true);
-        //}
-        //});
     }
 
     /*
      * This method form hisory list.
      */
     public void setListHistoruName(String name) {
-        nameListFilters[2] = nameListFilters[1];
-        nameListFilters[1] = nameListFilters[0];
-        nameListFilters[0] = name;
-    }
-
-    /**
-     * Class for "InitiateForm", class initiates the form with filters.
-     */
-    public static class InitiateForm extends Job {
-
-        public InitiateForm() {
-            super("Initiate Form", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
-            startJob();
-        }
-
-        @Override
-        public boolean doIt() throws JobException {
-            try {
-                invokeFilterUI();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return true;
-        }
+        filterNamesList[2] = filterNamesList[1];
+        filterNamesList[1] = filterNamesList[0];
+        filterNamesList[0] = name;
     }
 
 
@@ -1275,7 +1230,10 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      * This class forms an object which contains all the information about the current configuration.
      */
     public class BuildFilters {
+        // REV: класс хранит не процесс построения фильтров, а сам объект (название не соответствует)
+        // TODO: должна ли область видимости быть такой?
 
+        //REV: переменные, которые могут быть final, должны быть final
         private String name;
         private SerializableImageWithTextObject objectInfo;
 

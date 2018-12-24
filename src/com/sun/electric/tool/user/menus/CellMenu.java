@@ -90,783 +90,956 @@ import javax.swing.SwingConstants;
  */
 public class CellMenu {
 
-	static EMenu makeMenu() {
-		/****************************** THE CELL MENU ******************************/
+    static EMenu makeMenu() {
+        /**
+         * **************************** THE CELL MENU *****************************
+         */
 
-		// mnemonic keys available:	      J      Q        Z
-		return new EMenu("_Cell",
+        // mnemonic keys available:	      J      Q        Z
+        return new EMenu("_Cell",
+                new EMenuItem("Ne_w Cell...", 'N') {
+            public void run() {
+                newCellCommand();
+            }
+        },
+                new EMenuItem("_Edit Cell...") {
+            public void run() {
+                cellBrowserCommand(CellBrowser.DoAction.editCell);
+            }
+        },
+                new EMenuItem("_Place Cell Instance...", KeyStroke.getKeyStroke('N', 0)) {
+            public void run() {
+                cellBrowserCommand(CellBrowser.DoAction.newInstance);
+            }
+        },
+                new EMenuItem("_Rename Cell...") {
+            public void run() {
+                cellBrowserCommand(CellBrowser.DoAction.renameCell);
+            }
+        },
+                new EMenuItem("Duplic_ate Cell...") {
+            public void run() {
+                cellBrowserCommand(CellBrowser.DoAction.duplicateCell);
+            }
+        },
+                new EMenuItem("De_lete Cell...") {
+            public void run() {
+                cellBrowserCommand(CellBrowser.DoAction.deleteCell);
+            }
+        },
+                // mnemonic keys available: AB   FGHIJKL NOPQRSTU WXYZ
+                new EMenu("_Multi-Page Cells",
+                        new EMenuItem("_Make Cell Multi-Page") {
+                    public void run() {
+                        makeMultiPageCell();
+                    }
+                },
+                        new EMenuItem("_Create New Page") {
+                    public void run() {
+                        createNewMultiPage();
+                    }
+                },
+                        new EMenuItem("_Delete This Page") {
+                    public void run() {
+                        deleteThisMultiPage();
+                    }
+                },
+                        new EMenuItem("_Edit Next Page") {
+                    public void run() {
+                        editNextMultiPage();
+                    }
+                },
+                        new EMenuItem("Con_vert old-style Multi-Page Schematics") {
+                    public void run() {
+                        ViewChanges.convertMultiPageViews();
+                    }
+                }),
+                SEPARATOR,
+                new EMenuItem("_Cross-Library Copy...") {
+            public void run() {
+                crossLibraryCopyCommand();
+            }
+        },
+                // mnemonic keys available:  BCDEFGHIJKLMNOPQ STUVWXYZ
+                new EMenu("Merge Li_braries",
+                        new EMenuItem("_Add Exports from Library...") {
+                    public void run() {
+                        ExportChanges.synchronizeLibrary();
+                    }
+                },
+                        new EMenuItem("_Replace Cells from Library...") {
+                    public void run() {
+                        ExportChanges.replaceFromOtherLibrary();
+                    }
+                }),
+                SEPARATOR,
+                // mnemonic keys available: ABC E GHIJ LMNO QRSTUV XYZ
+                new EMenu("_Down Hierarchy",
+                        new EMenuItem("_Down Hierarchy", 'D') {
+                    public void run() {
+                        downHierCommand(false, false);
+                    }
+                },
+                        new EMenuItem("Down Hierarchy, Keep _Focus") {
+                    public void run() {
+                        downHierCommand(true, false);
+                    }
+                },
+                        new EMenuItem("Down Hierarchy, New _Window") {
+                    public void run() {
+                        downHierCommand(false, true);
+                    }
+                },
+                        new EMenuItem("Down Hierarchy, _Keep Focus, New Window") {
+                    public void run() {
+                        downHierCommand(true, true);
+                    }
+                },
+                        SEPARATOR,
+                        new EMenuItem("Down Hierarchy In _Place", KeyStroke.getKeyStroke('D', 0)) {
+                    public void run() {
+                        downHierInPlaceCommand();
+                    }
+                },
+                        new EMenuItem("Down Hierarchy In Place To Object", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_MASK)) {
+                    public void run() {
+                        downHierInPlaceToObject();
+                    }
+                }),
+                new EMenu("_Up Hierarchy",
+                        new EMenuItem("_Up Hierarchy", 'U') {
+                    public void run() {
+                        upHierCommand(false);
+                    }
+                },
+                        new EMenuItem("Up Hierarchy, Keep _Focus") {
+                    public void run() {
+                        upHierCommand(true);
+                    }
+                }),
+                // mnemonic keys available: A CDE GHIJKLMNOPQRSTUVWXYZ
+                new EMenu("Cell Viewing Histor_y",
+                        new EMenuItem("Go _Back a Cell") {
+                    public void run() {
+                        changeCellHistory(true);
+                    }
+                },
+                        new EMenuItem("Go _Forward a Cell") {
+                    public void run() {
+                        changeCellHistory(false);
+                    }
+                }),
+                SEPARATOR,
+                new EMenuItem("New _Version of Current Cell") {
+            public void run() {
+                newCellVersionCommand();
+            }
+        },
+                new EMenuItem("Delete Unused _Old Versions") {
+            public void run() {
+                deleteOldCellVersionsCommand();
+            }
+        },
+                new EMenuItem("Duplicate Curre_nt Cell...") {
+            public void run() {
+                duplicateCellCommand();
+            }
+        },
+                new EMenuItem("Replace Instance wit_h Duplicate Cell...") {
+            public void run() {
+                replaceInstanceWithDuplicateCellCommand();
+            }
+        },
+                SEPARATOR,
+                // mnemonic keys available:  BC      JK M OPQR   WXYZ
+                new EMenu("Cell In_fo",
+                        new EMenuItem("_Describe this Cell") {
+                    public void run() {
+                        CellLists.describeThisCellCommand();
+                    }
+                },
+                        new EMenuItem("_General Cell Lists...") {
+                    public void run() {
+                        CellLists.generalCellListsCommand();
+                    }
+                },
+                        SEPARATOR,
+                        new EMenuItem("_Summarize Cell Contents") {
+                    public void run() {
+                        CellLists.designSummaryCommand(false);
+                    }
+                },
+                        new EMenuItem("_Summarize Selected Cell Contents") {
+                    public void run() {
+                        CellLists.designSummaryCommand(true);
+                    }
+                },
+                        new EMenuItem("List _Nodes/Arcs in this Cell") {
+                    public void run() {
+                        CellLists.listNodesAndArcsInCellCommand();
+                    }
+                },
+                        new EMenuItem("List Cell _Instances") {
+                    public void run() {
+                        CellLists.listCellInstancesCommand();
+                    }
+                },
+                        new EMenuItem("List Cell _Usage") {
+                    public void run() {
+                        CellLists.listCellUsageCommand(false);
+                    }
+                },
+                        new EMenuItem("List Cell Usage, _Hierarchically") {
+                    public void run() {
+                        CellLists.listCellUsageCommand(true);
+                    }
+                },
+                        new EMenuItem("Number of _Transistors") {
+                    public void run() {
+                        CellLists.numberOfTransistorsCommand();
+                    }
+                },
+                        SEPARATOR,
+                        new EMenuItem("Cell Graph, _Entire Library") {
+                    public void run() {
+                        CircuitChanges.graphCellsInLibrary();
+                    }
+                },
+                        new EMenuItem("Cell Graph, _From Current Cell") {
+                    public void run() {
+                        CircuitChanges.graphCellsFromCell();
+                    }
+                },
+                        new EMenuItem("_Library Graph") {
+                    public void run() {
+                        CircuitChanges.graphLibraries();
+                    }
+                }),
+                new EMenuItem("Cell Propertie_s...") {
+            public void run() {
+                cellControlCommand();
+            }
+        },
+                SEPARATOR,
+                // mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
+                new EMenu("E_xpand Cell Instances",
+                        ToolBar.expandOneLevelCommand, // O
+                        new EMenuItem("_All the Way") {
+                    public void run() {
+                        CircuitChanges.DoExpandCommands(false, Integer.MAX_VALUE);
+                    }
+                },
+                        new EMenuItem("_Specified Amount...") {
+                    public void run() {
+                        CircuitChanges.DoExpandCommands(false, -1);
+                    }
+                }),
+                // mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
+                new EMenu("Unexpand Cell Ins_tances",
+                        ToolBar.unexpandOneLevelCommand, // O
+                        new EMenuItem("_All the Way") {
+                    public void run() {
+                        CircuitChanges.DoExpandCommands(true, Integer.MAX_VALUE);
+                    }
+                },
+                        new EMenuItem("_Specified Amount...") {
+                    public void run() {
+                        CircuitChanges.DoExpandCommands(true, -1);
+                    }
+                }),
+                new EMenuItem("Loo_k Inside Highlighted", 'P') {
+            public void run() {
+                peekCommand();
+            }
+        },
+                SEPARATOR,
+                new EMenuItem("Packa_ge Into Cell...") {
+            public void run() {
+                CircuitChanges.packageIntoCell();
+            }
+        },
+                // mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
+                new EMenu("Extract Cell _Instance",
+                        new EMenuItem("_One Level Down") {
+                    public void run() {
+                        CircuitChanges.extractCells(1);
+                    }
+                },
+                        new EMenuItem("_All the Way") {
+                    public void run() {
+                        CircuitChanges.extractCells(Integer.MAX_VALUE);
+                    }
+                },
+                        new EMenuItem("_Specified Amount...") {
+                    public void run() {
+                        CircuitChanges.extractCells(-1);
+                    }
+                }));
+    }
 
-			new EMenuItem("Ne_w Cell...", 'N') { public void run() {
-				newCellCommand(); }},
-			new EMenuItem("_Edit Cell...") { public void run() {
-				cellBrowserCommand(CellBrowser.DoAction.editCell); }},
-			new EMenuItem("_Place Cell Instance...", KeyStroke.getKeyStroke('N', 0)) { public void run() {
-				cellBrowserCommand(CellBrowser.DoAction.newInstance); }},
-			new EMenuItem("_Rename Cell...") { public void run() {
-				cellBrowserCommand(CellBrowser.DoAction.renameCell); }},
-			new EMenuItem("Duplic_ate Cell...") { public void run() {
-				cellBrowserCommand(CellBrowser.DoAction.duplicateCell); }},
-			new EMenuItem("De_lete Cell...") { public void run() {
-				cellBrowserCommand(CellBrowser.DoAction.deleteCell); }},
+    /**
+     * This method implements the command to do cell options.
+     */
+    private static void cellControlCommand() {
+        CellProperties dialog = new CellProperties(TopLevel.getCurrentJFrame());
+        dialog.setVisible(true);
+    }
 
-			// mnemonic keys available: AB   FGHIJKL NOPQRSTU WXYZ
-			new EMenu("_Multi-Page Cells",
-				new EMenuItem("_Make Cell Multi-Page") { public void run() {
-					makeMultiPageCell(); }},
-				new EMenuItem("_Create New Page") { public void run() {
-					createNewMultiPage(); }},
-				new EMenuItem("_Delete This Page") { public void run() {
-					deleteThisMultiPage(); }},
-				new EMenuItem("_Edit Next Page") { public void run() {
-					editNextMultiPage(); }},
-				new EMenuItem("Con_vert old-style Multi-Page Schematics") { public void run() {
-					ViewChanges.convertMultiPageViews(); }}),
+    /**
+     * This command opens a dialog box to edit a Cell.
+     */
+    private static void newCellCommand() {
+        NewCell dialog = new NewCell(TopLevel.getCurrentJFrame(), null, null);
+        dialog.setVisible(true);
+    }
 
-			SEPARATOR,
+    public static void cellBrowserCommand(CellBrowser.DoAction action) {
+        CellBrowser dialog = new CellBrowser(TopLevel.getCurrentJFrame(), false, action);
+        dialog.setVisible(true);
+    }
 
-			new EMenuItem("_Cross-Library Copy...") { public void run() {
-				crossLibraryCopyCommand(); }},
+    /**
+     * This method implements the command to make the current cell a multi-page
+     * schematic.
+     */
+    private static void makeMultiPageCell() {
+        Cell cell = WindowFrame.needCurCell();
+        if (cell == null) {
+            return;
+        }
+        if (!cell.isSchematic()) {
+            JOptionPane.showMessageDialog(TopLevel.getCurrentJFrame(), "Only Schematic cells can be made multi-page",
+                    "Cannot make multipage design", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-			// mnemonic keys available:  BCDEFGHIJKLMNOPQ STUVWXYZ
-			new EMenu("Merge Li_braries",
-				new EMenuItem("_Add Exports from Library...") { public void run() {
-					ExportChanges.synchronizeLibrary(); }},
-				new EMenuItem("_Replace Cells from Library...") { public void run() {
-					ExportChanges.replaceFromOtherLibrary(); }}),
+        new SetMultiPageJob(cell, 1);
+    }
 
-			SEPARATOR,
+    /**
+     * Class to set a cell to be multi-page with a given page count.
+     */
+    public static class SetMultiPageJob extends Job {
 
-			// mnemonic keys available: ABC E GHIJ LMNO QRSTUV XYZ
-			new EMenu("_Down Hierarchy",
-				new EMenuItem("_Down Hierarchy", 'D') { public void run() {
-					downHierCommand(false, false); }},
-				new EMenuItem("Down Hierarchy, Keep _Focus") { public void run() {
-					downHierCommand(true, false); }},
-				new EMenuItem("Down Hierarchy, New _Window") { public void run() {
-					downHierCommand(false, true); }},
-				new EMenuItem("Down Hierarchy, _Keep Focus, New Window") { public void run() {
-					downHierCommand(true, true); }},
-				SEPARATOR,
-				new EMenuItem("Down Hierarchy In _Place", KeyStroke.getKeyStroke('D', 0)) { public void run() {
-					downHierInPlaceCommand(); }},
-				new EMenuItem("Down Hierarchy In Place To Object", KeyStroke.getKeyStroke('D', KeyEvent.SHIFT_MASK)) { public void run() {
-					downHierInPlaceToObject(); }}),
+        private Cell cell;
+        private int numPages;
 
-			new EMenu("_Up Hierarchy",
-				new EMenuItem("_Up Hierarchy", 'U') { public void run() {
-					upHierCommand(false); }},
-				new EMenuItem("Up Hierarchy, Keep _Focus") { public void run() {
-					upHierCommand(true); }}),
-
-			// mnemonic keys available: A CDE GHIJKLMNOPQRSTUVWXYZ
-			new EMenu("Cell Viewing Histor_y",
-				new EMenuItem("Go _Back a Cell") { public void run() {
-					changeCellHistory(true); }},
-				new EMenuItem("Go _Forward a Cell") { public void run() {
-					changeCellHistory(false); }}),
-
-			SEPARATOR,
-
-			new EMenuItem("New _Version of Current Cell") { public void run() {
-				newCellVersionCommand(); }},
-			new EMenuItem("Delete Unused _Old Versions") { public void run() {
-				deleteOldCellVersionsCommand(); }},
-			new EMenuItem("Duplicate Curre_nt Cell...") { public void run() {
-				duplicateCellCommand(); }},
-			new EMenuItem("Replace Instance wit_h Duplicate Cell...") { public void run() {
-				replaceInstanceWithDuplicateCellCommand(); }},
-
-			SEPARATOR,
-
-			// mnemonic keys available:  BC      JK M OPQR   WXYZ
-			new EMenu("Cell In_fo",
-				new EMenuItem("_Describe this Cell") { public void run() {
-					CellLists.describeThisCellCommand(); }},
-				new EMenuItem("_General Cell Lists...") { public void run() {
-					CellLists.generalCellListsCommand(); }},
-				SEPARATOR,
-				new EMenuItem("_Summarize Cell Contents") { public void run() {
-					CellLists.designSummaryCommand(false); }},
-				new EMenuItem("_Summarize Selected Cell Contents") { public void run() {
-					CellLists.designSummaryCommand(true); }},
-				new EMenuItem("List _Nodes/Arcs in this Cell") { public void run() {
-					CellLists.listNodesAndArcsInCellCommand(); }},
-				new EMenuItem("List Cell _Instances") { public void run() {
-					CellLists.listCellInstancesCommand(); }},
-				new EMenuItem("List Cell _Usage") { public void run() {
-					CellLists.listCellUsageCommand(false); }},
-				new EMenuItem("List Cell Usage, _Hierarchically") { public void run() {
-					CellLists.listCellUsageCommand(true); }},
-				new EMenuItem("Number of _Transistors") { public void run() {
-					CellLists.numberOfTransistorsCommand(); }},
-				SEPARATOR,
-				new EMenuItem("Cell Graph, _Entire Library") { public void run() {
-					CircuitChanges.graphCellsInLibrary(); }},
-				new EMenuItem("Cell Graph, _From Current Cell") { public void run() {
-					CircuitChanges.graphCellsFromCell(); }},
-				new EMenuItem("_Library Graph") { public void run() {
-					CircuitChanges.graphLibraries(); }}),
-
-			new EMenuItem("Cell Propertie_s...") { public void run() {
-				cellControlCommand(); }},
-
-			SEPARATOR,
-
-			// mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
-			new EMenu("E_xpand Cell Instances",
-				ToolBar.expandOneLevelCommand, // O
-				new EMenuItem("_All the Way") { public void run() {
-					CircuitChanges.DoExpandCommands(false, Integer.MAX_VALUE); }},
-				new EMenuItem("_Specified Amount...") { public void run() {
-					CircuitChanges.DoExpandCommands(false, -1); }}),
-
-			// mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
-			new EMenu("Unexpand Cell Ins_tances",
-				ToolBar.unexpandOneLevelCommand, // O
-				new EMenuItem("_All the Way") { public void run() {
-					CircuitChanges.DoExpandCommands(true, Integer.MAX_VALUE); }},
-				new EMenuItem("_Specified Amount...") { public void run() {
-					CircuitChanges.DoExpandCommands(true, -1); }}),
-
-			new EMenuItem("Loo_k Inside Highlighted", 'P') { public void run() {
-				peekCommand(); }},
-
-			SEPARATOR,
-
-			new EMenuItem("Packa_ge Into Cell...") { public void run() {
-				CircuitChanges.packageIntoCell(); }},
-
-			// mnemonic keys available:  BCDEFGHIJKLMN PQR TUVWXYZ
-			new EMenu("Extract Cell _Instance",
-				new EMenuItem("_One Level Down") { public void run() {
-					CircuitChanges.extractCells(1); }},
-				new EMenuItem("_All the Way") { public void run() {
-					CircuitChanges.extractCells(Integer.MAX_VALUE); }},
-				new EMenuItem("_Specified Amount...") { public void run() {
-					CircuitChanges.extractCells(-1); }}));
-	}
-
-	/**
-	 * This method implements the command to do cell options.
-	 */
-	private static void cellControlCommand()
-	{
-		CellProperties dialog = new CellProperties(TopLevel.getCurrentJFrame());
-		dialog.setVisible(true);
-	}
-
-	/**
-	 * This command opens a dialog box to edit a Cell.
-	 */
-	private static void newCellCommand()
-	{
-		NewCell dialog = new NewCell(TopLevel.getCurrentJFrame(), null, null);
-		dialog.setVisible(true);
-	}
-
-	public static void cellBrowserCommand(CellBrowser.DoAction action)
-	{
-		CellBrowser dialog = new CellBrowser(TopLevel.getCurrentJFrame(), false, action);
-		dialog.setVisible(true);
-	}
-
-	/**
-	 * This method implements the command to make the current cell a multi-page schematic.
-	 */
-	private static void makeMultiPageCell()
-	{
-		Cell cell = WindowFrame.needCurCell();
-		if (cell == null) return;
-		if (!cell.isSchematic())
-		{
-			JOptionPane.showMessageDialog(TopLevel.getCurrentJFrame(), "Only Schematic cells can be made multi-page",
-				"Cannot make multipage design", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
-		new SetMultiPageJob(cell, 1);
-	}
-
-	/**
-	 * Class to set a cell to be multi-page with a given page count.
-	 */
-	public static class SetMultiPageJob extends Job
-	{
-		private Cell cell;
-		private int numPages;
-
-		public SetMultiPageJob(Cell cell, int numPages)
-		{
-			super("Make Cell be Multi-Page", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
-			this.cell = cell;
-			this.numPages = numPages;
-			startJob();
-		}
+        public SetMultiPageJob(Cell cell, int numPages) {
+            super("Make Cell be Multi-Page", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
+            this.cell = cell;
+            this.numPages = numPages;
+            startJob();
+        }
 
         @Override
-		public boolean doIt() throws JobException
-		{
+        public boolean doIt() throws JobException {
             EditingPreferences ep = getEditingPreferences();
-			Dimension d = new Dimension(0,0);
-			if (Cell.FrameDescription.getCellFrameInfo(cell, d) != 0)
-			{
-				cell.newVar(User.FRAME_SIZE, "a", ep);
-		   		System.out.println("Multi-page schematics must have cell frames turned on.  Setting this to A-size.");
-			}
-			boolean wasMulti = cell.isMultiPage();
-			cell.setMultiPage(true);
-			cell.newVar(Cell.MULTIPAGE_COUNT_KEY, new Integer(numPages), ep); // autoboxing
-			if (!wasMulti) System.out.println("Cell " + cell.describe(true) + " is now a multi-page schematic");
-			return true;
-		}
-	}
+            Dimension d = new Dimension(0, 0);
+            if (Cell.FrameDescription.getCellFrameInfo(cell, d) != 0) {
+                cell.newVar(User.FRAME_SIZE, "a", ep);
+                System.out.println("Multi-page schematics must have cell frames turned on.  Setting this to A-size.");
+            }
+            boolean wasMulti = cell.isMultiPage();
+            cell.setMultiPage(true);
+            cell.newVar(Cell.MULTIPAGE_COUNT_KEY, new Integer(numPages), ep); // autoboxing
+            if (!wasMulti) {
+                System.out.println("Cell " + cell.describe(true) + " is now a multi-page schematic");
+            }
+            return true;
+        }
+    }
 
-	/**
-	 * Class to delete a page from a multi-page schematic.
-	 */
-	public static class DeleteMultiPageJob extends Job
-	{
-		private Cell cell;
-		private int page, numPages;
+    /**
+     * Class to delete a page from a multi-page schematic.
+     */
+    public static class DeleteMultiPageJob extends Job {
 
-		public DeleteMultiPageJob(Cell cell, int page)
-		{
-			super("Delete Page from Multi-Page Schematic", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
-			this.cell = cell;
-			this.page = page;
-			startJob();
-		}
+        private Cell cell;
+        private int page, numPages;
+
+        public DeleteMultiPageJob(Cell cell, int page) {
+            super("Delete Page from Multi-Page Schematic", User.getUserTool(), Job.Type.CHANGE, null, null, Job.Priority.USER);
+            this.cell = cell;
+            this.page = page;
+            startJob();
+        }
 
         @Override
-		public boolean doIt() throws JobException
-		{
+        public boolean doIt() throws JobException {
             EditingPreferences ep = getEditingPreferences();
-			// first delete all circuitry on the page
-			double lY = page * Cell.FrameDescription.MULTIPAGESEPARATION - Cell.FrameDescription.MULTIPAGESEPARATION/2;
-			double hY = lY + Cell.FrameDescription.MULTIPAGESEPARATION;
-			List<Geometric> deleteList = new ArrayList<Geometric>();
-			for(Iterator<NodeInst> it = cell.getNodes(); it.hasNext(); )
-			{
-				NodeInst ni = it.next();
-				if (ni.getAnchorCenterY() > lY && ni.getAnchorCenterY() < hY) deleteList.add(ni);
-			}
-			for(Iterator<ArcInst> it = cell.getArcs(); it.hasNext(); )
-			{
-				ArcInst ai = it.next();
-				double ctrY = ai.getBounds().getCenterY();
-				if (ctrY > lY && ctrY < hY) deleteList.add(ai);
-			}
-			CircuitChangeJobs.eraseObjectsInList(cell, deleteList, false, null, ep);
+            // first delete all circuitry on the page
+            double lY = page * Cell.FrameDescription.MULTIPAGESEPARATION - Cell.FrameDescription.MULTIPAGESEPARATION / 2;
+            double hY = lY + Cell.FrameDescription.MULTIPAGESEPARATION;
+            List<Geometric> deleteList = new ArrayList<Geometric>();
+            for (Iterator<NodeInst> it = cell.getNodes(); it.hasNext();) {
+                NodeInst ni = it.next();
+                if (ni.getAnchorCenterY() > lY && ni.getAnchorCenterY() < hY) {
+                    deleteList.add(ni);
+                }
+            }
+            for (Iterator<ArcInst> it = cell.getArcs(); it.hasNext();) {
+                ArcInst ai = it.next();
+                double ctrY = ai.getBounds().getCenterY();
+                if (ctrY > lY && ctrY < hY) {
+                    deleteList.add(ai);
+                }
+            }
+            CircuitChangeJobs.eraseObjectsInList(cell, deleteList, false, null, ep);
 
-			// now slide circuitry down if this isn't the last page
-			numPages = cell.getNumMultiPages();
-			if (page+1 < numPages)
-			{
-				CircuitChangeJobs.spreadCircuitry(cell, null, 'u', -Cell.FrameDescription.MULTIPAGESEPARATION, 0, 0, lY, hY);
-			}
-			cell.newVar(Cell.MULTIPAGE_COUNT_KEY, new Integer((numPages-1)), ep); // autoboxing
-			fieldVariableChanged("numPages");
-			return true;
-		}
+            // now slide circuitry down if this isn't the last page
+            numPages = cell.getNumMultiPages();
+            if (page + 1 < numPages) {
+                CircuitChangeJobs.spreadCircuitry(cell, null, 'u', -Cell.FrameDescription.MULTIPAGESEPARATION, 0, 0, lY, hY);
+            }
+            cell.newVar(Cell.MULTIPAGE_COUNT_KEY, new Integer((numPages - 1)), ep); // autoboxing
+            fieldVariableChanged("numPages");
+            return true;
+        }
 
         @Override
-		public void terminateOK()
-		{
-			for(Iterator<WindowFrame> it = WindowFrame.getWindows(); it.hasNext(); )
-			{
-				WindowFrame wf = it.next();
-				if (wf.getContent() instanceof EditWindow)
-				{
-				   	EditWindow wnd = (EditWindow)wf.getContent();
-				   	if (wnd.getCell() == cell)
-				   	{
-				   		int wndPage = wnd.getMultiPageNumber();
-				   		if (wndPage+1 >= numPages)
-				   			wnd.setMultiPageNumber(wndPage-1);
-				   	}
-				}
-			}
-		}
-	}
+        public void terminateOK() {
+            for (Iterator<WindowFrame> it = WindowFrame.getWindows(); it.hasNext();) {
+                WindowFrame wf = it.next();
+                if (wf.getContent() instanceof EditWindow) {
+                    EditWindow wnd = (EditWindow) wf.getContent();
+                    if (wnd.getCell() == cell) {
+                        int wndPage = wnd.getMultiPageNumber();
+                        if (wndPage + 1 >= numPages) {
+                            wnd.setMultiPageNumber(wndPage - 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * This method implements the command to create a new page in a multi-page schematic.
-	 */
-	private static void createNewMultiPage()
-	{
-		EditWindow wnd = EditWindow.needCurrent();
-		if (wnd == null) return;
-		Cell cell = WindowFrame.needCurCell();
-		if (cell == null) return;
-		if (!cell.isMultiPage())
-		{
-			System.out.println("First turn this cell into a multi-page schematic");
-			return;
-		}
-		int numPages = cell.getNumMultiPages();
-		new SetMultiPageJob(cell, numPages+1);
-		wnd.setMultiPageNumber(numPages);
-	}
+    /**
+     * This method implements the command to create a new page in a multi-page
+     * schematic.
+     */
+    private static void createNewMultiPage() {
+        EditWindow wnd = EditWindow.needCurrent();
+        if (wnd == null) {
+            return;
+        }
+        Cell cell = WindowFrame.needCurCell();
+        if (cell == null) {
+            return;
+        }
+        if (!cell.isMultiPage()) {
+            System.out.println("First turn this cell into a multi-page schematic");
+            return;
+        }
+        int numPages = cell.getNumMultiPages();
+        new SetMultiPageJob(cell, numPages + 1);
+        wnd.setMultiPageNumber(numPages);
+    }
 
-	/**
-	 * This method implements the command to delete the current page in a multi-page schematic.
-	 */
-	private static void deleteThisMultiPage()
-	{
-		EditWindow wnd = EditWindow.needCurrent();
-		if (wnd == null) return;
-		Cell cell = WindowFrame.needCurCell();
-		if (cell == null) return;
-		if (!cell.isMultiPage())
-		{
-			System.out.println("This is not a multi-page schematic.  To delete this cell, use 'Cell / Delete Cell'");
-			return;
-		}
-		int curPage = wnd.getMultiPageNumber();
-		new DeleteMultiPageJob(cell, curPage);
-		int numPages = cell.getNumMultiPages();
-		if (curPage >= numPages) wnd.setMultiPageNumber(numPages-1);
-	}
+    /**
+     * This method implements the command to delete the current page in a
+     * multi-page schematic.
+     */
+    private static void deleteThisMultiPage() {
+        EditWindow wnd = EditWindow.needCurrent();
+        if (wnd == null) {
+            return;
+        }
+        Cell cell = WindowFrame.needCurCell();
+        if (cell == null) {
+            return;
+        }
+        if (!cell.isMultiPage()) {
+            System.out.println("This is not a multi-page schematic.  To delete this cell, use 'Cell / Delete Cell'");
+            return;
+        }
+        int curPage = wnd.getMultiPageNumber();
+        new DeleteMultiPageJob(cell, curPage);
+        int numPages = cell.getNumMultiPages();
+        if (curPage >= numPages) {
+            wnd.setMultiPageNumber(numPages - 1);
+        }
+    }
 
-	/**
-	 * This method implements the command to edit the next page in a multi-page schematic.
-	 */
-	private static void editNextMultiPage()
-	{
-		EditWindow wnd = EditWindow.needCurrent();
-		if (wnd == null) return;
-		Cell cell = WindowFrame.needCurCell();
-		if (cell == null) return;
-		if (!cell.isMultiPage())
-		{
-			System.out.println("First turn this cell into a multi-page schematic");
-			return;
-		}
-		int curPage = wnd.getMultiPageNumber();
-		int numPages = cell.getNumMultiPages();
-		wnd.setMultiPageNumber((curPage+1) % numPages);
-	}
+    /**
+     * This method implements the command to edit the next page in a multi-page
+     * schematic.
+     */
+    private static void editNextMultiPage() {
+        EditWindow wnd = EditWindow.needCurrent();
+        if (wnd == null) {
+            return;
+        }
+        Cell cell = WindowFrame.needCurCell();
+        if (cell == null) {
+            return;
+        }
+        if (!cell.isMultiPage()) {
+            System.out.println("First turn this cell into a multi-page schematic");
+            return;
+        }
+        int curPage = wnd.getMultiPageNumber();
+        int numPages = cell.getNumMultiPages();
+        wnd.setMultiPageNumber((curPage + 1) % numPages);
+    }
 
-	/**
-	 * This method implements the command to do cross-library copies.
-	 */
-	private static void crossLibraryCopyCommand()
-	{
-		CrossLibCopy dialog = new CrossLibCopy(TopLevel.getCurrentJFrame());
-		dialog.setVisible(true);
-	}
+    /**
+     * This method implements the command to do cross-library copies.
+     */
+    private static void crossLibraryCopyCommand() {
+        CrossLibCopy dialog = new CrossLibCopy(TopLevel.getCurrentJFrame());
+        dialog.setVisible(true);
+    }
 
-	/**
-	 * This command pushes down the hierarchy
-	 * @param keepFocus true to keep the zoom and scale in the new window.
-	 * @param newWindow true to create a new window for the cell.
-	 */
-	private static void downHierCommand(boolean keepFocus, boolean newWindow)
-	{
-		EditWindow curEdit = EditWindow.needCurrent();
-		if (curEdit == null) return;
-		curEdit.downHierarchy(keepFocus, newWindow, false);
-	}
+    /**
+     * This command pushes down the hierarchy
+     *
+     * @param keepFocus true to keep the zoom and scale in the new window.
+     * @param newWindow true to create a new window for the cell.
+     */
+    private static void downHierCommand(boolean keepFocus, boolean newWindow) {
+        EditWindow curEdit = EditWindow.needCurrent();
+        if (curEdit == null) {
+            return;
+        }
+        curEdit.downHierarchy(keepFocus, newWindow, false);
+    }
 
-	/**
-	 * This command pushes down the hierarchy "in place".
-	 */
-	private static void downHierInPlaceCommand()
-	{
-		EditWindow curEdit = EditWindow.needCurrent();
-		if (curEdit == null) return;
-		curEdit.downHierarchy(false, false, true);
-	}
+    /**
+     * This command pushes down the hierarchy "in place".
+     */
+    private static void downHierInPlaceCommand() {
+        EditWindow curEdit = EditWindow.needCurrent();
+        if (curEdit == null) {
+            return;
+        }
+        curEdit.downHierarchy(false, false, true);
+    }
 
-	private static class DownHierToObjectActionListener implements ActionListener
-	{
-		GeometrySearch.GeometrySearchResult result;
+    private static class DownHierToObjectActionListener implements ActionListener {
 
-		DownHierToObjectActionListener(GeometrySearch.GeometrySearchResult r) { result = r; }
+        GeometrySearch.GeometrySearchResult result;
 
-		public void actionPerformed(ActionEvent e)
-		{
-			descendToObject(result);
-		}
-	}
+        DownHierToObjectActionListener(GeometrySearch.GeometrySearchResult r) {
+            result = r;
+        }
 
-	private static void downHierInPlaceToObject()
-	{
-		EditWindow curEdit = EditWindow.needCurrent();
-		if (curEdit == null) return;
-		Cell cell = curEdit.getCell();
-		if (cell == null) return;
-		if (cell.getView() != View.LAYOUT)
-		{
-			System.out.println("Current cell should be a layout cell for 'Down Hierarchy In Place To Object'");
-			return;
-		}
+        public void actionPerformed(ActionEvent e) {
+            descendToObject(result);
+        }
+    }
 
-		// find all objects under the mouse
-		Point2D mouse = ClickZoomWireListener.theOne.getLastMouse();
-		Point2D mouseDB = curEdit.screenToDatabase((int)mouse.getX(), (int)mouse.getY());
-		EPoint point = EPoint.fromLambda(mouseDB.getX(), mouseDB.getY());
-		GeometrySearch.GeometrySearchResult foundAtTopLevel = null;
-		GeometrySearch search = new GeometrySearch(curEdit.getLayerVisibility(), curEdit.getGraphicsPreferences());
-		List<GeometrySearch.GeometrySearchResult> possibleTargets = search.searchGeometries(cell, point, true);
+    private static void downHierInPlaceToObject() {
+        EditWindow curEdit = EditWindow.needCurrent();
+        if (curEdit == null) {
+            return;
+        }
+        Cell cell = curEdit.getCell();
+        if (cell == null) {
+            return;
+        }
+        if (cell.getView() != View.LAYOUT) {
+            System.out.println("Current cell should be a layout cell for 'Down Hierarchy In Place To Object'");
+            return;
+        }
 
-		// eliminate results at the top level
-		for(int i=0; i<possibleTargets.size(); i++)
-		{
-			GeometrySearch.GeometrySearchResult res = possibleTargets.get(i);
-			if (res.getContext() == VarContext.globalContext)
-			{
-				possibleTargets.remove(i);
-				i--;
-				foundAtTopLevel = res;
-				continue;
-			}
+        // find all objects under the mouse
+        Point2D mouse = ClickZoomWireListener.theOne.getLastMouse();
+        Point2D mouseDB = curEdit.screenToDatabase((int) mouse.getX(), (int) mouse.getY());
+        EPoint point = EPoint.fromLambda(mouseDB.getX(), mouseDB.getY());
+        GeometrySearch.GeometrySearchResult foundAtTopLevel = null;
+        GeometrySearch search = new GeometrySearch(curEdit.getLayerVisibility(), curEdit.getGraphicsPreferences());
+        List<GeometrySearch.GeometrySearchResult> possibleTargets = search.searchGeometries(cell, point, true);
 
-			// also remove duplicate contexts at lower levels
-final boolean JUSTONEATALEVEL = false;
-			if (JUSTONEATALEVEL)
-			{
-				for(int j=0; j<i; j++)
-				{
-					GeometrySearch.GeometrySearchResult oRes = possibleTargets.get(j);
-					if (sameContext(oRes.getContext(), res.getContext()))
-					{
-						possibleTargets.remove(i);
-						i--;
-					}
-				}
-			}
-		}
-		
-		// give error if nothing was found
-		if (possibleTargets.size() == 0)
-		{
-			// nothing found, if top-level stuff found, say so
-			if (foundAtTopLevel != null)
-				System.out.println(foundAtTopLevel.describe() + " is at the top level, not down the hierarchy"); else
-					System.out.println("No primitive node or arc found under the mouse at lower levels of hierarchy");
-			return;
-		}
+        // eliminate results at the top level
+        for (int i = 0; i < possibleTargets.size(); i++) {
+            GeometrySearch.GeometrySearchResult res = possibleTargets.get(i);
+            if (res.getContext() == VarContext.globalContext) {
+                possibleTargets.remove(i);
+                i--;
+                foundAtTopLevel = res;
+                continue;
+            }
 
-		// get the selected object to edit
-		if (possibleTargets.size() == 1)
-		{
-			descendToObject(possibleTargets.get(0));
-		} else
-		{
-			// let the user choose, sort by the lower level
-			Map<String,List<GeometrySearch.GeometrySearchResult>> levelMap = new TreeMap<String,List<GeometrySearch.GeometrySearchResult>>();
-            for(GeometrySearch.GeometrySearchResult res : possibleTargets)
-			{
-            	String resDescript = res.getInstPath(res.getContext());
-            	List<GeometrySearch.GeometrySearchResult> itemsAtLevel = levelMap.get(resDescript);
-            	if (itemsAtLevel == null) levelMap.put(resDescript, itemsAtLevel = new ArrayList<GeometrySearch.GeometrySearchResult>());
-            	itemsAtLevel.add(res);
-			}
+            // also remove duplicate contexts at lower levels
+            final boolean JUSTONEATALEVEL = false;
+            if (JUSTONEATALEVEL) {
+                for (int j = 0; j < i; j++) {
+                    GeometrySearch.GeometrySearchResult oRes = possibleTargets.get(j);
+                    if (sameContext(oRes.getContext(), res.getContext())) {
+                        possibleTargets.remove(i);
+                        i--;
+                    }
+                }
+            }
+        }
 
-			JPopupMenu menu = new JPopupMenu();
-        	JMenuItem menuItem = new JMenuItem("Multiple objects under the cursor...choose one");
+        // give error if nothing was found
+        if (possibleTargets.size() == 0) {
+            // nothing found, if top-level stuff found, say so
+            if (foundAtTopLevel != null) {
+                System.out.println(foundAtTopLevel.describe() + " is at the top level, not down the hierarchy");
+            } else {
+                System.out.println("No primitive node or arc found under the mouse at lower levels of hierarchy");
+            }
+            return;
+        }
+
+        // get the selected object to edit
+        if (possibleTargets.size() == 1) {
+            descendToObject(possibleTargets.get(0));
+        } else {
+            // let the user choose, sort by the lower level
+            Map<String, List<GeometrySearch.GeometrySearchResult>> levelMap = new TreeMap<String, List<GeometrySearch.GeometrySearchResult>>();
+            for (GeometrySearch.GeometrySearchResult res : possibleTargets) {
+                String resDescript = res.getInstPath(res.getContext());
+                List<GeometrySearch.GeometrySearchResult> itemsAtLevel = levelMap.get(resDescript);
+                if (itemsAtLevel == null) {
+                    levelMap.put(resDescript, itemsAtLevel = new ArrayList<GeometrySearch.GeometrySearchResult>());
+                }
+                itemsAtLevel.add(res);
+            }
+
+            JPopupMenu menu = new JPopupMenu();
+            JMenuItem menuItem = new JMenuItem("Multiple objects under the cursor...choose one");
             menu.add(menuItem);
             menu.addSeparator();
-            for(String resDescript : levelMap.keySet())
-            {
-            	List<GeometrySearch.GeometrySearchResult> itemsAtLevel = levelMap.get(resDescript);
-            	menuItem = new JMenuItem("ITEMS IN: " + resDescript);
-            	menuItem.setEnabled(false);
+            for (String resDescript : levelMap.keySet()) {
+                List<GeometrySearch.GeometrySearchResult> itemsAtLevel = levelMap.get(resDescript);
+                menuItem = new JMenuItem("ITEMS IN: " + resDescript);
+                menuItem.setEnabled(false);
                 menu.add(menuItem);
-                for(GeometrySearch.GeometrySearchResult res : itemsAtLevel)
-                {
-                	menuItem = new JMenuItem("     " + res.getGeometric().describe(false));
-                	menuItem.addActionListener(new DownHierToObjectActionListener(res));
+                for (GeometrySearch.GeometrySearchResult res : itemsAtLevel) {
+                    menuItem = new JMenuItem("     " + res.getGeometric().describe(false));
+                    menuItem.addActionListener(new DownHierToObjectActionListener(res));
                     menu.add(menuItem);
                 }
             }
             menu.show(curEdit, 100, 100);
-		}
-	}
+        }
+    }
 
-	private static boolean sameContext(VarContext vc1, VarContext vc2)
-	{
-		if (vc1.getNumLevels() != vc2.getNumLevels()) return false;
-		while (vc1.getNodable() != null && vc2.getNodable() != null)
-		{
-			if (vc1.getNodable() != vc2.getNodable()) return false;
-			vc1 = vc1.pop();
-			vc2 = vc2.pop();
-		}
-		return true;
-	}
+    private static boolean sameContext(VarContext vc1, VarContext vc2) {
+        if (vc1.getNumLevels() != vc2.getNumLevels()) {
+            return false;
+        }
+        while (vc1.getNodable() != null && vc2.getNodable() != null) {
+            if (vc1.getNodable() != vc2.getNodable()) {
+                return false;
+            }
+            vc1 = vc1.pop();
+            vc2 = vc2.pop();
+        }
+        return true;
+    }
 
-	private static void descendToObject(GeometrySearch.GeometrySearchResult res)
-	{
-		// descend to that object
-		EditWindow curEdit = EditWindow.needCurrent();
-		System.out.println("Descending to cell " + res.getGeometric().getParent().getName());
-		for (Iterator<Nodable> it = res.getContext().getPathIterator(); it.hasNext(); )
-		{
-			Nodable no = it.next();
-			Cell curCell = no.getParent();
-			curEdit.getHighlighter().clear();
-			curEdit.getHighlighter().addElectricObject(no.getNodeInst(), curCell);
-			curEdit.getHighlighter().finished();
-			System.out.println("  Descended into "+no.getName()+"["+no.getProto().getName()+"] in cell "+curCell.getName());
-			curEdit.downHierarchy(false, false, true);
-		}
-		curEdit.getHighlighter().clear();
-		curEdit.getHighlighter().addElectricObject(res.getGeometric(), res.getGeometric().getParent());
-		curEdit.getHighlighter().finished();
-	}
+    private static void descendToObject(GeometrySearch.GeometrySearchResult res) {
+        // descend to that object
+        EditWindow curEdit = EditWindow.needCurrent();
+        System.out.println("Descending to cell " + res.getGeometric().getParent().getName());
+        for (Iterator<Nodable> it = res.getContext().getPathIterator(); it.hasNext();) {
+            Nodable no = it.next();
+            Cell curCell = no.getParent();
+            curEdit.getHighlighter().clear();
+            curEdit.getHighlighter().addElectricObject(no.getNodeInst(), curCell);
+            curEdit.getHighlighter().finished();
+            System.out.println("  Descended into " + no.getName() + "[" + no.getProto().getName() + "] in cell " + curCell.getName());
+            curEdit.downHierarchy(false, false, true);
+        }
+        curEdit.getHighlighter().clear();
+        curEdit.getHighlighter().addElectricObject(res.getGeometric(), res.getGeometric().getParent());
+        curEdit.getHighlighter().finished();
+    }
 
-	/**
-	 * This command goes up the hierarchy
-	 */
-	private static void upHierCommand(boolean keepFocus)
-	{
-		EditWindow curEdit = EditWindow.needCurrent();
-		if (curEdit == null) return;
-		curEdit.upHierarchy(keepFocus);
-	}
+    /**
+     * This command goes up the hierarchy
+     */
+    private static void upHierCommand(boolean keepFocus) {
+        EditWindow curEdit = EditWindow.needCurrent();
+        if (curEdit == null) {
+            return;
+        }
+        curEdit.upHierarchy(keepFocus);
+    }
 
-	private static void changeCellHistory(boolean back)
-	{
-		WindowFrame wf = WindowFrame.getCurrentWindowFrame();
-		if (wf == null) return;
-		if (back) wf.cellHistoryGoBack(); else
-			wf.cellHistoryGoForward();
-	}
+    private static void changeCellHistory(boolean back) {
+        WindowFrame wf = WindowFrame.getCurrentWindowFrame();
+        if (wf == null) {
+            return;
+        }
+        if (back) {
+            wf.cellHistoryGoBack();
+        } else {
+            wf.cellHistoryGoForward();
+        }
+    }
 
-	/**
-	 * This method implements the command to make a new version of the current Cell.
-	 */
-	private static void newCellVersionCommand()
-	{
-		Cell curCell = WindowFrame.needCurCell();
-		if (curCell == null) return;
-		CircuitChanges.newVersionOfCell(curCell);
-	}
+    /**
+     * This method implements the command to make a new version of the current
+     * Cell.
+     */
+    private static void newCellVersionCommand() {
+        Cell curCell = WindowFrame.needCurCell();
+        if (curCell == null) {
+            return;
+        }
+        CircuitChanges.newVersionOfCell(curCell);
+    }
 
-	/**
-	 * This method implements the command to make a copy of the current Cell.
-	 */
-	private static void duplicateCellCommand()
-	{
-		Cell curCell = WindowFrame.needCurCell();
-		if (curCell == null) return;
-		new CellMenu.NewCellName(NewCellName.CELLNAMEDUPLICATE, curCell, null);
-	}
+    /**
+     * This method implements the command to make a copy of the current Cell.
+     */
+    private static void duplicateCellCommand() {
+        Cell curCell = WindowFrame.needCurCell();
+        if (curCell == null) {
+            return;
+        }
+        new CellMenu.NewCellName(NewCellName.CELLNAMEDUPLICATE, curCell, null);
+    }
 
-	/**
-	 * Method to implement command to copy the cell whose instance is selected
-	 * and replace the instance with the new cell copy.
-	 */
-	private static void replaceInstanceWithDuplicateCellCommand()
-	{
-		Cell curCell = WindowFrame.needCurCell();
-		if (curCell == null) return;
-		EditWindow wnd = EditWindow.getCurrent();
-		if (wnd == null) return;
-		Highlighter highlighter = wnd.getHighlighter();
-		Highlight high = highlighter.getOneHighlight();
-		if (high == null) return;
-		ElectricObject eObj = high.getElectricObject();
-		if (high.isHighlightEOBJ())
-		{
-			if (eObj instanceof PortInst)
-			{
-				eObj = ((PortInst)eObj).getNodeInst();
-			}
-			if (eObj instanceof NodeInst)
-			{
-				NodeInst thisNi = (NodeInst)eObj;
-				if (thisNi.isCellInstance())
-				{
-					// make a new copy of the selected cell and replace the instance with it
-					new CellMenu.NewCellName(NewCellName.CELLNAMEREPLACE, (Cell)thisNi.getProto(), thisNi);
-					return;
-				}
-			}
-		}
-		System.out.println("Must select a cell instance first");
-	}
+    /**
+     * Method to implement command to copy the cell whose instance is selected
+     * and replace the instance with the new cell copy.
+     */
+    private static void replaceInstanceWithDuplicateCellCommand() {
+        Cell curCell = WindowFrame.needCurCell();
+        if (curCell == null) {
+            return;
+        }
+        EditWindow wnd = EditWindow.getCurrent();
+        if (wnd == null) {
+            return;
+        }
+        Highlighter highlighter = wnd.getHighlighter();
+        Highlight high = highlighter.getOneHighlight();
+        if (high == null) {
+            return;
+        }
+        ElectricObject eObj = high.getElectricObject();
+        if (high.isHighlightEOBJ()) {
+            if (eObj instanceof PortInst) {
+                eObj = ((PortInst) eObj).getNodeInst();
+            }
+            if (eObj instanceof NodeInst) {
+                NodeInst thisNi = (NodeInst) eObj;
+                if (thisNi.isCellInstance()) {
+                    // make a new copy of the selected cell and replace the instance with it
+                    new CellMenu.NewCellName(NewCellName.CELLNAMEREPLACE, (Cell) thisNi.getProto(), thisNi);
+                    return;
+                }
+            }
+        }
+        System.out.println("Must select a cell instance first");
+    }
 
-	public static class NewCellName extends EDialog
-	{
-		public static final int GROUPNAME = 0;
-		public static final int CELLNAMEDUPLICATE = 1;
-		public static final int CELLNAMEREPLACE = 2;
+    public static class NewCellName extends EDialog {
 
-		private JTextField cellName;
-		private Cell cell;
-		private int nature;
-		private NodeInst replaceThis;
+        public static final int GROUPNAME = 0;
+        public static final int CELLNAMEDUPLICATE = 1;
+        public static final int CELLNAMEREPLACE = 2;
 
-		/** Creates new form New Cell Name */
-		public NewCellName(int nature, Cell cell, NodeInst replaceThis)
-		{
-			super(TopLevel.getCurrentJFrame(), true);
-			this.nature = nature;
-			this.cell = cell;
-			this.replaceThis = replaceThis;
+        private JTextField cellName;
+        private Cell cell;
+        private int nature;
+        private NodeInst replaceThis;
 
-	        setTitle(nature == GROUPNAME ? "New Group Name" : "New Cell Name");
-	        setName("");
-	        addWindowListener(new WindowAdapter() {
-	            public void windowClosing(WindowEvent evt) { closeDialog(); }
-	        });
-	        getContentPane().setLayout(new GridBagLayout());
+        /**
+         * Creates new form New Cell Name
+         */
+        public NewCellName(int nature, Cell cell, NodeInst replaceThis) {
+            super(TopLevel.getCurrentJFrame(), true);
+            this.nature = nature;
+            this.cell = cell;
+            this.replaceThis = replaceThis;
 
-			String prompt = "Name of duplicated cell";
-			if (nature == GROUPNAME) prompt += " group";
-	        JLabel lab = new JLabel(prompt + ":");
-	        lab.setHorizontalAlignment(SwingConstants.LEFT);
-	        GridBagConstraints gbc = new GridBagConstraints();
-	        gbc.gridx = 0;   gbc.gridy = 0;
-	        gbc.gridwidth = 2;
-	        gbc.anchor = GridBagConstraints.WEST;
-	        gbc.insets = new Insets(4, 4, 4, 4);
-	        getContentPane().add(lab, gbc);
+            setTitle(nature == GROUPNAME ? "New Group Name" : "New Cell Name");
+            setName("");
+            addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent evt) {
+                    closeDialog();
+                }
+            });
+            getContentPane().setLayout(new GridBagLayout());
 
-	        String oldCellName = cell.getName();
-	        String newName = oldCellName + "NEW";
-	        cellName = new JTextField(newName);
-	        cellName.setSelectionStart(oldCellName.length());
-	        cellName.setSelectionEnd(newName.length());
-	        cellName.setColumns(Math.max(20, newName.length()));
-	        cellName.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) { ok(); }
-	        });
-	        gbc = new GridBagConstraints();
-	        gbc.gridx = 0;   gbc.gridy = 1;
-	        gbc.gridwidth = 2;
-	        gbc.fill = GridBagConstraints.HORIZONTAL;
-	        gbc.anchor = GridBagConstraints.WEST;
-	        gbc.weightx = 1.0;
-	        gbc.insets = new Insets(4, 4, 4, 4);
-	        getContentPane().add(cellName, gbc);
+            String prompt = "Name of duplicated cell";
+            if (nature == GROUPNAME) {
+                prompt += " group";
+            }
+            JLabel lab = new JLabel(prompt + ":");
+            lab.setHorizontalAlignment(SwingConstants.LEFT);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.insets = new Insets(4, 4, 4, 4);
+            getContentPane().add(lab, gbc);
 
-	        JButton cancel = new JButton("Cancel");
-	        cancel.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) { closeDialog(); }
-	        });
-	        gbc = new GridBagConstraints();
-	        gbc.gridx = 0;   gbc.gridy = 2;
-	        gbc.insets = new Insets(4, 4, 4, 4);
-	        getContentPane().add(cancel, gbc);
+            String oldCellName = cell.getName();
+            String newName = oldCellName + "NEW";
+            cellName = new JTextField(newName);
+            cellName.setSelectionStart(oldCellName.length());
+            cellName.setSelectionEnd(newName.length());
+            cellName.setColumns(Math.max(20, newName.length()));
+            cellName.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    ok();
+                }
+            });
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.gridwidth = 2;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.weightx = 1.0;
+            gbc.insets = new Insets(4, 4, 4, 4);
+            getContentPane().add(cellName, gbc);
 
-	        JButton ok = new JButton("OK");
-	        ok.addActionListener(new ActionListener() {
-	            public void actionPerformed(ActionEvent evt) { ok(); }
-	        });
-	        gbc = new GridBagConstraints();
-	        gbc.gridx = 1;   gbc.gridy = 2;
-	        gbc.insets = new Insets(4, 4, 4, 4);
-	        getContentPane().add(ok, gbc);
-			getRootPane().setDefaultButton(ok);
+            JButton cancel = new JButton("Cancel");
+            cancel.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    closeDialog();
+                }
+            });
+            gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.insets = new Insets(4, 4, 4, 4);
+            getContentPane().add(cancel, gbc);
 
-	        pack();
-			finishInitialization();
-			setVisible(true);
-	    }
+            JButton ok = new JButton("OK");
+            ok.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt) {
+                    ok();
+                }
+            });
+            gbc = new GridBagConstraints();
+            gbc.gridx = 1;
+            gbc.gridy = 2;
+            gbc.insets = new Insets(4, 4, 4, 4);
+            getContentPane().add(ok, gbc);
+            getRootPane().setDefaultButton(ok);
 
-		protected void escapePressed() { closeDialog(); }
+            pack();
+            finishInitialization();
+            setVisible(true);
+        }
 
-		private void ok()
-		{
-	    	String newName = cellName.getText();
-			closeDialog();
-			Cell already = cell.getLibrary().findNodeProto(newName);
-			if (already != null && already.getView() == cell.getView())
-			{
-				int response = JOptionPane.showOptionDialog(TopLevel.getCurrentJFrame(),
-					"Cell " + newName + " already exists.  Make this a new version?", "Confirm duplication",
-					JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[] {"Yes", "Cancel"}, "Yes");
-				if (response != 0) return;
-			}
-			new CellChangeJobs.DuplicateCell(cell, newName, cell.getLibrary(), nature == GROUPNAME, false, replaceThis);
-		}
-	}
+        protected void escapePressed() {
+            closeDialog();
+        }
 
-	/**
-	 * Method to delete old, unused versions of cells.
-	 */
-	private static void deleteOldCellVersionsCommand()
-	{
-		// count the number of old unused cells to delete in the current and in other libraries
-		int oldUnusedCurrent = 0, oldUnusedElsewhere = 0;
-		for(Library lib : Library.getVisibleLibraries())
-		{
-			for(Iterator<Cell> it = lib.getCells(); it.hasNext(); )
-			{
-				Cell cell = it.next();
-				if (cell.getNewestVersion() == cell) continue;
-				if (cell.getInstancesOf().hasNext()) continue;
-				if (lib == Library.getCurrent()) oldUnusedCurrent++; else
-					oldUnusedElsewhere++;
-			}
-		}
+        private void ok() {
+            String newName = cellName.getText();
+            closeDialog();
+            Cell already = cell.getLibrary().findNodeProto(newName);
+            if (already != null && already.getView() == cell.getView()) {
+                int response = JOptionPane.showOptionDialog(TopLevel.getCurrentJFrame(),
+                        "Cell " + newName + " already exists.  Make this a new version?", "Confirm duplication",
+                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new String[]{"Yes", "Cancel"}, "Yes");
+                if (response != 0) {
+                    return;
+                }
+            }
+            new CellChangeJobs.DuplicateCell(cell, newName, cell.getLibrary(), nature == GROUPNAME, false, replaceThis);
+        }
+    }
 
-		// if complex, prompt for what to do
-		if (oldUnusedCurrent+oldUnusedElsewhere != 0 && oldUnusedElsewhere != 0)
-		{
-			// old unused cells are not just in the current library: ask what to do
-			String [] options = {"Current library", "Other libraries", "All libraries", "Cancel"};
-			int ret = Job.getUserInterface().askForChoice("There are " + oldUnusedCurrent +
-				" old unused cells in the current library and " + oldUnusedElsewhere +
-				" in other libraries.  Which libraries should have their old unused cells deleted?",
-				"Which Old Unused Cells to Delete", options, "No");
-			if (ret == 0) oldUnusedElsewhere = 0;
-			if (ret == 1) oldUnusedCurrent = 0;
-			if (ret == 3) return;
-		}
+    /**
+     * Method to delete old, unused versions of cells.
+     */
+    private static void deleteOldCellVersionsCommand() {
+        // count the number of old unused cells to delete in the current and in other libraries
+        int oldUnusedCurrent = 0, oldUnusedElsewhere = 0;
+        for (Library lib : Library.getVisibleLibraries()) {
+            for (Iterator<Cell> it = lib.getCells(); it.hasNext();) {
+                Cell cell = it.next();
+                if (cell.getNewestVersion() == cell) {
+                    continue;
+                }
+                if (cell.getInstancesOf().hasNext()) {
+                    continue;
+                }
+                if (lib == Library.getCurrent()) {
+                    oldUnusedCurrent++;
+                } else {
+                    oldUnusedElsewhere++;
+                }
+            }
+        }
 
-		// stop now if nothing to delete
-		if (oldUnusedCurrent == 0 && oldUnusedElsewhere == 0)
-		{
-			System.out.println("There are no old unused cells to delete");
-			return;
-		}
+        // if complex, prompt for what to do
+        if (oldUnusedCurrent + oldUnusedElsewhere != 0 && oldUnusedElsewhere != 0) {
+            // old unused cells are not just in the current library: ask what to do
+            String[] options = {"Current library", "Other libraries", "All libraries", "Cancel"};
+            int ret = Job.getUserInterface().askForChoice("There are " + oldUnusedCurrent
+                    + " old unused cells in the current library and " + oldUnusedElsewhere
+                    + " in other libraries.  Which libraries should have their old unused cells deleted?",
+                    "Which Old Unused Cells to Delete", options, "No");
+            if (ret == 0) {
+                oldUnusedElsewhere = 0;
+            }
+            if (ret == 1) {
+                oldUnusedCurrent = 0;
+            }
+            if (ret == 3) {
+                return;
+            }
+        }
 
-		// pre-clean the cell references
-		List<Cell> cellsToDelete = new ArrayList<Cell>();
-		for(Library lib : Library.getVisibleLibraries())
-		{
-			if (lib == Library.getCurrent())
-			{
-				if (oldUnusedCurrent == 0) continue;
-			} else
-			{
-				if (oldUnusedElsewhere == 0) continue;
-			}
-			for(Iterator<Cell> it = lib.getCells(); it.hasNext(); )
-			{
-				Cell cell = it.next();
-				if (cell.getNewestVersion() == cell) continue;
-				if (cell.getInstancesOf().hasNext()) continue;
-				CircuitChanges.cleanCellRef(cell);
-				cellsToDelete.add(cell);
-			}
-		}
+        // stop now if nothing to delete
+        if (oldUnusedCurrent == 0 && oldUnusedElsewhere == 0) {
+            System.out.println("There are no old unused cells to delete");
+            return;
+        }
 
-		// do the deletion
-		new CellChangeJobs.DeleteManyCells(cellsToDelete);
-	}
+        // pre-clean the cell references
+        List<Cell> cellsToDelete = new ArrayList<Cell>();
+        for (Library lib : Library.getVisibleLibraries()) {
+            if (lib == Library.getCurrent()) {
+                if (oldUnusedCurrent == 0) {
+                    continue;
+                }
+            } else {
+                if (oldUnusedElsewhere == 0) {
+                    continue;
+                }
+            }
+            for (Iterator<Cell> it = lib.getCells(); it.hasNext();) {
+                Cell cell = it.next();
+                if (cell.getNewestVersion() == cell) {
+                    continue;
+                }
+                if (cell.getInstancesOf().hasNext()) {
+                    continue;
+                }
+                CircuitChanges.cleanCellRef(cell);
+                cellsToDelete.add(cell);
+            }
+        }
 
-	/**
-	 * Method to temporarily expand the current selected area to the bottom.
-	 */
-	private static void peekCommand()
-	{
-		EditWindow wnd = EditWindow.needCurrent();
-		if (wnd == null) return;
-		Highlighter highlighter = wnd.getHighlighter();
-		if (highlighter == null) return;
+        // do the deletion
+        new CellChangeJobs.DeleteManyCells(cellsToDelete);
+    }
 
-		Rectangle2D bounds = highlighter.getHighlightedArea(wnd);
-		if (bounds == null)
-		{
-			System.out.println("Must define an area in which to display");
-			return;
-		}
-		wnd.repaintContents(ERectangle.fromLambda(bounds), true);
-	}
+    /**
+     * Method to temporarily expand the current selected area to the bottom.
+     */
+    private static void peekCommand() {
+        EditWindow wnd = EditWindow.needCurrent();
+        if (wnd == null) {
+            return;
+        }
+        Highlighter highlighter = wnd.getHighlighter();
+        if (highlighter == null) {
+            return;
+        }
+
+        Rectangle2D bounds = highlighter.getHighlightedArea(wnd);
+        if (bounds == null) {
+            System.out.println("Must define an area in which to display");
+            return;
+        }
+        wnd.repaintContents(ERectangle.fromLambda(bounds), true);
+    }
 }

@@ -19,8 +19,9 @@
  */
 package com.sun.electric.tool.dcs;
 
-import com.sun.electric.database.topology.NodeInst;
-import com.sun.electric.database.variable.Variable;
+import com.sun.electric.tool.dcs.Data.LinksHolder;
+import com.sun.electric.tool.user.dialogs.ExecDialog;
+import com.sun.electric.tool.user.ui.TopLevel;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,8 +31,6 @@ import java.io.BufferedReader;
 import javax.swing.JOptionPane;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Class is needed to have constant access to utility methods like writing to
@@ -62,7 +61,7 @@ public class Accessory {
                 fw.write(text + "\n");
             }
         } catch (IOException ioe) {
-            System.err.println("IOException: " + ioe.getMessage());
+            System.out.println("IOException: " + ioe.getMessage());
         }
     }
 
@@ -148,6 +147,16 @@ public class Accessory {
         } else {
             timeStart = System.currentTimeMillis();
         }
-
+    }
+    /**
+     * Method executes application with absolute path as path.
+     * @param path
+     * @param extension 
+     */
+    public static void executeApplication(String path, String extension) {
+        ExecDialog dialog = new ExecDialog(TopLevel.getCurrentJFrame(), false);
+        File dir = new File(LinksHolder.getXCADPath());
+        String command = path + extension;
+        dialog.startProcess(command, null, dir);
     }
 }

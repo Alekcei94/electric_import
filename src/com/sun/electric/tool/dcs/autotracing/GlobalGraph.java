@@ -32,15 +32,15 @@ import java.util.Map;
  *
  * @author diivanov
  */
-public class GlobalGraph implements IConnectable, ICopyable {
+public class GlobalGraph/* implements IConnectable, ICopyable*/ {
 
-    public void deleteKeyFromGraph(String key);
+    //public void deleteKeyFromGraph(String key);
 
-    public String getName();
+    //public String getName();
 
-    public int getWeight(String elemFrom, String elemTo);
+    //public int getWeight(String elemFrom, String elemTo);
 
-    public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete);
+    //public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete);
     
     /**
      *
@@ -56,10 +56,10 @@ public class GlobalGraph implements IConnectable, ICopyable {
          * @param graphName
          * @return
          */
-        public static ConnectionGraph createGlobalGraph(String graphName) {
+        /*public static ConnectionGraph createGlobalGraph(String graphName) {
             File importFile = new File(LinksHolder.getPathTo("global graph"));
             return createGlobalGraphFromFile(graphName, importFile);
-        }
+        }*/
 
         /**
          * Factory method to create graph using name and "import graph" file.
@@ -68,7 +68,7 @@ public class GlobalGraph implements IConnectable, ICopyable {
          * @param importFile
          * @return
          */
-        public static GlobalGraph createGlobalGraphFromFile(String graphName, File importFile) {
+        /*public static GlobalGraph createGlobalGraphFromFile(String graphName, File importFile) {
             GlobalGraph globalGraph = graphMap.get(
                     new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()));
             if (globalGraph == null) {
@@ -77,6 +77,6 @@ public class GlobalGraph implements IConnectable, ICopyable {
                         new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()), globalGraph);
             }
             return new GlobalGraph(graphName, globalGraph);
-        }
+        }*/
     }
 }

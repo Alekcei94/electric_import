@@ -39,7 +39,7 @@ public class MemoryMap {
     private final HashMap<String, MemoryFile> nameToMemoryAddressMap = new HashMap<>();
 
     private MemoryMap() {
-        buildMap(LinksHolder.getInstance().getMemoryMapRoot());
+        buildMap(LinksHolder.getMemoryMapRoot());
     }
 
     public static MemoryMap getInstance() {

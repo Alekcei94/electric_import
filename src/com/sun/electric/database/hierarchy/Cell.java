@@ -1255,7 +1255,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * **************************** LOW-LEVEL IMPLEMENTATION *****************************
+     * **************************** LOW-LEVEL IMPLEMENTATION
+     * *****************************
      */
     private static CellName makeUnique(Library lib, CellName cellName) {
         // ensure unique cell name
@@ -4218,8 +4219,8 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     }
 
     /**
-     * Method to return the main schematic or verilog Cell associated with this Cell.
-     * Examines the group for the main schematic.
+     * Method to return the main schematic or verilog Cell associated with this
+     * Cell. Examines the group for the main schematic.
      *
      * @return the main schematic Cell associated with this Cell.
      * @throws IllegalStateException if Cell is not linked
@@ -4385,8 +4386,15 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
             return null;
         }
 
-        // first check to see if there is a schematics link
+        // firstly we should check for verilog for 5400 needs
         List<Cell> cellsInGroup = getCellsInGroup();
+        for (Cell cellInGroup : cellsInGroup) {
+            if (cellInGroup.getView() == View.VERILOG) {
+                return cellInGroup;
+            }
+        }
+
+        // first check to see if there is a schematics link
         for (Cell cellInGroup : cellsInGroup) {
             if (cellInGroup.isSchematic()) {
                 return cellInGroup;
@@ -4403,13 +4411,6 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
         // finally check to see if there is any "unknown" link
         for (Cell cellInGroup : cellsInGroup) {
             if (cellInGroup.getView() == View.UNKNOWN) {
-                return cellInGroup;
-            }
-        }
-        
-        // finally check to see if there is any "unknown" link
-        for (Cell cellInGroup : cellsInGroup) {
-            if (cellInGroup.getView() == View.VERILOG) {
                 return cellInGroup;
             }
         }
@@ -5330,7 +5331,7 @@ public class Cell extends ElectricObject implements NodeProto, Comparable<Cell> 
     public Cell getEquivalent() {
         return isIcon() ? getMainSchematicOrVerilogInGroup() : this;
     }
-    
+
     /**
      * Finds the Verilog Cell associated with this Icon Cell.
      *

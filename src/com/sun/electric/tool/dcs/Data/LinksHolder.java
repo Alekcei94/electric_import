@@ -24,28 +24,18 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Class to hold links and relative/absolute addresses
- *
- * @author diivanov
+ * Class to hold links and relative/absolute addresses.
+ * Only static final methods and constants.
  */
-public class LinksHolder {
-
-    private static LinksHolder linksHolder;
+public final class LinksHolder {
 
     private LinksHolder() {
-
+        throw new AssertionError("Constructor is not required here");
     }
 
-    public static LinksHolder getInstance() {
-        if (linksHolder == null) {
-            linksHolder = new LinksHolder();
-        }
-        return linksHolder;
-    }
+    private static final String memoryMapRoot = "./MEMORY_MAP/";
 
-    private final String memoryMapRoot = "./MEMORY_MAP/";
-
-    public String getMemoryMapRoot() {
+    public static String getMemoryMapRoot() {
         return memoryMapRoot;
     }
 
@@ -66,7 +56,7 @@ public class LinksHolder {
     /*
      * Path to file config filters
      */
-    private static final String FILER_CONFIG = "./filterDesign.txt";
+    private static final String FILTER_CONFIG = "./FilterScripts/filterDesign.txt";
     /*
      * Path to file all used block in scheme.
      */
@@ -115,7 +105,7 @@ public class LinksHolder {
     }
 
     public static String getFilterConfig() {
-        return FILER_CONFIG;
+        return FILTER_CONFIG;
     }
 
     /**
