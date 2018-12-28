@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -119,6 +120,17 @@ public class Chain extends Vertex {
      */
     public void addWeight() {
         weight += 2;
+    }
+    
+    /**
+     * Method to show if this chain has certain block.
+     * @param pattern
+     * @return 
+     */
+    public boolean fitsPattern(String pattern) {
+         Pattern inst = Pattern.compile(pattern);
+         return chainElements.values().stream().anyMatch((elem)
+                 -> (inst.matcher(elem.getContext()).find()));
     }
 
     /**

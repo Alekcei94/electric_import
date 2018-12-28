@@ -34,12 +34,8 @@ import java.util.Map;
 
 /**
  * Class to implement connection graph structure (ConnectionBox, mux4_1 etc).
- * Contract: reset shouldn't be initiated outside of object. Contract: all
- * methods that change internal environment must toggle isChanged flag.
- * Contract: all methods that transfer information to user must check isChanged
- * and throw Exception if true.
- *
- * @author diivanov
+ * Contract: reset shouldn't be initiated outside of object. 
+ *0
  */
 public class ConnectionGraph implements IConnectable, ICopyable {
 
@@ -50,6 +46,8 @@ public class ConnectionGraph implements IConnectable, ICopyable {
     // Object to manage all weights between external verteces.
     private final LinksMatrix LINKS_MATRIX;
     private final String graphName;
+    
+    private boolean ready;
 
     // BinaryHeaps are creating with the factory
     private static final BinaryHeap.BinaryHeapFactory HEAP_FAB = new BinaryHeap.BinaryHeapFactory();
@@ -111,6 +109,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
+        ready = true;
     }
 
     /**
@@ -121,6 +120,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
         DEIKSTRA = new Deikstra();
         LINKS_MATRIX = new LinksMatrix();
         this.graphName = graphName;
+        ready = true;
     }
 
     /**
@@ -192,6 +192,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
         
         /**
          * Method to get distance to vertex after deikstra method.
+         * Be careful to reset pathes after getting result.
          * @param vertexTo
          * @return 
          */
@@ -295,6 +296,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
             } while (!currentVertex.getContext().equals(vertexFrom.getContext()));
 
             if (doDelete) {
+                ready = false;
                 deleteVerteces(vertecesToDeleteList);
             }
             return configPath;
@@ -360,7 +362,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @return
          * @throws com.sun.electric.tool.dcs.Exceptions.HardFunctionalException
          */
-        public static ConnectionGraph createConnectionGraph(String graphName) throws HardFunctionalException {
+        public static IConnectable createConnectionGraph(String graphName) throws HardFunctionalException {
             File importFile = new File(LinksHolder.getPathTo("connection graph"));
             if(importFile == null) {
                 throw new HardFunctionalException("Connection graph file is not found.");
@@ -375,7 +377,7 @@ public class ConnectionGraph implements IConnectable, ICopyable {
          * @param importFile
          * @return
          */
-        public static ConnectionGraph createConnectionGraphFromFile(String graphName, File importFile) {
+        public static IConnectable createConnectionGraphFromFile(String graphName, File importFile) {
             ConnectionGraph conGraph = graphMap.get(
                     new ImmutableUnorderedPairOfStrings(graphName, importFile.getName()));
             if (conGraph == null) {

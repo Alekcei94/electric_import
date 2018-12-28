@@ -6,14 +6,15 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
-import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import com.sun.electric.tool.dcs.autotracing.Chain.ChainElement;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Class incapsulates the importing logic that shouldn't be used after creation.
@@ -22,7 +23,7 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
 
     private final Map<String, Chain> vertMap; //keeps all vertices
     private final Map<String, LinkedList<String>> adjacencyMap; // keeps main vertex as String and LinkedList with all connected verteces
-    private final Map<ImmutableUnorderedPairOfStrings, ITraceable> edgeMap; // keeps edges as values for vertice+vertice pair as key
+    private final Map<ImmutableUnorderedPairOfStrings, LinkedList<IConnectable>> edgeMap; // keeps edges as values for vertice+vertice pair as key
 
     /**
      * Constructor shouldn't allow more than one instance of class.
@@ -90,7 +91,6 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
     protected void importOneLine(String line) {
         Chain chain = addVertex(line, true);
         handleAdjacency(chain);
-
     }
 
     /**
@@ -116,8 +116,17 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
      * @param vert2
      * @param adr
      */
-    private void handleEdges() {
-
+    private void handleEdges(Chain chain) {
+        // Method is not used because it's faster to get chain/chain/intersectionList from handleAdjacency method
+        List<ChainElement> connectionsList = chain.getConnectionChainElementsList();
+        for (Chain otherChain : vertMap.values()) {
+            List<ChainElement> otherConnectionList = otherChain.getConnectionChainElementsList();
+            List<ChainElement> intersectionsList = connectionsList.stream()
+                    .filter(otherConnectionList::contains)
+                    .collect(Collectors.toList());
+            handleEdge(chain, otherChain, intersectionsList);
+            handleEdge(otherChain, chain, intersectionsList);
+        }
     }
 
     /**
@@ -129,22 +138,39 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
     private void handleAdjacency(Chain chain) {
         List<ChainElement> connectionsList = chain.getConnectionChainElementsList();
         for (Chain otherChain : vertMap.values()) {
-            if (otherChain.getConnectionChainElementsList().stream()
-                    .anyMatch((elem) -> {
-                        return connectionsList.stream()
-                                .anyMatch(otherElem -> otherElem.isSameBlock((ChainElement) elem));
-                    })) {
+            List<ChainElement> otherConnectionList = otherChain.getConnectionChainElementsList();
+            List<ChainElement> intersectionsList = connectionsList.stream()
+                    .filter(otherConnectionList::contains)
+                    .collect(Collectors.toList());
+            if(!intersectionsList.isEmpty()) {
                 addAdjacencyForChains(chain, otherChain);
                 addAdjacencyForChains(otherChain, chain);
             }
-
+            // handle edges is excess operation but it's faster to handle it here.
+            handleEdge(chain, otherChain, intersectionsList);
+            handleEdge(otherChain, chain, intersectionsList);
+            //
+        }
+    }
+    
+    private void handleEdge(Chain first, Chain second, List<ChainElement> intersectionsList) {
+        ImmutableUnorderedPairOfStrings pair =
+                    new ImmutableUnorderedPairOfStrings(first.getContext(), second.getContext());
+        for(ChainElement elem : intersectionsList) {
+            IConnectable localGraph = ConnectionGraph.ConnectionFactory.createConnectionGraph(elem.getContext());
+            LinkedList<IConnectable> edgesList = edgeMap.get(pair);
+            if(edgesList == null) {
+                edgesList = new LinkedList<>();
+            }
+            edgesList.add(localGraph);
         }
     }
 
-    public void addAdjacencyForChains(Chain chain, Chain otherChain) {
+    private void addAdjacencyForChains(Chain chain, Chain otherChain) {
         LinkedList<String> adjList = adjacencyMap.get(chain.getContext());
         if (adjList == null) {
-            adjacencyMap.put(chain.getContext(), new LinkedList<>());
+            adjList = new LinkedList<>();
+            adjacencyMap.put(chain.getContext(), adjList);
         }
         adjList.add(otherChain.getContext());
     }
@@ -166,7 +192,7 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
     /**
      * @return the edgeMap
      */
-    public Map<ImmutableUnorderedPairOfStrings, ITraceable> getEdgeMap() {
+    public Map<ImmutableUnorderedPairOfStrings, LinkedList<IConnectable>> getEdgeMap() {
         return edgeMap;
     }
 

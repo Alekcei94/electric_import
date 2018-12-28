@@ -21,7 +21,7 @@ package com.sun.electric.tool.dcs.Exceptions;
 
 import com.sun.electric.tool.dcs.Accessory;
 
-public class HardFunctionalException extends Exception {
+public class HardFunctionalException extends RuntimeException {
 
     public HardFunctionalException() {
         super();

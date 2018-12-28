@@ -19,7 +19,6 @@ import java.util.Map;
 
 /**
  *
- * @author diivanov
  */
 public abstract class AbstractGraphStructure {
     

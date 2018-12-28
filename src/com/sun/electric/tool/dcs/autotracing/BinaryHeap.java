@@ -29,7 +29,7 @@ import java.util.ArrayList;
  */
 public class BinaryHeap {
 
-    private ArrayList<Pair<Vertex, Integer>> pairList;
+    private ArrayList<Pair<? extends Vertex, Integer>> pairList;
 
     /**
      * Constructor of heap.
@@ -53,8 +53,8 @@ public class BinaryHeap {
      */
     public void add(Vertex key, int value) {
         boolean exist = false;
-        Pair<Vertex, Integer> existingPair = null;
-        for (Pair<Vertex, Integer> pair : pairList) {
+        Pair<? extends Vertex, Integer> existingPair = null;
+        for (Pair<? extends Vertex, Integer> pair : pairList) {
             if (pair.getFirstObject().equals(key)) {
                 exist = true;
                 existingPair = pair;
@@ -68,7 +68,7 @@ public class BinaryHeap {
                 heapifyUp(pairList.indexOf(existingPair));
             }
         } else {
-            Pair<Vertex, Integer> pair = new Pair<>(key, value);
+            Pair<? extends Vertex, Integer> pair = new Pair<>(key, value);
             pairList.add(pair);
             heapifyUp(getKeyHeapSize() - 1);
         }
@@ -84,7 +84,7 @@ public class BinaryHeap {
         int parent = (i - 1) / 2;
 
         while (i > 0 && pairList.get(parent).getSecondObject() > pairList.get(i).getSecondObject()) {
-            Pair<Vertex, Integer> tempPair = pairList.get(i);
+            Pair<? extends Vertex, Integer> tempPair = pairList.get(i);
             pairList.set(i, pairList.get(parent));
             pairList.set(parent, tempPair);
 
@@ -119,7 +119,7 @@ public class BinaryHeap {
                 break;
             }
             
-            Pair<Vertex, Integer> tempPair = pairList.get(i);
+            Pair<? extends Vertex, Integer> tempPair = pairList.get(i);
             pairList.set(i, pairList.get(largestChild));
             pairList.set(largestChild, tempPair);
 

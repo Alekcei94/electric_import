@@ -19,6 +19,8 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
+import java.util.Objects;
+
 /**
  * Class holds vertex logic for autotracing system.
  * @author diivanov
@@ -27,7 +29,7 @@ public class Vertex {
 
     private final String CONTEXT;
     
-    private final int MAXPATHCOUNT = 1000;
+    private static final int MAXPATHCOUNT = 10000;
     private int pathCount = MAXPATHCOUNT;
       
     private final boolean isExternal;
@@ -103,7 +105,7 @@ public class Vertex {
      * Get pathcount of untouched vertex.
      * @return 
      */
-    public int getMaxPathCount() {
+    public static int getMaxPathCount() {
         return MAXPATHCOUNT;
     }
     
@@ -119,4 +121,36 @@ public class Vertex {
     public boolean isExternal() {
         return isExternal;
     }
+    
+    /**
+     * Not sure if it will be used
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + Objects.hashCode(this.getContext());
+        return hash;
+    }
+
+    /**
+     * Not sure if it will be used.
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        } else if (!(o instanceof Chain)) {
+            return false;
+        } else if (!((Chain) o).getContext().equals(this.getContext())) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }
