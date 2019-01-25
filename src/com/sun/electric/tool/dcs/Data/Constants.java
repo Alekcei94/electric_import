@@ -28,11 +28,16 @@ public class Constants {
     private static final String SPLITTER = "\\.";
     private static final String[] CONNECTION_ELEMENT_NAME = {"CB", "CB_small", "MUX4in1"};
     private static final String[] UNIQ_CONNECTION_ELEMENT_NAME = {"CB_small", "MUX4in1"};
+    // TODO: form available nodeInsts from external file.
+    private static final String[] AVAILABLE_NODEINSTS_IN_SCHEME = {};
+    private static final String[] AVAILABLE_INVISIBLE_NODEINSTS_IN_SCHEME = {"Wire_Pin"};
+    private static final String[] STARTING_NODEINST = {"Input", "Output", "Output_adr", "Output_ddr"};
     private static final String KEY_NAME = "key";
     private static final String FPGA_SCHEME_NAME = "FPGA";
     private static final String MAIN_CELL_NAME = "5400TP094";
     private static final String MAIN_LIBRARY_NAME = "5400TP094";
-
+    
+    
     /**
      * @return the splitter
      */
@@ -80,6 +85,20 @@ public class Constants {
      */
     public static String getMainLibraryName() {
         return MAIN_LIBRARY_NAME;
+    }
+
+    /**
+     * @return the STARTING_NODEINST
+     */
+    public static String[] getPossibleStartingNodeInsts() {
+        return STARTING_NODEINST;
+    }
+
+    /**
+     * @return the AVAILABLE_INVISIBLE_NODEINSTS_IN_SCHEME
+     */
+    public static String[] getAvailableInvisibleNodeInstsInScheme() {
+        return AVAILABLE_INVISIBLE_NODEINSTS_IN_SCHEME;
     }
 
 }

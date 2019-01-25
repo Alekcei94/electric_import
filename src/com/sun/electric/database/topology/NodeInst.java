@@ -21,7 +21,6 @@
  */
 package com.sun.electric.database.topology;
 
-import com.sun.electric.database.hierarchy.BatchChanges;
 import com.sun.electric.database.CellBackup;
 import com.sun.electric.database.CellTree;
 import com.sun.electric.database.EObjectInputStream;
@@ -38,6 +37,7 @@ import com.sun.electric.database.geometry.ERectangle;
 import com.sun.electric.database.geometry.Poly;
 import com.sun.electric.database.geometry.PolyBase;
 import com.sun.electric.database.geometry.PolyBase.Point;
+import com.sun.electric.database.hierarchy.BatchChanges;
 import com.sun.electric.database.hierarchy.Cell;
 import com.sun.electric.database.hierarchy.EDatabase;
 import com.sun.electric.database.hierarchy.Export;
@@ -75,7 +75,6 @@ import com.sun.electric.util.math.DBMath;
 import com.sun.electric.util.math.FixpTransform;
 import com.sun.electric.util.math.GenMath;
 import com.sun.electric.util.math.Orientation;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
@@ -4479,5 +4478,31 @@ public class NodeInst extends Geometric implements Nodable, Comparable<NodeInst>
         }
 
         return (true);
+    }
+    
+    /**
+     * Override equals to use nodeInsts in hashsets.
+     * @param o
+     * @return 
+     */
+    @Override
+    public boolean equals(Object o) {
+        if(o == null) {
+            return false;
+        } else if(!(o instanceof NodeInst)) {
+            return false;
+        } else if(! this.toString().equals(o.toString())) {
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Override hashCode as part of the equals contract.
+     * @return 
+     */
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
     }
 }

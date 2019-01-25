@@ -21,9 +21,6 @@
  */
 package com.sun.electric.tool.user.menus;
 
-import static com.sun.electric.tool.user.menus.EMenuItem.SEPARATOR;
-import static com.sun.electric.util.collections.ArrayIterator.i2i;
-
 import com.sun.electric.database.EditingPreferences;
 import com.sun.electric.database.ImmutableExport;
 import com.sun.electric.database.geometry.EPoint;
@@ -72,9 +69,10 @@ import com.sun.electric.tool.compaction.Compaction;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
-import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
+import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
+import com.sun.electric.tool.dcs.autotracing.Autotracing;
 import com.sun.electric.tool.dcs.autotracing.AutotracingTest;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
@@ -150,12 +148,13 @@ import com.sun.electric.tool.user.dialogs.LanguageScripts;
 import com.sun.electric.tool.user.dialogs.MultiFingerTransistor;
 import com.sun.electric.tool.user.dialogs.OpenFile;
 import com.sun.electric.tool.user.dialogs.SeaOfGatesCell;
+import static com.sun.electric.tool.user.menus.EMenuItem.SEPARATOR;
 import com.sun.electric.tool.user.ncc.HighlightEquivalent;
 import com.sun.electric.tool.user.ui.EditWindow;
 import com.sun.electric.tool.user.ui.TextWindow;
 import com.sun.electric.tool.user.ui.TopLevel;
 import com.sun.electric.tool.user.ui.WindowFrame;
-
+import static com.sun.electric.util.collections.ArrayIterator.i2i;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
@@ -170,7 +169,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -1120,6 +1118,12 @@ public class ToolMenu {
                         new EMenuItem("TryGlobalDeikstra") {
                     public void run() {
                         AutotracingTest autoTest = new AutotracingTest();
+                    }
+                },
+                        new EMenuItem("TryAutotracing") {
+                    public void run() {
+                        Autotracing auto = new Autotracing();
+                        auto.testStructure();
                     }
                 }),
                 MenuCommands.makeExtraMenu("pcell.gui.MainMenu", false),
