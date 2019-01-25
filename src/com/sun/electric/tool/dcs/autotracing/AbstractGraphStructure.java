@@ -6,7 +6,9 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Exceptions.InvalidInputException;
+import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import com.sun.electric.tool.dcs.SpecificStructures.Pair;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -21,7 +23,7 @@ import java.util.Map;
  *
  */
 public abstract class AbstractGraphStructure {
-    
+
     /**
      * Method to import graph object from text file.
      *
@@ -33,17 +35,19 @@ public abstract class AbstractGraphStructure {
             while ((line = br.readLine()) != null) {
                 importOneLine(line);
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             throw new AssertionError("Graph file is corrupted or doesn't exist.");
         }
     }
+
     /**
-     * Method to handle one line of import file,
-     * should be implemented with class' own logic.
-     * @param line 
+     * Method to handle one line of import file, should be implemented with
+     * class' own logic.
+     *
+     * @param line
      */
     protected abstract void importOneLine(String line);
-    
+
     /**
      * Class to implement cloning logic to use it as copy constructor.
      */
@@ -75,22 +79,47 @@ public abstract class AbstractGraphStructure {
             });
             return copiedMap;
         }
+        
+        /**
+         * Method to create deep copy of list by copying every object while
+         * iterating through it with copyObject method, Default copyObject
+         * method works with Strings, Verteces, Pairs and several types of Lists
+         * of these elements.
+         * BE CAREFUL: method doesn't work with other types than array/linked list.
+         *
+         * @param <E>
+         * @param listToCopy
+         * @return
+         */
+        protected <E> List<E> createDeepCopyOfList(List<E> listToCopy) {
+            return (List<E>) copyObject(listToCopy);
+        }
 
         /**
          * Method to support deep copy of complex objects. Method should be
          * extended for new object types.
-         *
+         * @param <E>
          * @param object
          * @return
          */
         protected <E> Object copyObject(Object object) {
             if (object instanceof String) {
                 return (String) object;
+            } else if (object instanceof Integer) {
+                // not sure if it's ok with double casting but that helps avoid same element.
+                return (int) object;
+            }
+            else if (object instanceof ImmutableUnorderedPairOfStrings) {
+                return new ImmutableUnorderedPairOfStrings((ImmutableUnorderedPairOfStrings) object);
             } else if (object instanceof Pair) {
                 // Pair's objects can't be deep copied so it must be used only with strings or other immutable classes.
                 return new Pair(((Pair) object).getFirstObject(), ((Pair) object).getSecondObject());
+            } else if (object instanceof Chain) {
+                return new Chain((Chain) object);
             } else if (object instanceof Vertex) {
                 return new Vertex((Vertex) object);
+            } else if (object instanceof IConnectable) {
+                return ((IConnectable) object).copySelf();
             } else if (object instanceof LinkedList) {
                 List<E> list = (LinkedList<E>) object;
                 LinkedList<E> copiedList = new LinkedList<>();

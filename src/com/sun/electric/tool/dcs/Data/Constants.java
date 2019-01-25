@@ -25,8 +25,9 @@ package com.sun.electric.tool.dcs.Data;
  */
 public class Constants {
     
-    private static final String SPLITTER = "_";
-    private static final String CONNECTION_ELEMENT_NAME = "CB";
+    private static final String SPLITTER = "\\.";
+    private static final String[] CONNECTION_ELEMENT_NAME = {"CB", "CB_small", "MUX4in1"};
+    private static final String[] UNIQ_CONNECTION_ELEMENT_NAME = {"CB_small", "MUX4in1"};
     private static final String KEY_NAME = "key";
     private static final String FPGA_SCHEME_NAME = "FPGA";
     private static final String MAIN_CELL_NAME = "5400TP094";
@@ -42,8 +43,14 @@ public class Constants {
     /**
      * @return the CONNECTION_ELEMENT_NAME
      */
-    public static String getConnectionElementName() {
+    public static String[] getConnectionElementNames() {
         return CONNECTION_ELEMENT_NAME;
+    }
+    /**
+     * @return the CONNECTION_ELEMENT_NAME
+     */
+    public static String[] getUniqConnectionElementNames() {
+        return UNIQ_CONNECTION_ELEMENT_NAME;
     }
     
     private Constants() {

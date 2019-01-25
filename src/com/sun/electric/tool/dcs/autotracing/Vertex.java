@@ -23,30 +23,33 @@ import java.util.Objects;
 
 /**
  * Class holds vertex logic for autotracing system.
+ *
  * @author diivanov
  */
 public class Vertex {
 
     private final String CONTEXT;
-    
+
     private static final int MAXPATHCOUNT = 10000;
     private int pathCount = MAXPATHCOUNT;
-      
+
     private final boolean isExternal;
+    private final boolean isGlobal;
     private boolean isVisited;
-    
 
     /**
      * @param context
      */
     public Vertex(String context) {
         this.CONTEXT = context;
-        isExternal = context.contains("#");
+        this.isExternal = context.contains("#");
+        this.isGlobal = context.contains("/");
     }
-    
+
     /**
      * Copy constructor.
-     * @param vert 
+     *
+     * @param vert
      */
     public Vertex(Vertex vert) {
         this(vert.getContext());
@@ -56,6 +59,7 @@ public class Vertex {
 
     /**
      * Uniq label.
+     *
      * @return label.
      */
     public String getContext() {
@@ -64,6 +68,7 @@ public class Vertex {
 
     /**
      * Get variable for deikstra method.
+     *
      * @return true if vert was visited
      */
     public boolean isVisited() {
@@ -72,6 +77,7 @@ public class Vertex {
 
     /**
      * Set variable for deikstra method.
+     *
      * @param isVisited
      */
     public final void setVisited(boolean isVisited) {
@@ -80,6 +86,7 @@ public class Vertex {
 
     /**
      * Get variable for deikstra method.
+     *
      * @return current path value for vertice
      */
     public int getPathCount() {
@@ -88,6 +95,7 @@ public class Vertex {
 
     /**
      * Set variable for deikstra method.
+     *
      * @param count
      */
     public final void setPathCount(int count) {
@@ -103,12 +111,13 @@ public class Vertex {
 
     /**
      * Get pathcount of untouched vertex.
-     * @return 
+     *
+     * @return
      */
     public static int getMaxPathCount() {
         return MAXPATHCOUNT;
     }
-    
+
     @Override
     public String toString() {
         String answer = "Vertex: " + this.getContext();
@@ -121,7 +130,7 @@ public class Vertex {
     public boolean isExternal() {
         return isExternal;
     }
-    
+
     /**
      * Not sure if it will be used
      *
@@ -151,6 +160,12 @@ public class Vertex {
         }
         return true;
     }
-    
-    
+
+    /**
+     * @return the isGlobal
+     */
+    public boolean isGlobal() {
+        return isGlobal;
+    }
+
 }

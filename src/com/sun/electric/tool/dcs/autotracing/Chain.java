@@ -20,6 +20,7 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Data.Constants;
+import com.sun.electric.tool.dcs.Exceptions.HardFunctionalException;
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -35,9 +38,13 @@ import java.util.stream.Collectors;
 public class Chain extends Vertex {
 
     private final Map<String, ChainElement> chainElements = new HashMap<>();
+    private final String simplifiedName;
+
     //private final List<ChainElement> connectionChainElementsList = new ArrayList<>();
     private int weight = 1;
     private boolean isDeleted;
+
+    private static final Logger logger = LoggerFactory.getLogger(Chain.class);
 
     /**
      * Constructor: parse input String to port elements, adding parse return to
@@ -48,6 +55,7 @@ public class Chain extends Vertex {
     public Chain(String context) {
         super(context);
         formChainElementsMap(context);
+        this.simplifiedName = simplifyName(context);
     }
 
     /**
@@ -56,14 +64,19 @@ public class Chain extends Vertex {
      *
      * @param vertex
      */
-    public Chain(Vertex vertex) {
+    public Chain(Chain vertex) {
         super(vertex.getContext());
-        Chain chain = (Chain) vertex;
-        formChainElementsMap(chain.getContext());
-        this.weight = chain.getWeight();
+        formChainElementsMap(vertex.getContext());
+        this.weight = vertex.getWeight();
+        this.simplifiedName = vertex.getSimplifiedName();
     }
-    
-    public List getConnectionChainElementsList() {
+
+    /**
+     * Method to get all chainElements from this chain.
+     *
+     * @return
+     */
+    public List<ChainElement> getConnectionChainElementsList() {
         return chainElements.values().stream()
                 .filter(value -> value.isConnectionElement())
                 .collect(Collectors.toList());
@@ -79,6 +92,26 @@ public class Chain extends Vertex {
             chainElement = new ChainElement(element);
             chainElements.put(element, chainElement);
         }
+    }
+
+    /**
+     * Method to improve perfomancy of chains by using cut names
+     *
+     * @param fullName
+     * @return
+     */
+    private String simplifyName(String fullName) {
+        String[] split = fullName.split(" ");
+        if (split.length == 0) {
+            throw new HardFunctionalException("Incorrect structure, there are some spaces in graph");
+        }
+        String simplifyName = split[0];
+        split = simplifyName.split(Constants.getSplitter());
+        if (split.length != 3) {
+            throw new HardFunctionalException("Incorrect structure, one of the elements isn't ");
+        }
+        simplifyName = split[1] + "." + split[2];
+        return simplifyName;
     }
 
     /**
@@ -121,16 +154,33 @@ public class Chain extends Vertex {
     public void addWeight() {
         weight += 2;
     }
-    
+
     /**
      * Method to show if this chain has certain block.
+     *
      * @param pattern
-     * @return 
+     * @return
      */
     public boolean fitsPattern(String pattern) {
-         Pattern inst = Pattern.compile(pattern);
-         return chainElements.values().stream().anyMatch((elem)
-                 -> (inst.matcher(elem.getContext()).find()));
+        Pattern inst = Pattern.compile(pattern);
+        return chainElements.values().stream().anyMatch((elem)
+                -> (inst.matcher(elem.getContext()).find()));
+    }
+
+    /**
+     * Method to get ChainElement for any local graph from only it's name.
+     *
+     * @param context
+     * @return
+     */
+    public ChainElement getChainElementWithContext(String context) {
+        List<ChainElement> elemList = getConnectionChainElementsList();
+        for (ChainElement elem : elemList) {
+            if (elem.getNameAndAddr().equals(context)) {
+                return elem;
+            }
+        }
+        throw new HardFunctionalException("No elements with context");
     }
 
     /**
@@ -164,7 +214,15 @@ public class Chain extends Vertex {
     }
 
     /**
+     * @return the simplifiedName
+     */
+    public String getSimplifiedName() {
+        return simplifiedName;
+    }
+
+    /**
      * Class incapsulates parameters of each object inside chain.
+     *
      * @Contract: global address is unique.
      */
     public class ChainElement {
@@ -175,11 +233,12 @@ public class Chain extends Vertex {
         private final String globalAddr;
         private final String port;
 
-        private final boolean connectionElement;
+        private boolean connectionElement;
 
         private ChainElement(String context) {
             this.context = context;
             String splitter = Constants.getSplitter();
+            logger.debug(context);
             String[] split = context.split(splitter);
             if (split.length != 3) {
                 throw new InvalidStructureError("Incorrect configuration of graph file");
@@ -187,7 +246,11 @@ public class Chain extends Vertex {
             this.name = split[0];
             this.globalAddr = split[1];
             this.port = split[2];
-            connectionElement = this.name.equals(Constants.getConnectionElementName());
+            for (String connectionName : Constants.getConnectionElementNames()) {
+                if (name.equals(connectionName)) {
+                    connectionElement = true;
+                }
+            }
         }
 
         /**
@@ -205,6 +268,24 @@ public class Chain extends Vertex {
         }
 
         /**
+         * Method to show if this element is connected to chainElement. We
+         * consider element as connected if it has same block name and global
+         * address.
+         *
+         * @param chainElement
+         * @return
+         */
+        public boolean isConnectedTo(ChainElement chainElement) {
+            if (!this.name.equals(chainElement.getName())) {
+                return false;
+            }
+            if (!this.globalAddr.equals(chainElement.getGlobalAddr())) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
          * @return the globalAddr
          */
         public String getGlobalAddr() {
@@ -217,15 +298,16 @@ public class Chain extends Vertex {
         public String getPort() {
             return port;
         }
-        
+
         /**
          * Method to check if object relates to same block as this object.
          * Suggesting that global address is unique.
+         *
          * @param chainElement
-         * @return 
+         * @return
          */
         public boolean isSameBlock(ChainElement chainElement) {
-            return chainElement.getGlobalAddr().equals(this.getGlobalAddr()); 
+            return chainElement.getGlobalAddr().equals(this.getGlobalAddr());
         }
 
         @Override
@@ -254,5 +336,15 @@ public class Chain extends Vertex {
             return context;
         }
 
+        /**
+         * Method to get name and addr to use it as unique name.
+         *
+         * @return
+         */
+        public String getNameAndAddr() {
+            return this.name + "." + this.globalAddr;
+        }
+
     }
+
 }

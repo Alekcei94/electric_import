@@ -10,6 +10,7 @@ package com.sun.electric.tool.dcs.SpecificStructures;
  * @author diivanov
  */
 public final class ImmutableUnorderedPairOfStrings {
+    
     private final String first;
     private final String second;
 
@@ -27,6 +28,21 @@ public final class ImmutableUnorderedPairOfStrings {
         }
         this.first = first;
         this.second = second;
+    }
+    
+    /**
+     * Copy constructor
+     * @param original
+     */
+    public ImmutableUnorderedPairOfStrings(ImmutableUnorderedPairOfStrings original) {
+        this.first = original.getFirstObject();
+        this.second = original.getSecondObject();
+        if ((first == null) || (second == null)) {
+            throw new NullPointerException("Transfer null object to pair");
+        }
+        if(first.equals(second)) {
+            throw new AssertionError("Pair elements must not be equals");
+        }
     }
 
     /**
@@ -84,8 +100,8 @@ public final class ImmutableUnorderedPairOfStrings {
     
     @Override
     public String toString() {
-        String answer = "first string: " + getFirstObject().toString()
-                + ", second string: " + getSecondObject().toString();
+        String answer = "first string: " + getFirstObject()
+                + ", second string: " + getSecondObject();
         return answer;
     }
 }

@@ -46,4 +46,24 @@ public interface IConnectable {
      * @return
      */
     public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete);
+    
+    /**
+     * Interface to get copy of local graph.
+     * @return 
+     */
+    public IConnectable copySelf();
+    
+    /**
+     * Must override equals
+     * @return 
+     */
+    @Override
+    public boolean equals(Object con);
+    
+    /**
+     * Must override hashCode
+     * @return 
+     */
+    @Override
+    public int hashCode();
 }

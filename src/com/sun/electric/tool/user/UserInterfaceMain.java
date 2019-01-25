@@ -33,7 +33,6 @@ import com.sun.electric.database.hierarchy.EDatabase;
 import com.sun.electric.database.id.IdManager;
 import com.sun.electric.database.text.Pref;
 import com.sun.electric.database.text.TextUtils;
-import com.sun.electric.database.text.Version;
 import com.sun.electric.database.variable.EditWindow_;
 import com.sun.electric.technology.TechPool;
 import com.sun.electric.tool.AbstractUserInterface;
@@ -56,10 +55,8 @@ import com.sun.electric.tool.user.ui.WindowContent;
 import com.sun.electric.tool.user.ui.WindowFrame;
 import com.sun.electric.util.ClientOS;
 import com.sun.electric.util.math.FixpTransform;
-
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -82,8 +79,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -1280,20 +1275,20 @@ public class UserInterfaceMain extends AbstractUserInterface {
             setIconImage(TopLevel.getFrameIcon().getImage());
 
             JPanel whole = new JPanel();
-            whole.setBorder(BorderFactory.createLineBorder(new Color(0, 170, 0), 5));
+            //whole.setBorder(BorderFactory.createLineBorder(new Color(0, 170, 0), 5));
             whole.setLayout(new BorderLayout());
 
             ImageIcon splashImage = Resources.getResource(TopLevel.class, "SplashImage.gif");
             JLabel l = new JLabel(splashImage);
             whole.add(l, BorderLayout.CENTER);
-            JLabel v = new JLabel("Version " + Version.getVersion(), JLabel.CENTER);
-            whole.add(v, BorderLayout.SOUTH);
+            //JLabel v = new JLabel("Version " + Version.getVersion(), JLabel.CENTER);
+            //whole.add(v, BorderLayout.SOUTH);
             String fontName = User.getFactoryDefaultFont();
             //String fontName = User.getDefaultFont();
             Font font = new Font(fontName, Font.BOLD, 24);
-            v.setFont(font);
-            v.setForeground(Color.BLACK);
-            v.setBackground(Color.WHITE);
+            //v.setFont(font);
+            //v.setForeground(Color.BLACK);
+            //v.setBackground(Color.WHITE);
 
             getContentPane().add(whole, BorderLayout.SOUTH);
 

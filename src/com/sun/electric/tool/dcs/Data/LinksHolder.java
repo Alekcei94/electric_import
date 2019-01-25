@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Class to hold links and relative/absolute addresses.
- * Only static final methods and constants.
+ * Class to hold links and relative/absolute addresses. Only static final
+ * methods and constants.
  */
 public final class LinksHolder {
 
@@ -46,25 +46,40 @@ public final class LinksHolder {
     private static final String CB_PATH = "./autotracing/CBGraph.trc";
     /**
      * Path to configuration String (list of keys), typically in
-     * /config/config.txt
+     * /config/config.txt.
      */
     private static final String CONFIG_PATH = "../config/config.txt";
     /**
-     * Path to global graph, typically in /electric/autotracing/global.trc
+     * Path to global graph, typically in /electric/autotracing/global.trc.
      */
     private static final String GLOBAL_PATH = "./autotracing/global.trc";
+    /**
+     * Path to SPM's connection graph.
+     */
+    private static final String CB_SMALL_PATH = "./autotracing/CBsmallGraph.trc";
+    /**
+     * Path to muxGraph that is uniq every element.
+     */
+    private static final String MUX_GRAPH_PATH = "./autotracing/muxGraph.trc";
     /*
      * Path to file config filters
      */
     private static final String FILTER_CONFIG = "./FilterScripts/filterDesign.txt";
+
+    private static final String PATH_TO_FILTER_IMAGE =
+            "./FilterScripts/filterDesignResult.png";
+
+    private static final String FILTER_PATH = "./FilterScripts";
     /*
      * Path to file all used block in scheme.
      */
-    private static final String PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME = "./accessory/allUsedBlocks.acc";
+    private static final String PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME =
+            "./accessory/allUsedBlocks.acc";
     /*
      * Path in file config FPGA.
      */
-    private static final String PATH_FILE_CONFIG_FPGA_BLOCK = "../Projects/5400TP094/simulation/Verilog.bitnum";
+    private static final String PATH_FILE_CONFIG_FPGA_BLOCK =
+            "../Projects/5400TP094/simulation/Verilog.bitnum";
     /*
      *
      */
@@ -81,8 +96,12 @@ public final class LinksHolder {
 
     public static String getPathTo(String pathTo) {
         switch (pathTo) {
-            case "connection graph":
+            case "CB":
                 return CB_PATH;
+            case "CB_small":
+                return CB_SMALL_PATH;
+            case "MUX4in1":
+                return MUX_GRAPH_PATH;
             case "config":
                 return CONFIG_PATH;
             case "global graph":
@@ -161,7 +180,7 @@ public final class LinksHolder {
     }
 
     /////////////////////////////////////////////////////////////////////////
-    private static final String pathToXCAD = PARENT_PATH + "\\XCAD\\bin";
+    private static final String PATH_TO_XCAD = PARENT_PATH + "\\XCAD\\bin";
 
     /**
      * Method to get path to xcad. ex: C:/CYGELENG/xcad/bin/
@@ -169,6 +188,20 @@ public final class LinksHolder {
      * @return
      */
     public static String getXCADPath() {
-        return pathToXCAD;
+        return PATH_TO_XCAD;
+    }
+
+    /**
+     * @return the PATH_TO_FILTER_IMAGE
+     */
+    public static String getPathToFilterImage() {
+        return PATH_TO_FILTER_IMAGE;
+    }
+
+    /**
+     * @return the FILTER_PATH
+     */
+    public static String getFilterPath() {
+        return FILTER_PATH;
     }
 }

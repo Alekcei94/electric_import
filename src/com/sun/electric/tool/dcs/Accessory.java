@@ -22,15 +22,12 @@ package com.sun.electric.tool.dcs;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
-
-import javax.swing.JOptionPane;
-
+import java.io.IOException;
 import java.io.PrintWriter;
+import javax.swing.JOptionPane;
 
 /**
  * Class is needed to have constant access to utility methods like writing to
@@ -39,14 +36,15 @@ import java.io.PrintWriter;
  */
 public class Accessory {
 
-    private static long timeStart;
-    private static long deltaTime;
-
     /**
      * private constructor prohibits creating objects of this class.
      */
     private Accessory() {
         throw new AssertionError();
+    }
+
+    public static void writeToLog(String text) {
+        write("C:/dcsEle/log.txt", text);
     }
 
     /**
@@ -119,35 +117,33 @@ public class Accessory {
      * @param file
      * @return
      */
-    public static int getStringCount(File file) {
-        int qr = 0;
-        BufferedReader bufferedReader;
-        try {
-            FileReader fileReader = new FileReader(file);
-            bufferedReader = new BufferedReader(fileReader);
-            while (bufferedReader.readLine() != null) {
-                qr++;
+    public static int getStringCount(File file) throws IOException {
+        int counter = 0;
+        try(BufferedReader br = InputFactory.bufferedReader(file)) {
+            String line;
+            while(br.readLine() != null) {
+                counter++;
             }
-            bufferedReader.close();
-            return qr;
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+            return counter;
         }
-        return 0;
     }
+
+    private static long timeStart;
 
     /**
      * Timer starts here.
      */
-    public static void timeStart() {
+    public static long timeStart() {
         if ((timeStart != 0L) || (timeStart > 300000L)) {
-            deltaTime = (System.currentTimeMillis() - timeStart);
+            long deltaTime = (System.currentTimeMillis() - timeStart);
             timeStart = System.currentTimeMillis();
-            System.out.println(deltaTime + " ms");
+            return deltaTime;
         } else {
             timeStart = System.currentTimeMillis();
+            return 0;
         }
     }
+    
     /**
      * Method executes application with absolute path as path.
      * @param path

@@ -75,6 +75,7 @@ import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
+import com.sun.electric.tool.dcs.autotracing.AutotracingTest;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
 import com.sun.electric.tool.drc.CalibreDrcErrors;
 import com.sun.electric.tool.drc.DRC;
@@ -1114,6 +1115,11 @@ public class ToolMenu {
                         Cell mainCell = Library.findCellInLibraries(Constants.getMainCellName(),
                                 View.SCHEMATIC, Constants.getMainLibraryName());
                         ExportKeys.startFormingConfig(mainCell);
+                    }
+                },
+                        new EMenuItem("TryGlobalDeikstra") {
+                    public void run() {
+                        AutotracingTest autoTest = new AutotracingTest();
                     }
                 }),
                 MenuCommands.makeExtraMenu("pcell.gui.MainMenu", false),

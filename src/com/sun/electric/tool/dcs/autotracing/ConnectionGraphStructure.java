@@ -5,14 +5,9 @@
  */
 package com.sun.electric.tool.dcs.autotracing;
 
-import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Exceptions.InvalidInputException;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
-import com.sun.electric.tool.dcs.SpecificStructures.Pair;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -43,12 +38,13 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
     }
 
     /**
-     * Copy constructor.
+     * Copy constructor from structure of another graph.
      *
      * @param structure
      */
     public ConnectionGraphStructure(ConnectionGraphStructure structure) {
         CloneGraphStructure clone = new CloneGraphStructure();
+        // be careful for clone because it must not make useless copies of graphs (graph should be copied only once).
         this.vertMap = clone.createDeepCopyOfMap(structure.getVertMap());
         this.adjacencyMap = clone.createDeepCopyOfMap(structure.getAdjacencyMap());
         this.edgeMap = clone.createDeepCopyOfMap(structure.getEdgeMap());
@@ -99,6 +95,10 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
                 extVertexList.add(entry.getKey());
             }
         });
+        // not sure if it's better than existing code
+        /*vertMap.entrySet().stream().filter((entry) -> entry.getValue().isExternal())
+                .map((entry) -> entry.getKey())
+                .collect(Collectors.toList());*/
         return extVertexList;
     }
 
@@ -116,7 +116,7 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
         String adr = split[0];
         //should I verify input with regex?
         if (vertices.length != 2) {
-            throw new InvalidInputException("Incorrect structure of graph file");
+            throw new InvalidInputException("Incorrect structure of graph file, number of verteces isn't equal 2");
         }
         for (String vert : vertices) {
             addVertex(vert, false);
@@ -135,7 +135,7 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
     private void addVertex(String name, boolean throwIfExists) {
         if (getVertMap().get(name) != null) {
             if (throwIfExists) {
-                throw new IllegalArgumentException("Vertex with name" + name + "already exists");
+                throw new IllegalArgumentException("Vertex with name " + name + " already exists");
             }
         } else {
             Vertex vert = new Vertex(name);
@@ -144,8 +144,7 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
     }
 
     /**
-     * Method to tie edges with vertex pairs. Automatically added reverse pair
-     * to list.
+     * Method to tie edges with vertex pairs. pair is immutable so reverse situation is ok.
      *
      * @param vert1
      * @param vert2
@@ -154,9 +153,6 @@ public final class ConnectionGraphStructure extends AbstractGraphStructure {
     private void handleEdges(String vert1, String vert2, String adr) {
         ImmutableUnorderedPairOfStrings pair = new ImmutableUnorderedPairOfStrings(vert1, vert2);
         getEdgeMap().put(pair, adr);
-        // handle reverse situation
-        ImmutableUnorderedPairOfStrings pair2 = new ImmutableUnorderedPairOfStrings(vert2, vert1);
-        getEdgeMap().put(pair2, adr);
     }
 
     /**

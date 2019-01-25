@@ -5,10 +5,15 @@
  */
 package com.sun.electric.tool.dcs.autotracing.Interfaces;
 
+import java.util.List;
+
 /**
- *
- * @author diivanov
+ * Interface for global graphs.
  */
 public interface ITraceable {
     
+    public List<String> getConfigurationPath(String vertexFrom, String pattern,
+            boolean doDelete);
+    
+    public String getName();
 }

@@ -52,16 +52,14 @@ public class BinaryHeap {
      * @param key
      */
     public void add(Vertex key, int value) {
-        boolean exist = false;
         Pair<? extends Vertex, Integer> existingPair = null;
         for (Pair<? extends Vertex, Integer> pair : pairList) {
             if (pair.getFirstObject().equals(key)) {
-                exist = true;
                 existingPair = pair;
                 break;
             }
         }
-        if (exist) {
+        if (existingPair != null) {
             int oldVal = existingPair.getSecondObject();
             if (value < oldVal) {
                 existingPair.setSecondObject(value);

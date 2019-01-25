@@ -106,13 +106,13 @@ public class CommonMethods {
      * there.
      */
     public static <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) {
-        ArrayList<A> objectsList = new ArrayList<>();
+        A object = null;
         while (iterator.hasNext()) {
-            objectsList.add(iterator.next());
+            if(object != null) {
+                throw new IllegalStateException("More than one object in iterator");
+            }
+            object = iterator.next();
         }
-        if (objectsList.size() != 1) {
-            throw new IllegalStateException("More than one object in iterator");
-        }
-        return objectsList.get(0);
+        return object;
     }
 }

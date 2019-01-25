@@ -20,14 +20,14 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
-import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
-import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.Exceptions.HardFunctionalException;
-import com.sun.electric.tool.dcs.Scripts.ExportKeys;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import com.sun.electric.tool.dcs.SpecificStructures.Pair;
+import com.sun.electric.tool.dcs.autotracing.Chain.ChainElement;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
+import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,10 +41,11 @@ import org.slf4j.LoggerFactory;
 /**
  *
  */
-public class GlobalGraph implements IConnectable, ICopyable {
+public class GlobalGraph implements ITraceable, ICopyable {
 
     private final String graphName;
     private final GlobalGraphStructure STRUCTURE;
+    private final Deikstra DEIKSTRA;
 
     // BinaryHeaps are creating with the factory
     private static final BinaryHeap.BinaryHeapFactory HEAP_FAB = new BinaryHeap.BinaryHeapFactory();
@@ -57,8 +58,9 @@ public class GlobalGraph implements IConnectable, ICopyable {
      * @param importStructure
      */
     private GlobalGraph(String graphName, File importStructure) {
-        STRUCTURE = new GlobalGraphStructure(importStructure);
+        this.STRUCTURE = new GlobalGraphStructure(importStructure);
         this.graphName = graphName;
+        this.DEIKSTRA = new Deikstra();
     }
 
     /**
@@ -70,9 +72,47 @@ public class GlobalGraph implements IConnectable, ICopyable {
     private GlobalGraph(String graphName, GlobalGraph original) {
         this.STRUCTURE = new GlobalGraphStructure(original.getStructure());
         this.graphName = graphName;
+        this.DEIKSTRA = new Deikstra();
     }
 
-    public void deleteKeyFromGraph(String key);
+    /**
+     * ONLY METHOD TO DEVELOP, DELETE AFTER.
+     */
+    public void showStructure() {
+        //System.out.println(STRUCTURE.getVertMap().toString());
+        //System.out.println(STRUCTURE.getAdjacencyMap().toString());
+        //System.out.println(STRUCTURE.getEdgeMap().toString());
+        Map map = STRUCTURE.getVertMap();
+        map.forEach((key, value) -> {
+            System.out.println(key + " : " + value);
+        });
+        map = STRUCTURE.getAdjacencyMap();
+        map.forEach((key, value) -> {
+            System.out.println(key + " : " + value);
+        });
+        map = STRUCTURE.getEdgeMap();
+        map.forEach((key, value) -> {
+            System.out.println(key + " : " + value);
+        });
+    }
+
+    /**
+     * Method to get path between verteces.
+     * @param vertexFrom
+     * @param pattern
+     * @param doDelete
+     * @return list of keys or null if path is not found.
+     */
+    @Override
+    public List<String> getConfigurationPath(String vertexFrom, String pattern,
+            boolean doDelete) {
+        //Chain chain = getChainFromPattern(vertexFrom); ???
+        Chain chain = STRUCTURE.getVertMap().get(vertexFrom);
+        if (chain == null) {
+            throw new AssertionError("Chain with name " + vertexFrom + " is not found.");
+        }
+        return DEIKSTRA.deikstra(chain, pattern, doDelete);
+    }
 
     /**
      * Method to get the name of this graph.
@@ -84,9 +124,22 @@ public class GlobalGraph implements IConnectable, ICopyable {
         return graphName;
     }
 
-    public int getWeight(String elemFrom, String elemTo);
-
-    public List<String> getConfigurationPath(String elemFrom, String elemTo, boolean doDelete);
+    /**
+     * Method to get Chain that meets the requirements.
+     *
+     * @param vertex
+     * @return
+     */
+    private Chain getChainFromPattern(String vertex) {
+        Map<String, Chain> map = STRUCTURE.getVertMap();
+        Accessory.writeToLog(vertex);
+        for (String str : map.keySet()) {
+            if (str.contains(vertex)) {
+                return map.get(str);
+            }
+        }
+        throw new HardFunctionalException("Pattern isn't found in structure");
+    }
 
     /**
      * Method to get structure from this global graph. Used in copy constructor.
@@ -103,8 +156,8 @@ public class GlobalGraph implements IConnectable, ICopyable {
     private class Deikstra {
 
         /**
-         * Method to get distance to vertex after deikstra method. 
-         * Be careful to reset pathes after getting result.
+         * Method to get distance to vertex after deikstra method. Be careful to
+         * reset pathes after getting result.
          *
          * @param vertexTo
          * @return
@@ -114,84 +167,69 @@ public class GlobalGraph implements IConnectable, ICopyable {
                 throw new HardFunctionalException("Null in Deikstra's getDistance method");
             }
             Vertex vert = STRUCTURE.getVertMap().get(vertexTo);
-            if (vert.getPathCount() == vert.getMaxPathCount()) {
+            if (vert.getPathCount() == Vertex.getMaxPathCount()) {
                 throw new AssertionError("Algorithm failed");
             }
             return vert.getPathCount();
         }
-        
+
         /**
          * Method to get minimum distance between two verteces.
+         *
          * @param vertexFrom
          * @param VertexTo
          * @return minimum distance or -1 if way was not found
          */
-        private int getDistanceBetween(String vertexFrom, String vertexTo) {
-            ImmutableUnorderedPairOfStrings pair =
-                    new ImmutableUnorderedPairOfStrings(vertexFrom, vertexTo);
-            List<IConnectable> connectionGraphs = STRUCTURE.getEdgeMap().get(pair);
+        private Pair<String, Integer> getGraphWithMinimumDistance(Chain vertexFrom, Chain vertexTo) {
+            ImmutableUnorderedPairOfStrings pair
+                    = new ImmutableUnorderedPairOfStrings(vertexFrom.getSimplifiedName(), vertexTo.getSimplifiedName());
+            LinkedList<String> connectionGraphs = STRUCTURE.getEdgeMap().get(pair);
             int minimum = Vertex.getMaxPathCount();
-            for(IConnectable conGraph : connectionGraphs) {
-                int distance = conGraph.getWeight(vertexFrom, vertexTo);
-                if(distance < minimum) {
+            String best = null;
+            for (String conGraphStr : connectionGraphs) {
+                IConnectable conGraph = STRUCTURE.getConnectionMap().get(conGraphStr);
+                ChainElement ceFrom = vertexFrom.getChainElementWithContext(conGraphStr);
+                ChainElement ceTo = vertexTo.getChainElementWithContext(conGraphStr);
+                int distance = conGraph.getWeight(ceFrom.getPort(), ceTo.getPort());
+                if (distance < minimum) {
                     minimum = distance;
+                    best = conGraphStr;
                 }
             }
-            return (minimum ==  Vertex.getMaxPathCount()) ? -1 : minimum;
-        }
-        
-        /**
-         * Method to get minimum distance between two verteces.
-         * @param vertexFrom
-         * @param VertexTo
-         * @return pair of connection graph and it's minimum distance.
-         */
-        private Pair<IConnectable, Integer> getGraphWithMinimumDistance(String vertexFrom, String vertexTo) {
-            ImmutableUnorderedPairOfStrings pair =
-                    new ImmutableUnorderedPairOfStrings(vertexFrom, vertexTo);
-            LinkedList<IConnectable> connectionGraphs = STRUCTURE.getEdgeMap().get(pair);
-            int minimum = Vertex.getMaxPathCount();
-            IConnectable best = connectionGraphs.getFirst();
-            for(IConnectable conGraph : connectionGraphs) {
-                int distance = conGraph.getWeight(vertexFrom, vertexTo);
-                if(distance < minimum) {
-                    minimum = distance;
-                    best = conGraph;
-                }
+            if (best == null) {
+                throw new HardFunctionalException("Null in minimum distance.");
             }
             //TODO: check for non-existance of path
             return new Pair<>(best, minimum);
         }
-        
-        /**
-         * Method to get minimum distance between two verteces.
-         * @param vertexFrom
-         * @param VertexTo
-         * @return minimum distance or -1 if way was not found
-         */
-        private Pair<IConnectable, Integer> getGraphWithMinimumDistance(Vertex vertexFrom, Vertex vertexTo) {
-            return getGraphWithMinimumDistance(vertexFrom.getContext(), vertexTo.getContext());
-        }
-        
-        /**
-         * Method to get minimum distance between two verteces.
-         * @param vertexFrom
-         * @param VertexTo
-         * @return minimum distance or -1 if way was not found
-         */
-        private int getDistanceBetween(Vertex vertexFrom, Vertex vertexTo) {
-            return getDistanceBetween(vertexFrom.getContext(), vertexTo.getContext());
-        }
 
         /**
-         * Main deikstra function, count minimum distance between VertexFrom and
-         * all other verteces.
+         * Method to get minimum distance between two verteces.
          *
          * @param vertexFrom
+         * @param VertexTo
+         * @return minimum distance or -1 if way was not found
          */
-        private List<String> deikstra(String vertexFrom, String pattern, boolean doDelete) throws HardFunctionalException {
+        private int getDistanceBetween(Chain vertexFrom, Chain vertexTo) {
+            ImmutableUnorderedPairOfStrings pair
+                    = new ImmutableUnorderedPairOfStrings(vertexFrom.getSimplifiedName(), vertexTo.getSimplifiedName());
+            List<String> connectionGraphs = STRUCTURE.getEdgeMap().get(pair);
+            int minimum = Vertex.getMaxPathCount();
+            for (String conGraphStr : connectionGraphs) {
+                IConnectable conGraph = STRUCTURE.getConnectionMap().get(conGraphStr);
+                ChainElement ceFrom = vertexFrom.getChainElementWithContext(conGraphStr);
+                ChainElement ceTo = vertexTo.getChainElementWithContext(conGraphStr);
+                int distance = conGraph.getWeight(ceFrom.getPort(), ceTo.getPort());
+                if (distance < minimum) {
+                    minimum = distance;
+                }
+            }
+            return (minimum == Vertex.getMaxPathCount()) ? -1 : minimum;
+        }
+
+        private List<String> deikstra(Chain currentVertex, String pattern,
+                boolean doDelete) {
             BinaryHeap heap = HEAP_FAB.createBinaryHeap();
-            Chain currentVertex = STRUCTURE.getVertMap().get(vertexFrom);
             Chain lastVertex = null;
 
             currentVertex.setPathCount(0);
@@ -199,7 +237,7 @@ public class GlobalGraph implements IConnectable, ICopyable {
 
             Chain closestVertex;
             while ((closestVertex = (Chain) heap.getKeyOfMinValueElement()) != null) {
-                if(closestVertex.fitsPattern(pattern)) {
+                if (closestVertex.fitsPattern(pattern)) {
                     lastVertex = closestVertex;
                     break;
                 }
@@ -211,21 +249,31 @@ public class GlobalGraph implements IConnectable, ICopyable {
                         continue;
                     }
                     int weight = getDistanceBetween(closestVertex, vert)
-                            + (vert.getWeight() + closestVertex.getWeight())/2;
+                            + (vert.getWeight() + closestVertex.getWeight()) / 2;
                     if (vert.getPathCount() > (closestVertex.getPathCount() + weight)) {
                         vert.setPathCount(closestVertex.getPathCount() + weight);
                     }
                     heap.add(vert, vert.getPathCount());
                 }
             }
-            
-            if(lastVertex == null) {
-                List<String> errorList = new ArrayList<>();
-                errorList.add("Error");
-                return errorList;
+
+            if (lastVertex == null) {
+                return null;
             }
             List<String> keys = deikstraBackway(currentVertex, lastVertex, doDelete);
             return keys;
+        }
+
+        /**
+         * Main deikstra function, count minimum distance between VertexFrom and
+         * all other verteces.
+         *
+         * @param vertexFrom
+         */
+        private List<String> deikstra(String vertexFrom, String pattern,
+                boolean doDelete) throws HardFunctionalException {
+            Chain currentVertex = STRUCTURE.getVertMap().get(vertexFrom);
+            return deikstra(currentVertex, pattern, doDelete);
         }
 
         /**
@@ -243,21 +291,26 @@ public class GlobalGraph implements IConnectable, ICopyable {
             List<String> configPath = new ArrayList<>();
             vertecesToDeleteList.add(currentVertex);
 
-            while (!currentVertex.getContext().equals(vertexFrom.getContext())) {
+            while (!currentVertex.getSimplifiedName().equals(vertexFrom.getSimplifiedName())) {
                 List<Chain> closestVerteces = getCloseVerteces(currentVertex);
                 boolean nextStep = false;
                 for (Chain vert : closestVerteces) {
-                    Pair<IConnectable, Integer> bestWeight
+                    Pair<String, Integer> bestWeight
                             = getGraphWithMinimumDistance(currentVertex, vert);
                     // distance + weightFirst/2 + weightSecond/2
                     int weight = bestWeight.getSecondObject()
-                            + (vert.getWeight() + currentVertex.getWeight())/2;
+                            + (vert.getWeight() + currentVertex.getWeight()) / 2;
                     if ((currentVertex.getPathCount() - vert.getPathCount()) == weight) {
                         vertecesToDeleteList.add(vert);
-                        List<String> pathKeys = bestWeight.getFirstObject()
-                                .getConfigurationPath(currentVertex.getContext(),
-                                        vert.getContext(), doDelete);
                         
+                        IConnectable conGraph = STRUCTURE.getConnectionMap().get(bestWeight.getFirstObject());
+                        ChainElement ceFrom = currentVertex.getChainElementWithContext(bestWeight.getFirstObject());
+                        ChainElement ceTo = vert.getChainElementWithContext(bestWeight.getFirstObject());
+                        
+                        List<String> pathKeys = conGraph
+                                .getConfigurationPath(ceFrom.getPort(),
+                                        ceTo.getPort(), doDelete);
+
                         configPath.addAll(pathKeys); // add each key that we passed to configuration
                         currentVertex = vert;
                         nextStep = true;
@@ -271,7 +324,7 @@ public class GlobalGraph implements IConnectable, ICopyable {
                     throw new HardFunctionalException("Deikstra method failed");
                     //return null;
                 }
-            } 
+            }
 
             if (doDelete) {
                 deleteVerteces(vertecesToDeleteList);
@@ -283,7 +336,6 @@ public class GlobalGraph implements IConnectable, ICopyable {
          * Just reset after any action, reset isChanged flag too.
          */
         private void resetPathes() {
-            //chain
             Collection<Chain> vertColl = STRUCTURE.getVertMap().values();
             for (Vertex vert : vertColl) {
                 vert.setVisited(false);
@@ -308,11 +360,12 @@ public class GlobalGraph implements IConnectable, ICopyable {
          * @param main
          * @return
          */
-        private List<Chain> getCloseVerteces(Vertex main) throws HardFunctionalException {
+        private List<Chain> getCloseVerteces(Chain main) throws HardFunctionalException {
             if (main == null) {
                 throw new HardFunctionalException("Null vertex input");
             }
-            List<String> vertexStringList = STRUCTURE.getAdjacencyMap().get(main.getContext());
+            List<String> vertexStringList = 
+                    STRUCTURE.getAdjacencyMap().get(main.getSimplifiedName());
             //chain
             Map<String, Chain> vertMap = STRUCTURE.getVertMap();
             List<Chain> vertexAjacencyList = new ArrayList<>();

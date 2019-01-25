@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,7 +55,7 @@ import javax.swing.JOptionPane;
 public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     private static FilterDesignWindowUIFrame theDialog;
-    
+
     private final String[] filterNamesList = new String[3];
     private final List<BuildFilters> objectConfigFiltersAutosave = new ArrayList<>();
 
@@ -76,7 +75,8 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     /**
      * This method return status enable.
-     * @return 
+     *
+     * @return
      */
     public boolean getEnableStatus() {
         //REV: enable что?
@@ -161,7 +161,6 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
      * This method checks for the presence of a file with the same name. return
      * fase - save file return truen - not save
      */
-
     private boolean serchAddressName(String name) throws IOException {
         File dir = new File(LinksHolder.getPathFiltetrs());
         String[] thisName;
@@ -253,7 +252,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     private void formCmdRequestForPython() {
         if (EllipticRadioButton.isSelected()) {
             System.out.println("Filter design process started.");
-            String path = "FilterScripts/FilterDesign.py"; /// ВОПРОС к Диме
+            String path = "FilterDesign.py";
             String order = ellipticOrderTextField.getText();
             String rp = ellipticMaximumRippleTextField.getText();
             String rs = ellipticMinimumAttenuationTextField.getText();
@@ -262,7 +261,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             String[] cmd = {"python", path, order, rp, rs, Wn, fType};
             System.out.println(Arrays.toString(cmd));
             ProcessBuilder pb = new ProcessBuilder(cmd);
-            String s = Paths.get(".").toAbsolutePath().normalize().toString();
+            String s = LinksHolder.getFilterPath();
             pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             //System.out.println(s);
             File file = new File(s);
@@ -1033,7 +1032,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             List<String> config = readFileConfigFilters();
             Map<String, String> exportConfigFilters = exportConfigFiltersInFile();
             String nameFilters = formNameFileHistory(exportConfigFilters);
-            setHistoruList(nameFilters, exportConfigFilters, config);
+            setHistoryList(nameFilters, exportConfigFilters, config);
         } catch (Exception e) {
             e.printStackTrace();
             Accessory.showMessage("Image is not forming properly");
@@ -1058,7 +1057,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             readFileSaveConfigFilters = deserializeFilterObject(addressImportFile);
             addressImportFile = addressImportFile.replace("\\", "/");
             String[] nameAddress = addressImportFile.split("/");
-            setHistoruList(nameAddress[nameAddress.length - 1], readFileSaveConfigFilters.getInfo(), readFileSaveConfigFilters.getConfig());
+            setHistoryList(nameAddress[nameAddress.length - 1], readFileSaveConfigFilters.getInfo(), readFileSaveConfigFilters.getConfig());
             writeFileConfigFilters(readFileSaveConfigFilters.getConfig());
             setParam(readFileSaveConfigFilters.getInfo(), readFileSaveConfigFilters.getImage());
 
@@ -1078,7 +1077,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
         Map<String, String> exportConfigFilters = exportConfigFiltersInFile();
         try {
             if (!serchAddressName(adresSave)) {
-                serializeFilterObject(adresSave, "./filterDesignResult.png", exportConfigFilters, config);
+                serializeFilterObject(adresSave, LinksHolder.getPathToFilterImage(), exportConfigFilters, config);
                 JOptionPane.showMessageDialog(null, "File saved.");
             } else {
                 JOptionPane.showMessageDialog(null, "File not saved.");
@@ -1092,7 +1091,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     /*
     * This method set historu list.
      */
-    private void setHistoruList(String nameFilters, Map<String, String> exportConfigFilters, List<String> config) {
+    private void setHistoryList(String nameFilters, Map<String, String> exportConfigFilters, List<String> config) {
         boolean flag = true;
         if (objectConfigFiltersAutosave.size() != 0) {
             for (BuildFilters object : objectConfigFiltersAutosave) {
@@ -1103,7 +1102,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
             }
         }
         if (flag) {
-            setListHistoruName(nameFilters);
+            setListHistoryName(nameFilters);
             SerializableImageWithTextObject objectFilters = new SerializableImageWithTextObject("filterDesignResult.png", exportConfigFilters, config);
             objectConfigFiltersAutosave.add(0, new BuildFilters(nameFilters, objectFilters));
             historyList.setListData(filterNamesList);
@@ -1146,6 +1145,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
 
     /**
      * Invoke frame.
+     *
      * @throws java.lang.InterruptedException
      * @throws java.lang.reflect.InvocationTargetException
      */
@@ -1164,7 +1164,7 @@ public class FilterDesignWindowUIFrame extends EModelessDialog {
     /*
      * This method form hisory list.
      */
-    public void setListHistoruName(String name) {
+    public void setListHistoryName(String name) {
         filterNamesList[2] = filterNamesList[1];
         filterNamesList[1] = filterNamesList[0];
         filterNamesList[0] = name;
