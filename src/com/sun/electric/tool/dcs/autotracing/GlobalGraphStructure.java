@@ -154,7 +154,7 @@ public final class GlobalGraphStructure extends AbstractGraphStructure {
             //this function is adjacency+edges, other way it should be findAny instead of collect.
             List<ChainElement> intersectionsList = connectionsList.stream()
                     .filter((elem) -> {
-                        return otherConnectionList.stream().anyMatch(elem::isConnectedTo);
+                        return otherConnectionList.stream().anyMatch(elem::isSameBlock);
                     })
                     .collect(Collectors.toList());
             if (!intersectionsList.isEmpty()) {

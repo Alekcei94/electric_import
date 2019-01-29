@@ -5,6 +5,8 @@
  */
 package com.sun.electric.tool.dcs.autotracing.Interfaces;
 
+import com.sun.electric.tool.dcs.Data.BlockMap;
+import com.sun.electric.tool.dcs.Exceptions.NoPathFoundException;
 import java.util.List;
 
 /**
@@ -12,8 +14,8 @@ import java.util.List;
  */
 public interface ITraceable {
     
-    public List<String> getConfigurationPath(String vertexFrom, String pattern,
-            boolean doDelete);
+    public List<String> getConfigurationPath(BlockMap.BlockPattern vertexFrom,
+            BlockMap.BlockPattern pattern, boolean doDelete) throws NoPathFoundException;
     
     public String getName();
 }

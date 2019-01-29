@@ -20,11 +20,12 @@
 package com.sun.electric.tool.dcs.autotracing;
 
 import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.Data.BlockMap.BlockPattern;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Exceptions.HardFunctionalException;
+import com.sun.electric.tool.dcs.Exceptions.NoPathFoundException;
 import com.sun.electric.tool.dcs.SpecificStructures.ImmutableUnorderedPairOfStrings;
 import com.sun.electric.tool.dcs.SpecificStructures.Pair;
-import com.sun.electric.tool.dcs.autotracing.Chain.ChainElement;
 import com.sun.electric.tool.dcs.autotracing.Interfaces.IConnectable;
 import com.sun.electric.tool.dcs.autotracing.Interfaces.ICopyable;
 import com.sun.electric.tool.dcs.autotracing.Interfaces.ITraceable;
@@ -102,12 +103,13 @@ public class GlobalGraph implements ITraceable, ICopyable {
      * @param pattern
      * @param doDelete
      * @return list of keys or null if path is not found.
+     * @throws com.sun.electric.tool.dcs.Exceptions.NoPathFoundException
      */
     @Override
-    public List<String> getConfigurationPath(String vertexFrom, String pattern,
-            boolean doDelete) {
-        //Chain chain = getChainFromPattern(vertexFrom); ???
-        Chain chain = STRUCTURE.getVertMap().get(vertexFrom);
+    public List<String> getConfigurationPath(BlockPattern vertexFrom, BlockPattern pattern,
+            boolean doDelete)throws NoPathFoundException  {
+        Chain chain = getChainFromPattern(vertexFrom);
+        //Chain chain = STRUCTURE.getVertMap().get(vertexFrom); ???
         if (chain == null) {
             throw new AssertionError("Chain with name " + vertexFrom + " is not found.");
         }
@@ -130,15 +132,16 @@ public class GlobalGraph implements ITraceable, ICopyable {
      * @param vertex
      * @return
      */
-    private Chain getChainFromPattern(String vertex) {
+    private Chain getChainFromPattern(BlockPattern pattern) {
         Map<String, Chain> map = STRUCTURE.getVertMap();
-        Accessory.writeToLog(vertex);
-        for (String str : map.keySet()) {
-            if (str.contains(vertex)) {
-                return map.get(str);
+        //Accessory.writeToLog(vertex);
+        for (Chain chain : map.values()) {
+            if(!chain.isDeleted() && chain.fitsPattern(pattern)) {
+                return chain;
             }
         }
-        throw new HardFunctionalException("Pattern isn't found in structure");
+        throw new HardFunctionalException("Pattern " + pattern.toString()
+                + " isn't found in structure");
     }
 
     /**
@@ -180,17 +183,21 @@ public class GlobalGraph implements ITraceable, ICopyable {
          * @param VertexTo
          * @return minimum distance or -1 if way was not found
          */
-        private Pair<String, Integer> getGraphWithMinimumDistance(Chain vertexFrom, Chain vertexTo) {
+        private Pair<String, Integer> getGraphWithMinimumDistance(Chain vertexFrom, Chain vertexTo) throws NoPathFoundException {
             ImmutableUnorderedPairOfStrings pair
                     = new ImmutableUnorderedPairOfStrings(vertexFrom.getSimplifiedName(), vertexTo.getSimplifiedName());
             LinkedList<String> connectionGraphs = STRUCTURE.getEdgeMap().get(pair);
+            if(connectionGraphs == null) {
+                throw new HardFunctionalException("Broken structure for chains: "
+                        + vertexFrom.getSimplifiedName() + " and "
+                        + vertexTo.getSimplifiedName());
+            }
             int minimum = Vertex.getMaxPathCount();
             String best = null;
             for (String conGraphStr : connectionGraphs) {
                 IConnectable conGraph = STRUCTURE.getConnectionMap().get(conGraphStr);
-                ChainElement ceFrom = vertexFrom.getChainElementWithContext(conGraphStr);
-                ChainElement ceTo = vertexTo.getChainElementWithContext(conGraphStr);
-                int distance = conGraph.getWeight(ceFrom.getPort(), ceTo.getPort());
+                int distance = conGraph.getWeight(vertexFrom.getPortOfChainElement(conGraphStr),
+                        vertexTo.getPortOfChainElement(conGraphStr));
                 if (distance < minimum) {
                     minimum = distance;
                     best = conGraphStr;
@@ -199,7 +206,9 @@ public class GlobalGraph implements ITraceable, ICopyable {
             if (best == null) {
                 throw new HardFunctionalException("Null in minimum distance.");
             }
-            //TODO: check for non-existance of path
+            if(minimum == Vertex.getMaxPathCount()) {
+                throw new NoPathFoundException("No path in local graph");
+            }
             return new Pair<>(best, minimum);
         }
 
@@ -217,9 +226,8 @@ public class GlobalGraph implements ITraceable, ICopyable {
             int minimum = Vertex.getMaxPathCount();
             for (String conGraphStr : connectionGraphs) {
                 IConnectable conGraph = STRUCTURE.getConnectionMap().get(conGraphStr);
-                ChainElement ceFrom = vertexFrom.getChainElementWithContext(conGraphStr);
-                ChainElement ceTo = vertexTo.getChainElementWithContext(conGraphStr);
-                int distance = conGraph.getWeight(ceFrom.getPort(), ceTo.getPort());
+                int distance = conGraph.getWeight(vertexFrom.getPortOfChainElement(conGraphStr),
+                        vertexTo.getPortOfChainElement(conGraphStr));
                 if (distance < minimum) {
                     minimum = distance;
                 }
@@ -227,8 +235,8 @@ public class GlobalGraph implements ITraceable, ICopyable {
             return (minimum == Vertex.getMaxPathCount()) ? -1 : minimum;
         }
 
-        private List<String> deikstra(Chain currentVertex, String pattern,
-                boolean doDelete) {
+        private List<String> deikstra(Chain currentVertex, BlockPattern pattern,
+                boolean doDelete) throws NoPathFoundException {
             BinaryHeap heap = HEAP_FAB.createBinaryHeap();
             Chain lastVertex = null;
 
@@ -265,18 +273,6 @@ public class GlobalGraph implements ITraceable, ICopyable {
         }
 
         /**
-         * Main deikstra function, count minimum distance between VertexFrom and
-         * all other verteces.
-         *
-         * @param vertexFrom
-         */
-        private List<String> deikstra(String vertexFrom, String pattern,
-                boolean doDelete) throws HardFunctionalException {
-            Chain currentVertex = STRUCTURE.getVertMap().get(vertexFrom);
-            return deikstra(currentVertex, pattern, doDelete);
-        }
-
-        /**
          * Method to count distance between 2 specific verteces. Works only
          * inside main deikstra method.
          *
@@ -284,7 +280,7 @@ public class GlobalGraph implements ITraceable, ICopyable {
          * @param VertexTo
          */
         private List<String> deikstraBackway(Chain vertexFrom,
-                Chain VertexTo, boolean doDelete) throws HardFunctionalException {
+                Chain VertexTo, boolean doDelete) throws HardFunctionalException, NoPathFoundException {
             Chain currentVertex = VertexTo;
 
             List<Vertex> vertecesToDeleteList = new ArrayList<>();
@@ -303,13 +299,10 @@ public class GlobalGraph implements ITraceable, ICopyable {
                     if ((currentVertex.getPathCount() - vert.getPathCount()) == weight) {
                         vertecesToDeleteList.add(vert);
                         
-                        IConnectable conGraph = STRUCTURE.getConnectionMap().get(bestWeight.getFirstObject());
-                        ChainElement ceFrom = currentVertex.getChainElementWithContext(bestWeight.getFirstObject());
-                        ChainElement ceTo = vert.getChainElementWithContext(bestWeight.getFirstObject());
-                        
+                        IConnectable conGraph = STRUCTURE.getConnectionMap().get(bestWeight.getFirstObject());                       
                         List<String> pathKeys = conGraph
-                                .getConfigurationPath(ceFrom.getPort(),
-                                        ceTo.getPort(), doDelete);
+                                .getConfigurationPath(currentVertex.getPortOfChainElement(bestWeight.getFirstObject()),
+                                        vert.getPortOfChainElement(bestWeight.getFirstObject()), doDelete);
 
                         configPath.addAll(pathKeys); // add each key that we passed to configuration
                         currentVertex = vert;

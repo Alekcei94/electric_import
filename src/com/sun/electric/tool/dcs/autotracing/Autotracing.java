@@ -79,10 +79,16 @@ public class Autotracing {
             init();
         }
 
+        /**
+         * Method to create queue with all traces in current cell.
+         * @return
+         * @throws FunctionalException 
+         */
         private Queue<Pair<PortInst, PortInst>> createQueue() throws FunctionalException {
             Queue<Pair<PortInst, PortInst>> queue = new ArrayDeque();
             Set<NodeInst> usedNodeInstSet = new HashSet<>();
             NodeInst startingNode = getStartingNodeInst(niList);
+            
             Queue<NodeInst> nodeQueue = new ArrayDeque<>();
             
             usedNodeInstSet.add(startingNode);

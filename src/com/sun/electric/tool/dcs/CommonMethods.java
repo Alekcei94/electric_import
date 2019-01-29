@@ -88,6 +88,8 @@ public class CommonMethods {
     
     /**
      * Method to get ONE parameter of nodeInst if there are no more parameters
+     * @param ni
+     * @return 
      */
     public static String getOnlyParamOfNodeInst(NodeInst ni) {
         ArrayList<String> paramList = new ArrayList<>();
@@ -105,6 +107,10 @@ public class CommonMethods {
     /**
      * Method to get ONE object from any iterator if there are no more objects
      * there.
+     * @param <A>
+     * @param <B>
+     * @param iterator
+     * @return 
      */
     public static <A, B extends Iterator<A>> A getOnlyIteratorObject(B iterator) {
         A object = null;
