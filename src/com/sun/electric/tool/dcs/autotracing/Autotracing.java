@@ -26,6 +26,7 @@ import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.dcs.Accessory;
+import com.sun.electric.tool.dcs.CommonMethods;
 import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Exceptions.FunctionalException;
 import com.sun.electric.tool.dcs.SpecificStructures.Pair;
@@ -51,7 +52,7 @@ public class Autotracing {
 
     }
 
-    public void testStructure() {
+    public void invokeAutotracing() {
         AutotracingStructure struct = new AutotracingStructure();
         try {
             Queue<Pair<PortInst, PortInst>> queue = struct.createQueue();
@@ -59,7 +60,7 @@ public class Autotracing {
                 System.out.println("first: " + pair.getFirstObject().toString());
                 System.out.println("second: " + pair.getSecondObject().toString());
             }
-        } catch(FunctionalException fe) {
+        } catch (FunctionalException fe) {
             Accessory.showMessage(fe.getMessage());
             return;
         }
@@ -71,26 +72,31 @@ public class Autotracing {
         private final Cell cell = Job.getUserInterface().getCurrentCell();
         private final Netlist netlist = cell.getNetlist();
 
-        private final List<NodeInst> niList = new ArrayList<>();
+        private final List<NodeInst> inputList = new ArrayList<>();
+        private final List<NodeInst> outputList = new ArrayList<>();
+        private final List<NodeInst> clockList = new ArrayList<>();
+        private final List<NodeInst> blockList = new ArrayList<>();
+
         // map that matches list of connected ports to the current port.toString()
         private final Map<String, List<PortInst>> connectionMap = new HashMap<>();
 
         private AutotracingStructure() {
             init();
         }
-
+        
         /**
          * Method to create queue with all traces in current cell.
+         *
          * @return
-         * @throws FunctionalException 
+         * @throws FunctionalException
          */
         private Queue<Pair<PortInst, PortInst>> createQueue() throws FunctionalException {
             Queue<Pair<PortInst, PortInst>> queue = new ArrayDeque();
             Set<NodeInst> usedNodeInstSet = new HashSet<>();
-            NodeInst startingNode = getStartingNodeInst(niList);
-            
+            NodeInst startingNode = getStartingNodeInst(blockList);
+
             Queue<NodeInst> nodeQueue = new ArrayDeque<>();
-            
+
             usedNodeInstSet.add(startingNode);
             nodeQueue.add(startingNode);
             NodeInst current;
@@ -100,9 +106,9 @@ public class Autotracing {
                     List<PortInst> connectedPorts = getClosestPortInsts(port);
                     for (PortInst conPort : connectedPorts) {
                         if (!usedNodeInstSet.contains(conPort.getNodeInst())) {
+                            usedNodeInstSet.add(conPort.getNodeInst());
                             queue.add(new Pair<>(port, conPort));
                             nodeQueue.add(conPort.getNodeInst());
-                            usedNodeInstSet.add(conPort.getNodeInst());
                         }
                     }
                 }
@@ -111,16 +117,108 @@ public class Autotracing {
         }
 
         /**
+         * Method to fill .tcl file using this autotracing structure.
+         *
+         * @param file
+         */
+        private StringBuilder getTclStructure() {
+            //set input
+            StringBuilder str = new StringBuilder("set xc_input { ");
+            for (NodeInst block : inputList) {
+                str.append(block.getName()).append(" ");
+            }
+            str.append("}\n\n");
+            //set output
+            str = new StringBuilder("set xc_output { ");
+            for (NodeInst block : outputList) {
+                str.append(block.getName()).append(" ");
+            }
+            str.append("}\n\n");
+            //set clock
+            str = new StringBuilder("set xc_clock { ");
+            for (NodeInst block : clockList) {
+                str.append(block.getName()).append(" ");
+            }
+            str.append("}\n\n");
+            //#INPUT IOs
+            for(NodeInst block : inputList) {
+                str.append("xc_inst ").append(block.getName()).append(" xa_ib ")
+                        .append(" {");
+                str.append(block.getName()).append(" ");
+                for(PortInst port : getPortsOfNodeInst(block)) {
+                    str.append(netlist.getNetwork(port).getName()).append(" ");
+                }
+                str.append("} {inp_io=1}\n");
+            }
+            str.append("\n");
+            //#OUTPUT IOs
+            for(NodeInst block : outputList) {
+                str.append("xc_inst ").append(block.getName()).append(" xa_ob ")
+                        .append(" {");
+                for(PortInst port : getPortsOfNodeInst(block)) {
+                    str.append(netlist.getNetwork(port).getName()).append(" ");
+                }
+                str.append(block.getName());
+                str.append("} {out_io=1}\n");
+            }
+            str.append("\n");
+            //#CLOCK IOs
+            for(NodeInst block : outputList) {
+                str.append("xc_inst ").append(block.getName()).append(" xa_ob ")
+                        .append(" {");
+                str.append(block.getName()).append(" ");
+                for(PortInst port : getPortsOfNodeInst(block)) {
+                    str.append(netlist.getNetwork(port).getName()).append(" ");
+                }
+                str.append("} {out_io=1}\n");
+            }
+            str.append("\n");
+            //#LUTs
+            for(NodeInst block : blockList) {
+                str.append("xc_inst ").append(block.getName()).append(" ")
+                        .append(block.getProto().getName()).append(" ")
+                        .append(" { ");
+                for(PortInst port : getPortsOfNodeInst(block)) {
+                    String portName = CommonMethods.getOnlyIteratorObject(port.getExports()).getName();
+                    str.append(portName).append("=").append(netlist.getNetwork(port).getName());
+                }
+                str.append("\n");
+            }
+            return str;
+        }
+
+        /**
          * Initialize general structures.
          */
         private void init() {
-            // fill niList
+            // fill blockList
             Iterator<NodeInst> niItr = cell.getNodes();
             while (niItr.hasNext()) {
-                niList.add(niItr.next());
+                NodeInst next = niItr.next();
+                if (next.getProto().getName().contains("input")) {
+                    inputList.add(next);
+                } else if (next.getProto().getName().contains("output")) {
+                    outputList.add(next);
+                } else if (next.getProto().getName().contains("clock")) {
+                   clockList.add(next);
+                } else {
+                    blockList.add(niItr.next());
+                }
             }
             // fill connectionMap
-            for (NodeInst ni : niList) {
+            fillConnectionMap(blockList);
+            fillConnectionMap(inputList);
+            fillConnectionMap(outputList);
+        }
+
+        /**
+         * Method to analyse all ports of nodeInsts from list. Added all links
+         * to connectionMap.
+         *
+         * @param list
+         */
+        private void fillConnectionMap(List<NodeInst> list) {
+            for (NodeInst ni : list) {
                 Iterator<PortInst> piItr = ni.getPortInsts();
                 while (piItr.hasNext()) {
                     PortInst pi = piItr.next();
@@ -130,18 +228,18 @@ public class Autotracing {
         }
 
         /**
-         * Method to get initial nodeInst, we can choose any of them but
-         * it's more preferable to start
+         * Method to get initial nodeInst, we can choose any of them but it's
+         * more preferable to start
+         *
          * @param nodeList
          * @return
-         * @throws FunctionalException 
+         * @throws FunctionalException
          */
         private NodeInst getStartingNodeInst(List<NodeInst> nodeList) throws FunctionalException {
             String[] possibleStartingNodeInsts = Constants.getPossibleStartingNodeInsts();
             for (NodeInst ni : nodeList) {
                 for (String startingNode : possibleStartingNodeInsts) {
-                    System.out.println(ni.getName());
-                    if (ni.toString().contains(startingNode)) {
+                    if (ni.getProto().getName().equals(startingNode)) {
                         return ni;
                     }
                 }
@@ -172,16 +270,16 @@ public class Autotracing {
          */
         private List<PortInst> getClosestPortInsts(PortInst pi) {
             Network network = netlist.getNetwork(pi);
-            if(network == null) {
+            if (network == null) {
                 return new ArrayList<>();
             }
             List<PortInst> portList = network.getPortsList();
-            
+
             Iterator<PortInst> portItr = portList.iterator();
-            while(portItr.hasNext()) {
+            while (portItr.hasNext()) {
                 PortInst port = portItr.next();
-                for(String str : Constants.getAvailableInvisibleNodeInstsInScheme()) {
-                    if(port.toString().contains(str)) {
+                for (String str : Constants.getAvailableInvisibleNodeInstsInScheme()) {
+                    if (port.toString().contains(str)) {
                         portItr.remove();
                     }
                 }

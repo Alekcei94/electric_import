@@ -1123,7 +1123,7 @@ public class ToolMenu {
                         new EMenuItem("TryAutotracing") {
                     public void run() {
                         Autotracing auto = new Autotracing();
-                        auto.testStructure();
+                        auto.invokeAutotracing();
                     }
                 }),
                 MenuCommands.makeExtraMenu("pcell.gui.MainMenu", false),

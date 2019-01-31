@@ -159,24 +159,6 @@ public class GlobalGraph implements ITraceable, ICopyable {
     private class Deikstra {
 
         /**
-         * Method to get distance to vertex after deikstra method. Be careful to
-         * reset pathes after getting result.
-         *
-         * @param vertexTo
-         * @return
-         */
-        private int getDistanceTo(String vertexTo) throws HardFunctionalException {
-            if (vertexTo == null) {
-                throw new HardFunctionalException("Null in Deikstra's getDistance method");
-            }
-            Vertex vert = STRUCTURE.getVertMap().get(vertexTo);
-            if (vert.getPathCount() == Vertex.getMaxPathCount()) {
-                throw new AssertionError("Algorithm failed");
-            }
-            return vert.getPathCount();
-        }
-
-        /**
          * Method to get minimum distance between two verteces.
          *
          * @param vertexFrom
@@ -269,6 +251,7 @@ public class GlobalGraph implements ITraceable, ICopyable {
                 return null;
             }
             List<String> keys = deikstraBackway(currentVertex, lastVertex, doDelete);
+            resetPathes();
             return keys;
         }
 
@@ -366,10 +349,6 @@ public class GlobalGraph implements ITraceable, ICopyable {
                 vertexAjacencyList.add(vertMap.get(vertexString));
             }
             return vertexAjacencyList;
-        }
-
-        private List<Chain> getCloseVerteces(String mainName) throws HardFunctionalException {
-            return getCloseVerteces(STRUCTURE.getVertMap().get(mainName));
         }
     }
 
