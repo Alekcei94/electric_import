@@ -72,6 +72,7 @@ import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
 import com.sun.electric.tool.dcs.Design.FpgaArgumentsUI;
 import com.sun.electric.tool.dcs.Scripts.ExportKeys;
+import com.sun.electric.tool.dcs.Scripts.ImportKeysTest;
 import com.sun.electric.tool.dcs.autotracing.Autotracing;
 import com.sun.electric.tool.dcs.autotracing.AutotracingTest;
 import com.sun.electric.tool.drc.AssuraDrcErrors;
@@ -1120,6 +1121,7 @@ public class ToolMenu {
                         AutotracingTest autoTest = new AutotracingTest();
                     }
                 },
+                       
                         new EMenuItem("TryAutotracing") {
                     public void run() {
                         Autotracing auto = new Autotracing();
@@ -1146,6 +1148,12 @@ public class ToolMenu {
                         Cell mainCell = Job.getUserInterface().getCurrentCell();
                         ExportKeys.getContructionDigitalConfigExport(mainCell,
                                FPGAnodeInstName);*/
+                    }
+                },
+                         new EMenuItem("meTest") {
+                    public void run() {
+                        ImportKeysTest importTest = ImportKeysTest.getImportKeysTest();
+                        importTest.mainFunction();
                     }
                 },
                         new EMenuItem("Filter UI") {
