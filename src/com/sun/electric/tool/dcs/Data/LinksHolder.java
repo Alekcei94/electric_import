@@ -41,6 +41,11 @@ public final class LinksHolder {
 
     ///////////////////////////////////////////////////////////////////////////
     /**
+     * Path to MAP.
+     */
+    private static final String MAP_PATH = "./MAP";
+
+    /**
      * Path to CB graph in .trc file.
      */
     private static final String CB_PATH = "./autotracing/CBGraph.trc";
@@ -66,24 +71,26 @@ public final class LinksHolder {
      */
     private static final String FILTER_CONFIG = "./FilterScripts/filterDesign.txt";
 
-    private static final String PATH_TO_FILTER_IMAGE =
-            "./FilterScripts/filterDesignResult.png";
+    private static final String PATH_TO_FILTER_IMAGE
+            = "./FilterScripts/filterDesignResult.png";
 
     private static final String FILTER_PATH = "./FilterScripts";
-    /*
+
+    /**
      * Path to file all used block in scheme.
      */
-    private static final String PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME =
-            "./accessory/allUsedBlocks.acc";
-    /*
+    private static final String PATH_FILE_ALL_USED_BLOCKS_IN_SCHEME
+            = "./accessory/allUsedBlocks.acc";
+    /**
      * Path in file config FPGA.
      */
-    private static final String PATH_FILE_CONFIG_FPGA_BLOCK =
-            "../Projects/5400TP094/simulation/Verilog.bitnum";
-    /*
+    private static final String PATH_FILE_CONFIG_FPGA_BLOCK
+            = "../Projects/5400TP094/simulation/Verilog.bitnum";
+    /**
      *
      */
     private static final String PATH_FILTERS = "../config/Filters/";
+
     /**
      * Path to electric folder (.../electric/).
      */
@@ -113,6 +120,10 @@ public final class LinksHolder {
 
     public static String getPathInFileConfigFPGABlock() {
         return PATH_FILE_CONFIG_FPGA_BLOCK;
+    }
+
+    public static String getPathInDirectoryMAP() {
+        return MAP_PATH;
     }
 
     public static String getPathFileAllUsedBlocksInScheme() {

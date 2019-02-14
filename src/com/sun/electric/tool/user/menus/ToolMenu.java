@@ -1153,7 +1153,7 @@ public class ToolMenu {
                          new EMenuItem("meTest") {
                     public void run() {
                         ImportKeysTest importTest = ImportKeysTest.getImportKeysTest();
-                        importTest.mainFunction();
+                        importTest.importFunction();
                     }
                 },
                         new EMenuItem("Filter UI") {
