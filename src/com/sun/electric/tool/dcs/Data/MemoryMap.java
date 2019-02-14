@@ -77,7 +77,6 @@ public class MemoryMap {
      */
     private void buildMemoryFile(Path path) {
         MemoryFile mf = new MemoryFile(path.getFileName().toString());
-        //System.out.println(mf.getName());
         try (InputStream in = Files.newInputStream(path)) {
             try (BufferedReader reader
                     = new BufferedReader(new InputStreamReader(in))) {
@@ -87,8 +86,6 @@ public class MemoryMap {
                     String trueAddress = split[0];
                     String internalAddress = split[1];
                     mf.addDependency(internalAddress, trueAddress);
-                    //System.out.println(internalAddress);
-                    //System.out.println(trueAddress);
                 }
             }
         } catch(IOException ioe) {

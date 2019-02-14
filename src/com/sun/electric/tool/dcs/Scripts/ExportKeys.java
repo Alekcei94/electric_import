@@ -28,12 +28,9 @@ import com.sun.electric.database.topology.NodeInst;
 import com.sun.electric.database.topology.PortInst;
 import com.sun.electric.database.variable.Variable;
 import com.sun.electric.tool.Job;
-import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.CommonMethods;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import com.sun.electric.tool.dcs.Data.Constants;
 import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.Design.FilterDesignWindowUIFrame;
@@ -42,6 +39,9 @@ import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import com.sun.electric.tool.user.User;
 import com.sun.electric.tool.user.dialogs.ExecDialog;
 import com.sun.electric.tool.user.ui.TopLevel;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -308,6 +308,7 @@ public class ExportKeys {
                     Export outExport = CommonMethods.getOnlyIteratorObject(outPort.getExports());
                     PortInst outsidePort = ni.findPortInstFromEquivalentProto(outExport);
 
+                    //TODO: убрать hardcode mAd.
                     if (!CommonMethods.parsePortToPort(outsidePort.toString()).equals("mAd"
                             + CommonMethods.getOnlyParamOfNodeInst(key) + "_1")) {
                         throw new InvalidStructureError("Incorrect block map");
