@@ -250,8 +250,9 @@ public class ExportKeys {
                     String address = getConfigForKey(key, ni) + "\n";
                     return address;
                 } else if (param.toString().contains("uniq")) {
-                    String address = MemoryMap.getInstance().getTrueAddress(param.getObject().toString(),
-                            CommonMethods.getOnlyParamOfNodeInst(key));
+                    /*String address = MemoryMap.getInstance().getTrueAddress(param.getObject().toString(),
+                            CommonMethods.getOnlyParamOfNodeInst(key));*/
+                    String address = "Not true";
                     if (address == null) {
                         throw new InvalidStructureError("Local address is not correct: "
                                 + param + "/" + CommonMethods.getOnlyParamOfNodeInst(key));

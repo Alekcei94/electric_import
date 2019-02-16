@@ -19,6 +19,13 @@
  */
 package com.sun.electric.tool.dcs.Data;
 
+import com.sun.electric.database.geometry.btree.unboxed.Pair;
+import com.sun.electric.database.hierarchy.Cell;
+import com.sun.electric.database.topology.NodeInst;
+import com.sun.electric.database.topology.PortInst;
+import com.sun.electric.database.variable.Variable;
+import com.sun.electric.tool.Job;
+import com.sun.electric.tool.dcs.Accessory;
 import com.sun.electric.tool.dcs.Exceptions.InvalidStructureError;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Class holds all data related to memory addresses.
@@ -35,8 +43,10 @@ import java.util.HashMap;
 public class MemoryMap {
 
     private static MemoryMap memoryMap;
-
-    private final HashMap<String, MemoryFile> nameToMemoryAddressMap = new HashMap<>();
+    /**
+     * HashMap<parameter, Pair<import, export>>
+     */
+    private final HashMap<String, Pair<MemoryFile, MemoryFile>> nameToMemoryAddressMap = new HashMap<>();
 
     private MemoryMap() {
         buildMap(LinksHolder.getMemoryMapRoot());
@@ -48,10 +58,22 @@ public class MemoryMap {
         }
         return memoryMap;
     }
-    
-    public String getTrueAddress(String block, String internalAddress) {
-        MemoryFile mf = nameToMemoryAddressMap.get(block);
+
+    public String getTrueAddressExport(String parameter, String internalAddress) {
+        Pair<MemoryFile, MemoryFile> memoryMapImportAndExport = nameToMemoryAddressMap.get(parameter);
+        MemoryFile mf = memoryMapImportAndExport.getValue();
         return mf.getDependency(internalAddress);
+    }
+
+    public String getInternalAddressImport(String parameter, String trueAddress) {
+        Pair<MemoryFile, MemoryFile> memoryMapImportAndExport = nameToMemoryAddressMap.get(parameter);
+        if (memoryMapImportAndExport != null) {
+            MemoryFile mf = memoryMapImportAndExport.getKey();
+            return mf.getDependency(trueAddress);
+        } else {
+            System.out.println(" null ");
+            return null;
+        }
     }
 
     /**
@@ -62,6 +84,7 @@ public class MemoryMap {
             Files.walk(Paths.get(path))
                     .filter(Files::isRegularFile)
                     .forEach(this::buildMemoryFile);
+            formAGlobalHashMapInGAdrParameters();
         } catch (IOException ioe) {
             memoryMap = null;
             throw new InvalidStructureError("Your internal map files are corrupted. "
@@ -70,13 +93,15 @@ public class MemoryMap {
     }
 
     /**
-     * Method to get all files and transfer them into MemoryFile objects,
-     * add dependency as map(key=internalAddress, value=trueAddress).
+     * Method to get all files and transfer them into MemoryFile objects, add
+     * dependency as map(key=internalAddress, value=trueAddress).
+     *
      * @param path
-     * @throws IOException 
+     * @throws IOException
      */
     private void buildMemoryFile(Path path) {
-        MemoryFile mf = new MemoryFile(path.getFileName().toString());
+        MemoryFile mfi = new MemoryFile();
+        MemoryFile mfe = new MemoryFile();
         try (InputStream in = Files.newInputStream(path)) {
             try (BufferedReader reader
                     = new BufferedReader(new InputStreamReader(in))) {
@@ -85,14 +110,60 @@ public class MemoryMap {
                     String[] split = line.split(" ");
                     String trueAddress = split[0];
                     String internalAddress = split[1];
-                    mf.addDependency(internalAddress, trueAddress);
+                    mfe.addDependency(internalAddress, trueAddress);
+                    mfi.addDependency(trueAddress, internalAddress);
                 }
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             memoryMap = null;
             throw new InvalidStructureError("Map is corrupted");
         }
-        nameToMemoryAddressMap.put(mf.getName(), mf);
+        String nameFile = path.getFileName().toString();
+        String[] nameFileArray = nameFile.split(".txt");
+        nameToMemoryAddressMap.put(nameFileArray[0], new Pair<>(mfi, mfe));
+    }
+
+    /**
+     * Create a hashMap for blocks with gAdr parameters.
+     */
+    private void formAGlobalHashMapInGAdrParameters() {
+        Cell curcell = Job.getUserInterface().getCurrentCell();
+        MemoryFile mfi;
+        MemoryFile mfe;
+        if (curcell == null) {
+            //FIX: давай выкинем HardFunctionalException.
+            Accessory.showMessage("No schema selected.");
+            return;
+        }
+        Iterator<NodeInst> iteratorNodeInst = curcell.getNodes();
+        while (iteratorNodeInst.hasNext()) {
+            NodeInst nodeInstBlock = iteratorNodeInst.next();
+            Iterator<Variable> iteratorParameters = nodeInstBlock.getParameters();
+            while (iteratorParameters.hasNext()) {
+                Variable parameterNode = iteratorParameters.next();
+                if (parameterNode.toString().contains("gAdr")) {
+                    String parameterKey = parameterNode.getObject().toString();
+                    String nameParameters = parameterKey.substring(0, parameterKey.lastIndexOf("h"));
+                    mfi = new MemoryFile();
+                    mfe = new MemoryFile();
+                    Iterator<PortInst> itr = nodeInstBlock.getPortInsts();
+                    while (itr.hasNext()) {
+                        String nameKey = itr.next().toString();
+                        if ((nameKey.contains(ProjectConfiguration.getPinPatternHead())) && (nameKey.contains(ProjectConfiguration.getPinPatternTailFirst()))) {
+                            //It was mAd001_1
+                            String key = nameKey.substring(nameKey.lastIndexOf(ProjectConfiguration.getPinPatternHead())
+                                    + ProjectConfiguration.getPinPatternHead().length(),
+                                    nameKey.lastIndexOf(ProjectConfiguration.getPinPatternTailFirst()));
+                            //Has become 001
+                            String addressKey = nameParameters + key;
+                            mfi.addDependency(addressKey, key);
+                            mfe.addDependency(key, addressKey);
+                        }
+                    }
+                    nameToMemoryAddressMap.put(nameParameters, new Pair<>(mfi, mfe));
+                }
+            }
+        }
     }
 
     /**
@@ -103,15 +174,9 @@ public class MemoryMap {
      */
     private class MemoryFile {
 
-        private final String name;
         private final HashMap<String, String> dependencyMap = new HashMap<>();
 
-        private MemoryFile(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
+        private MemoryFile() {
         }
 
         private void addDependency(String internalAddress, String trueAddress) {
