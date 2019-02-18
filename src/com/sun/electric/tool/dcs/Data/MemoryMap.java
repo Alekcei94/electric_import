@@ -59,19 +59,25 @@ public class MemoryMap {
         return memoryMap;
     }
 
+    /*
+    * This method returns true address in block.
+    */
     public String getTrueAddressExport(String parameter, String internalAddress) {
         Pair<MemoryFile, MemoryFile> memoryMapImportAndExport = nameToMemoryAddressMap.get(parameter);
         MemoryFile mf = memoryMapImportAndExport.getValue();
         return mf.getDependency(internalAddress);
     }
 
+    /*
+    * This method returns internal address in block.
+    */
     public String getInternalAddressImport(String parameter, String trueAddress) {
         Pair<MemoryFile, MemoryFile> memoryMapImportAndExport = nameToMemoryAddressMap.get(parameter);
         if (memoryMapImportAndExport != null) {
             MemoryFile mf = memoryMapImportAndExport.getKey();
             return mf.getDependency(trueAddress);
         } else {
-            System.out.println(" null ");
+            //System.out.println(" null ");
             return null;
         }
     }
@@ -84,7 +90,7 @@ public class MemoryMap {
             Files.walk(Paths.get(path))
                     .filter(Files::isRegularFile)
                     .forEach(this::buildMemoryFile);
-            formAGlobalHashMapInGAdrParameters();
+            addsAGlobalHashMapInGAdrParameters();
         } catch (IOException ioe) {
             memoryMap = null;
             throw new InvalidStructureError("Your internal map files are corrupted. "
@@ -124,9 +130,9 @@ public class MemoryMap {
     }
 
     /**
-     * Create a hashMap for blocks with gAdr parameters.
+     * Adds blocks with gAdr parameters to the map.
      */
-    private void formAGlobalHashMapInGAdrParameters() {
+    private void addsAGlobalHashMapInGAdrParameters() {
         Cell curcell = Job.getUserInterface().getCurrentCell();
         MemoryFile mfi;
         MemoryFile mfe;

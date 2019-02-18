@@ -17,29 +17,18 @@ import com.sun.electric.technology.technologies.Generic;
 import com.sun.electric.tool.Job;
 import com.sun.electric.tool.JobException;
 import com.sun.electric.tool.dcs.Accessory;
-import com.sun.electric.tool.dcs.Data.LinksHolder;
 import com.sun.electric.tool.dcs.Data.MemoryMap;
 import com.sun.electric.tool.dcs.Data.ProjectConfiguration;
 import com.sun.electric.tool.dcs.InputFactory;
 import com.sun.electric.tool.user.User;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -47,13 +36,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class ImportKeysTest {
 
-    //FIX: нужна ли такая область видимости?
-    //FIX: должны ли они быть static?
-    /**
-     *
-     */
-    private static final HashMap<String, Pair<String, String>> uniqAddressMap = new HashMap<>();
-    private static final HashMap<String, Pair<String, String>> gAdrAddressMap = new HashMap<>();
+
     private static ImportKeysTest ImportKeysTest;
     private static final LinkedList<String> allLineConfig = new LinkedList<>();
 
@@ -80,8 +63,6 @@ public class ImportKeysTest {
         chooser.setAcceptAllFileFilterUsed(false);
 
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            //System.out.println("CurrentDirectory: " + chooser.getCurrentDirectory());
-            //System.out.println("SelectedFile: " + chooser.getSelectedFile());
             pathToFile = chooser.getSelectedFile().getAbsolutePath();
             if (!pathToFile.contains(".txt")) {
                 System.out.println("Wrong File ");
@@ -204,17 +185,16 @@ public class ImportKeysTest {
                 }
                 if ((firstPort != null) && (secondPort != null)) {
                     test.add(new com.sun.electric.tool.dcs.SpecificStructures.Pair<>(firstPort, secondPort));
-                    /*double size = 0.5;
+                    double size = 0.5;
                     ArcProto arc = Generic.tech().universal_arc;
-                    new CreateNewArc(arc, firstPort, secondPort, size);*/
-                    //setOfPortPairs.add(new com.sun.electric.tool.dcs.SpecificStructures.Pair<>(firstPort, secondPort));
+                    new CreateNewArc(arc, firstPort, secondPort, size);
                     break;
                 }
             }
         }
-        double size = 0.5;
+        /*double size = 0.5;
         ArcProto arc = Generic.tech().universal_arc;
-        new CreateLotsOfNewArcs(arc, test, size);
+        new CreateLotsOfNewArcs(arc, test, size);*/
     }
 
     /**
